@@ -2,8 +2,8 @@
 
 namespace Server
 {
-	public class Config
-	{
+    public class Config
+    {
         public static IEnumerable<IdentityResource> IdentityResources =>
             new[]
             {
@@ -47,14 +47,19 @@ namespace Server
                     ClientId = "interactive",
                     ClientSecrets = { new Secret("ClientSecret1".Sha256()) },
                     AllowedGrantTypes = GrantTypes.Code,
-                    RedirectUris = { "https://localhost:5444/signin-oidc" },
-                    FrontChannelLogoutUri = "https://localhost:5444/signout-oidc",
-                    PostLogoutRedirectUris = { "https://localhost:5444/signout-callback-oidc" },
+                    RedirectUris = {
+                        "https://localhost:4100/signin-oidc",
+                        "http://localhost:4100/signin-oidc",
+                        "http://localhost:4100/private"
+                    },
+                    FrontChannelLogoutUri = "http://localhost:4100/signout-oidc",
+                    PostLogoutRedirectUris = { "http://localhost:4100/signout-callback-oidc" },
                     AllowOfflineAccess = true,
                     AllowedScopes = { "openid", "profile", "CoffeeAPI.read" },
                     RequirePkce = true,
                     RequireConsent = true,
-                    AllowPlainTextPkce = false
+                    AllowPlainTextPkce = false,
+                    AccessTokenLifetime = 10
                 },
             };
     }

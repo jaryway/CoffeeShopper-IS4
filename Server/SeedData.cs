@@ -16,7 +16,7 @@ namespace Server
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddDbContext<AspNetIdentityDbContext>(
-                options => options.UseSqlServer(connectionString)
+                options => options.UseSqlite(connectionString)
             );
 
             services
@@ -28,7 +28,7 @@ namespace Server
                 options =>
                 {
                     options.ConfigureDbContext = db =>
-                        db.UseSqlServer(
+                        db.UseSqlite(
                             connectionString,
                             sql => sql.MigrationsAssembly(typeof(SeedData).Assembly.FullName)
                         );
@@ -38,7 +38,7 @@ namespace Server
                 options =>
                 {
                     options.ConfigureDbContext = db =>
-                        db.UseSqlServer(
+                        db.UseSqlite(
                             connectionString,
                             sql => sql.MigrationsAssembly(typeof(SeedData).Assembly.FullName)
                         );
@@ -48,15 +48,15 @@ namespace Server
             var serviceProvider = services.BuildServiceProvider();
 
             using var scope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            scope.ServiceProvider.GetService<PersistedGrantDbContext>().Database.Migrate();
+            scope.ServiceProvider.GetService<PersistedGrantDbContext>()!.Database.Migrate();
 
             var context = scope.ServiceProvider.GetService<ConfigurationDbContext>();
-            context.Database.Migrate();
+            context!.Database.Migrate();
 
             EnsureSeedData(context);
 
             var ctx = scope.ServiceProvider.GetService<AspNetIdentityDbContext>();
-            ctx.Database.Migrate();
+            ctx!.Database.Migrate();
             EnsureUsers(scope);
         }
 

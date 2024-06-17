@@ -15,6 +15,7 @@ namespace API.Services
 
         public async Task<List<CoffeeShopModel>> List()
         {
+            //dbContext.Set<>
             var coffeeShops = await (from shop in dbContext.CoffeeShops
                                      select new CoffeeShopModel()
                                      {

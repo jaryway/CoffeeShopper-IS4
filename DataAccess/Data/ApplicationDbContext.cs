@@ -8,12 +8,18 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Data
 {
-	public class ApplicationDbContext : DbContext
+	public partial class ApplicationDbContext : DbContext
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
 		{ }
 
 		public DbSet<CoffeeShop> CoffeeShops { get; set; }
-	}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            EntityTypeGenerator.RegisterEntities(modelBuilder);
+            base.OnModelCreating(modelBuilder);
+        }
+    }
 }
