@@ -110,7 +110,7 @@ namespace TestWeb.Controllers
             {
                 //_serviceProvider.GetService
                 //var context = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-                var serverVersion = new MySqlServerVersion(Version.Parse("8.4.0"));
+                var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
                 var builder = new DbContextOptionsBuilder<ApplicationDbContext>().UseMySql("server=localhost;uid=root;pwd=123456;database=test", serverVersion);
                 var context = new ApplicationDbContext(builder.Options);
                 //var migrationsScaffolder = GetMigrationsScaffolder(context);
@@ -130,10 +130,13 @@ namespace TestWeb.Controllers
                 //serviceCollection.AddSingleton<IAnnotationCodeGenerator, MySqlAnnotationCodeGenerator>();
 
                 var serviceProvider = serviceCollection.BuildServiceProvider();
+
                 var migrationsScaffolder = serviceProvider.GetRequiredService<IMigrationsScaffolder>();
                 var fiels = migrationsScaffolder.RemoveMigration(projectDir, null, true, null);
 
                 designTimeServices = null;
+                serviceProvider.Dispose();
+                scope.Dispose();
             }
 
             return Ok();
