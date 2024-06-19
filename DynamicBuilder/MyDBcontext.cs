@@ -29,12 +29,14 @@ namespace DynamicBuilder
         //    base.OnConfiguring(optionsBuilder);
         //}
 
-        public DbSet<Post> Posts { get; set; }
+        //public DbSet<Post> Posts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //EntityTypeGenerator.RegisterEntities(modelBuilder);
             base.OnModelCreating(modelBuilder);
+            
+            //modelBuilder.Entity<Post>().
         }
     }
 }
