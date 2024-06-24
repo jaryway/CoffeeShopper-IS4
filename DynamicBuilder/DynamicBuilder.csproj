@@ -8,10 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Models\" />
+    <Compile Remove="_Migrations\**" />
+    <EmbeddedResource Remove="_Migrations\**" />
+    <None Remove="_Migrations\**" />
   </ItemGroup>
+
   <ItemGroup>
-    <Folder Include="Models\" />
+    <None Remove="Models\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.10.0" />

@@ -7,25 +7,34 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-//builder.Services.AddDbContext<MyDbContext>(options =>
-//    options.UseSqlite(defaultConnString, b => b.MigrationsAssembly(dataAccessAssembyName)));
-var builder = new DbContextOptionsBuilder<MyDbContext>().UseSqlite("Data Source=./database.db");
-var generator = new DynamicSpace.DynamicDbContextGenerator();
-generator.AddEntity("Test", "public int Id { get; set; } public string Name2 {get; set;}");
-generator.AddEntity("Test01", "public int Id { get; set; } public string Name {get; set;}");
-generator.AddEntity("Test02", "public int Id { get; set; } public string Name {get; set;}");
-generator.AddMigration();
-generator.UpdateDatabase();
-
-//var list = new List<bool>().Where
-
-Console.WriteLine("Hello, World!");
-//var s = Console.ReadLine();
-
-using (var db = new MyDbContext(builder.Options))
+var connectionString = "server=localhost;uid=root;pwd=123456;database=test";
+var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
+var builder = new DbContextOptionsBuilder<ApplicationDbContext>().UseMySql(connectionString, serverVersion);
+using (var applicationDbContext = new ApplicationDbContext(builder.Options))
 {
-    Console.WriteLine("Hello, World!", db.Count);
+    SeedData.Initialize(applicationDbContext);
+    //var dbConnection = applicationDbContext.Database.GetDbConnection();
+    //var serverVersion1 = dbConnection.ServerVersion;
+    var list = applicationDbContext.DynamicEntities.Select(m => m.Name).ToList();
+
+
+
+
+    var generator = new DynamicSpace.DynamicDbContextGenerator(applicationDbContext);
+    // public string Name5 {get; set;} public string Name6 {get; set;}
+    generator.AddEntity("Test", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;} public string Name2 {get; set;} public string Name3 {get; set;} public string Name9 {get; set;}");
+    generator.AddEntity("Test01", "public int Id { get; set; } public string Name {get; set;}");
+    generator.AddEntity("Test02", "public int Id { get; set; } public string Name {get; set;}");
+    generator.AddMigration();
+    generator.UpdateDatabase();
+
+    //var list = new List<bool>().Where
+
+    Console.WriteLine("Hello, World!");
+    Console.ReadLine();
 }
+
+//applicationDbContext.Dispose();
 
 
 

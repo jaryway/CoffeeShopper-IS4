@@ -12,80 +12,54 @@ using Pomelo.EntityFrameworkCore.MySql.Design.Internal;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
-using DynamicDbContextAssembly;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using DynamicBuilder;
+using DynamicBuilder.Models;
+using SourceCodeKind = DynamicBuilder.Models.SourceCodeKind;
 
 namespace DynamicSpace;
 
 public class DynamicDbContextGenerator
 {
-    private readonly static string projectDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../../../"));
-    private readonly string outputDir = Path.GetFullPath(Path.Combine(projectDir, "./Migrations"));
-    private readonly string k = AppDomain.CurrentDomain.BaseDirectory;
-    private readonly static string MigrationDirectory = Path.Combine("Migrations");
+    //private readonly static string projectDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../../../"));
+    //private readonly string outputDir = Path.GetFullPath(Path.Combine(projectDir, "./_Migrations"));
+    private readonly static string MigrationDirectory = Path.Combine("_Migrations");
     private readonly static string ModelDirectory = Path.Combine("Models");//
     private readonly static string assemblyName = "DynamicDbContextAssembly";
-    private readonly static string str = $@"
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using {assemblyName}.Models;
-namespace {assemblyName};
 
-public abstract class EntityBase {{ }}
-
-public class DynamicDbContext : DbContext
-{{
-
-    public DynamicDbContext(DbContextOptions<DynamicDbContext> options) : base(options)
-    {{
-    }}
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {{
-        var entityTypes = Assembly.GetExecutingAssembly()
-             .GetTypes()
-             .Where(t => typeof(EntityBase).IsAssignableFrom(t) && !t.IsAbstract)
-             .ToList();
-
-        foreach (var t in entityTypes)
-        {{
-             var builder = typeof(ModelBuilder).GetMethod(""Entity"", [])?
-                    .MakeGenericMethod(t)?
-                    .Invoke(modelBuilder, null) as EntityTypeBuilder ?? throw new Exception(""modelBuilder.Entity<T> 失败"");
-
-                builder.ToTable(t.Name + ""s"");
-        }}
-
-        base.OnModelCreating(modelBuilder);
-    }}
-}}
-";
+    private readonly ApplicationDbContext applicationDbContext;
     private AssemblyLoadContext _context;
     private DbContext _dbContext;
     private bool hasPendingModelChanges = false;
     private readonly Dictionary<string, string> sourceCodeDict = new Dictionary<string, string>();
 
-    public DynamicDbContextGenerator()
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
+    public DynamicDbContextGenerator(ApplicationDbContext applicationDbContext)
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
     {
         this._context = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
-        InitSourceCode();
+        this.applicationDbContext = applicationDbContext;
+        Initialize();
     }
 
-    private void InitSourceCode()
+    private void Initialize()
     {
-        sourceCodeDict.Add("DynamicDbContext.cs", str);
-        if (!Directory.Exists(outputDir)) return;
-        string[] filePaths = Directory.GetFiles(outputDir, "*.cs");
-        foreach (string filePath in filePaths)
+        //sourceCodeDict.Add("Models/EntityBase.cs", entityBaseStr);
+        //sourceCodeDict.Add("DynamicDbContext.cs", str);
+        //if (!Directory.Exists(outputDir)) return;
+        //string[] filePaths = Directory.GetFiles(outputDir, "*.cs");
+        //foreach (string filePath in filePaths)
+        //{
+        //    string sourceCode = File.ReadAllText(filePath);
+        //    var relativePath = Path.GetRelativePath(projectDir, filePath);
+        //    AddSourceCode(relativePath, sourceCode);
+        //}
+
+        applicationDbContext.SourceCodes.ToList().ForEach(item =>
         {
-            string sourceCode = File.ReadAllText(filePath);
-            var relativePath = Path.GetRelativePath(projectDir, filePath);
-            AddSourceCode(relativePath, sourceCode);
-        }
+            AddSourceCode(item.Name, item.Code);
+        });
     }
 
     public DynamicDbContextGenerator AddEntity(string entityName, string entityPropertiesCode)
@@ -99,22 +73,15 @@ public class DynamicDbContext : DbContext
         sb.AppendLine("}");
 
         var entityFileName = Path.Combine(ModelDirectory, entityName + ".cs");
-        AddSourceCode(entityFileName, sb.ToString());
+        var entityCode = sb.ToString();
+
+        AddOrUpdateCode(entityFileName, entityCode, SourceCodeKind.Entity);
+        applicationDbContext.SaveChanges();
+
         return this;
     }
 
-    private IMigrationsScaffolder GetMigrationsScaffolder(DbContext dbContext)
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddEntityFrameworkDesignTimeServices();
-        serviceCollection.AddDbContextDesignTimeServices(dbContext);
-        new MySqlDesignTimeServices().ConfigureDesignTimeServices(serviceCollection);
 
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        var migrationsScaffolder = serviceProvider.GetRequiredService<IMigrationsScaffolder>();
-
-        return migrationsScaffolder;
-    }
 
     public DynamicDbContextGenerator AddMigration(string? name = null)
     {
@@ -122,7 +89,7 @@ public class DynamicDbContext : DbContext
         var dbContext = this._dbContext!;
         if (!dbContext.Database.HasPendingModelChanges()) return this;
 
-        var migrationName = name ?? DateTime.Now.Ticks.ToString();
+        var migrationName = name ?? ("M" + DateTime.Now.Ticks.ToString());
         using (var scope = dbContext.GetService<IServiceScopeFactory>().CreateScope())
         {
 
@@ -133,18 +100,20 @@ public class DynamicDbContext : DbContext
             var migrationFileName = Path.Combine(MigrationDirectory, migration.MigrationId + migration.FileExtension);
             var migrationMetadataFileName = Path.Combine(MigrationDirectory, migration.MigrationId + ".Designer" + migration.FileExtension);
 
-            AddSourceCode(modelSnapshotFileName, migration.SnapshotCode);
-            AddSourceCode(migrationFileName, migration.MigrationCode);
-            AddSourceCode(migrationMetadataFileName, migration.MetadataCode);
+            AddOrUpdateCode(modelSnapshotFileName, migration.SnapshotCode, SourceCodeKind.Snapshot);
+            AddOrUpdateCode(migrationFileName, migration.MigrationCode, SourceCodeKind.Migration);
+            AddOrUpdateCode(migrationMetadataFileName, migration.MetadataCode, SourceCodeKind.MigrationMetadata);
 
-            scaffolder.Save(projectDir, migration, outputDir);
+            applicationDbContext.SaveChanges();
+
+            //scaffolder.Save(projectDir, migration, outputDir);
 
             return this;
-            //}
+
         }
     }
 
-    public void UpdateDatabase()
+    public void UpdateDatabase(string? migrationName = null)
     {
         EnsureBuild();
         try
@@ -154,10 +123,11 @@ public class DynamicDbContext : DbContext
             //if (!dbContext.Database.HasPendingModelChanges()) return;
             var migrator = dbContext.GetService<IMigrator>();
 
-            migrator.Migrate();
+            migrator.Migrate(migrationName);
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.ToString());
         }
     }
 
@@ -170,10 +140,44 @@ public class DynamicDbContext : DbContext
         this._dbContext?.Dispose();
         var compilation = CreateCompilation();
         compilation = compilation.AddSyntaxTrees(syntaxTrees);
-        //compilation.AddSyntaxTrees(new SyntaxTree().w)
         var assembly = BuildAssembly(compilation);
         this._dbContext = BuildDbContext(assembly);
         this.hasPendingModelChanges = false;
+    }
+
+    private void AddOrUpdateCode(string name, string code, SourceCodeKind sourceCodeKind)
+    {
+        var entity = applicationDbContext.SourceCodes.FirstOrDefault(m => m.Name == name);
+        if (entity != null)
+        {
+            entity.Code = code;
+            applicationDbContext.SourceCodes.Update(entity);
+        }
+        else
+        {
+            applicationDbContext.SourceCodes.Add(new SourceCode
+            {
+                Name = name,
+                Code = code,
+                SourceCodeKind = sourceCodeKind,
+            });
+        }
+
+        AddSourceCode(name, code);
+    }
+
+    private IMigrationsScaffolder GetMigrationsScaffolder(DbContext dbContext)
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddEntityFrameworkDesignTimeServices();
+        serviceCollection.AddDbContextDesignTimeServices(dbContext);
+        serviceCollection.AddScoped<IMigrationsModelDiffer, MyMigrationsModelDiffer>();
+        new MySqlDesignTimeServices().ConfigureDesignTimeServices(serviceCollection);
+
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        var migrationsScaffolder = serviceProvider.GetRequiredService<IMigrationsScaffolder>();
+
+        return migrationsScaffolder;
     }
 
     private void EnsureBuild()
@@ -185,7 +189,7 @@ public class DynamicDbContext : DbContext
     {
         var references = new[] {
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(DynamicDbContext).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(ApplicationDbContext).Assembly.Location),
             MetadataReference.CreateFromFile(Assembly.Load("System").Location),
             MetadataReference.CreateFromFile(Assembly.Load("System.Reflection").Location),
             MetadataReference.CreateFromFile(Assembly.Load("System.Collections").Location),
@@ -237,14 +241,11 @@ public class DynamicDbContext : DbContext
             _context.Unload();
             _context = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
         }
-        //
-        //var bytes = new byte[ms.Length];
-        //ms.Read(bytes, 0, (int)ms.Length);
-        //return Assembly.Load(bytes);
+
         return _context!.LoadFromStream(ms);
     }
 
-    private static DbContext BuildDbContext(Assembly assembly)
+    private DbContext BuildDbContext(Assembly assembly)
     {
         if (assembly == null) throw new NullReferenceException("assembly is null");
 
@@ -252,6 +253,10 @@ public class DynamicDbContext : DbContext
         var serverVersion = new MySqlServerVersion(Version.Parse("8.4.0"));
         var optionsBuilderType = typeof(DbContextOptionsBuilder<>).MakeGenericType(dbContextType);
         var optionsBuilderInstance = Activator.CreateInstance(optionsBuilderType) ?? throw new NullReferenceException("OptionsBuilderInstance 为空");
+        //var dbConnection = applicationDbContext.Database.GetDbConnection()!;
+        //dbConnection.ServerVersion 
+
+        //applicationDbContext.Database.GetDbConnection
 
         // Get the UseMySql extension method
         optionsBuilderInstance = typeof(MySqlDbContextOptionsBuilderExtensions)?
