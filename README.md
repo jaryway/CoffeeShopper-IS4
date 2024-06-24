@@ -20,3 +20,10 @@ dotnet ef database update --startup-project API --project DataAccess --context A
 
 ### 3、初始化数据Ï
 dotnet run --project Server /seed
+
+
+### TODO
+[x] 将不用的字段标为 Deprecated
+[ ] 表名添加租户 id 前缀，注意导航属性也要处理
+[ ] 增删改查
+[ ] 获取导航属性

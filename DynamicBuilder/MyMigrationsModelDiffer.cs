@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -29,10 +31,21 @@ namespace DynamicBuilder
         IColumn target,
         DiffContext diffContext)
         {
-            // 修改字段名称时，要新增一个字段
+            // 修改字段名称时，先新增一个字段，再将字段标记为已弃用
             if (source.Name != target.Name)
             {
-                return base.Add(target, diffContext);
+                var s = base.Add(target, diffContext).ToList();
+                RenameColumnOperation renameColumnOperation = new RenameColumnOperation
+                {
+                    Schema = source.Table.Schema,
+                    Table = source.Table.Name,
+                    Name = source.Name,
+                    NewName = source.Name + "_Deprecated"
+                };
+                ((AnnotatableBase)renameColumnOperation).AddAnnotations(base.MigrationsAnnotationProvider.ForRename(source));
+                s.Add(renameColumnOperation);
+
+                return s;
             }
 
             return base.Diff(source, target, diffContext);

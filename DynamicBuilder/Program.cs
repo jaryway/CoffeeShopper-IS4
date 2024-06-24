@@ -22,7 +22,7 @@ using (var applicationDbContext = new ApplicationDbContext(builder.Options))
 
     var generator = new DynamicSpace.DynamicDbContextGenerator(applicationDbContext);
     // public string Name5 {get; set;} public string Name6 {get; set;}
-    generator.AddEntity("Test", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;} public string Name2 {get; set;} public string Name3 {get; set;} public string Name9 {get; set;}");
+    generator.AddEntity("Test", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;} public string Name2 {get; set;} public string Name3 {get; set;} public string Name11 {get; set;}");
     generator.AddEntity("Test01", "public int Id { get; set; } public string Name {get; set;}");
     generator.AddEntity("Test02", "public int Id { get; set; } public string Name {get; set;}");
     generator.AddMigration();
