@@ -26,6 +26,21 @@ namespace DynamicBuilder
         {
         }
 
+        protected override IEnumerable<MigrationOperation> Remove(IColumn source, DiffContext diffContext)
+        {
+            //return base.Remove(source, diffContext);
+            RenameColumnOperation renameColumnOperation = new RenameColumnOperation
+            {
+                Schema = source.Table.Schema,
+                Table = source.Table.Name,
+                Name = source.Name,
+                NewName = source.Name + "_Deprecated"
+            };
+            ((AnnotatableBase)renameColumnOperation).AddAnnotations(base.MigrationsAnnotationProvider.ForRename(source));
+            //s.Add(renameColumnOperation);
+            yield return renameColumnOperation;
+        }
+
         protected override IEnumerable<MigrationOperation> Diff(
         IColumn source,
         IColumn target,

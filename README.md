@@ -23,7 +23,8 @@ dotnet run --project Server /seed
 
 
 ### TODO
-[x] 将不用的字段标为 Deprecated
+[x] 重命名字段，新增字段，并将原字段标识为 Deprecated
+[x] 字段删除，不删除表字段，并将该字段标为 Deprecated
 [ ] 表名添加租户 id 前缀，注意导航属性也要处理
 [ ] 增删改查
 [ ] 获取导航属性
