@@ -12,7 +12,8 @@ namespace DynamicBuilder
     {
         private readonly static string assemblyName = "DynamicDbContextAssembly";
         public static IEnumerable<SourceCode> SourceCodes => new[] {
-            new SourceCode() { Id = 1, Name="Models/EntityBase.cs", SourceCodeKind=SourceCodeKind.Base,  Code=$@"namespace {assemblyName}.Models; public abstract class EntityBase {{ }}"},
+            new SourceCode() { Id = 1, Name = Path.Combine("Models","EntityBase.cs"), SourceCodeKind=SourceCodeKind.Base,
+                Code=$@"namespace {assemblyName}.Models; public abstract class EntityBase {{ }}"},
             new SourceCode() { Id = 2, Name="DynamicDbContext.cs", SourceCodeKind=SourceCodeKind.Base, Code=$@"
 using System;
 using System.Linq;

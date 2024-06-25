@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using DynamicBuilder;
 using DynamicBuilder.Models;
 using SourceCodeKind = DynamicBuilder.Models.SourceCodeKind;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
 namespace DynamicSpace;
 
@@ -96,6 +97,7 @@ public class DynamicDbContextGenerator
             var scaffolder = GetMigrationsScaffolder(dbContext);
             var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: assemblyName);
 
+
             var modelSnapshotFileName = Path.Combine(MigrationDirectory, migration.SnapshotName + migration.FileExtension);
             var migrationFileName = Path.Combine(MigrationDirectory, migration.MigrationId + migration.FileExtension);
             var migrationMetadataFileName = Path.Combine(MigrationDirectory, migration.MigrationId + ".Designer" + migration.FileExtension);
@@ -113,15 +115,48 @@ public class DynamicDbContextGenerator
         }
     }
 
+    public void RemoveMigration()
+    {
+        EnsureBuild();
+        var scaffolder = (DynamicMigrationsScaffolder)GetMigrationsScaffolder(_dbContext!);
+
+        var files = scaffolder.RemoveMigration(true, null);
+        var ss = files.Keys.Select(m => Path.Combine(MigrationDirectory, m)).ToList();
+        var list = applicationDbContext.SourceCodes.Where(m => ss.Any(s => s == m.Name)).ToList();
+
+        list.ForEach(entity =>
+        {
+            var key = Path.GetFileName(entity.Name);
+            var code = files[key];
+            if (code == null)
+            {
+                applicationDbContext.SourceCodes.Remove(entity);
+            }
+            else
+            {
+                entity.Code = code;
+                applicationDbContext.SourceCodes.Update(entity);
+            }
+        });
+
+        applicationDbContext.SaveChanges();
+    }
+
     public void UpdateDatabase(string? migrationName = null)
     {
         EnsureBuild();
         try
         {
-            var dbContext = this._dbContext;
+            var migrator = (Migrator)_dbContext.GetService<IMigrator>();
+            //var scaffolder = (Migrator)_dbContext.GetService<IMigrationsScaffolder>();
+            var migrationsAssembly = _dbContext.GetService<IMigrationsAssembly>();
+            var s = _dbContext.Database.GetPendingMigrations();
+            var m = migrationsAssembly.Migrations;
 
-            //if (!dbContext.Database.HasPendingModelChanges()) return;
-            var migrator = dbContext.GetService<IMigrator>();
+            //if (string.IsNullOrEmpty(migrationName)) {
+            //    var mm = migrationsAssembly.GetMigrationId(migrationName);
+               
+            //}
 
             migrator.Migrate(migrationName);
         }
@@ -137,12 +172,12 @@ public class DynamicDbContextGenerator
         {
             return CSharpSyntaxTree.ParseText(item.Value).WithFilePath(item.Key);
         }).ToList();
-        this._dbContext?.Dispose();
+        _dbContext?.Dispose();
         var compilation = CreateCompilation();
         compilation = compilation.AddSyntaxTrees(syntaxTrees);
         var assembly = BuildAssembly(compilation);
-        this._dbContext = BuildDbContext(assembly);
-        this.hasPendingModelChanges = false;
+        _dbContext = BuildDbContext(assembly);
+        hasPendingModelChanges = false;
     }
 
     private void AddOrUpdateCode(string name, string code, SourceCodeKind sourceCodeKind)
@@ -171,11 +206,14 @@ public class DynamicDbContextGenerator
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddEntityFrameworkDesignTimeServices();
         serviceCollection.AddDbContextDesignTimeServices(dbContext);
-        serviceCollection.AddScoped<IMigrationsModelDiffer, MyMigrationsModelDiffer>();
+        serviceCollection.AddScoped<IMigrationsModelDiffer, DynamicMigrationsModelDiffer>();
+        serviceCollection.AddScoped<IMigrationsScaffolder, DynamicMigrationsScaffolder>();
         new MySqlDesignTimeServices().ConfigureDesignTimeServices(serviceCollection);
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
         var migrationsScaffolder = serviceProvider.GetRequiredService<IMigrationsScaffolder>();
+        //var migrationsAssembly = serviceProvider.GetRequiredService<IMigrationsAssembly>();
+        //var m = migrationsAssembly.Migrations;
 
         return migrationsScaffolder;
     }

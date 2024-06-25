@@ -16,18 +16,28 @@ using Microsoft.EntityFrameworkCore.Update.Internal;
 
 namespace DynamicBuilder
 {
-    public class MyMigrationsModelDiffer : MigrationsModelDiffer
+    public class DynamicMigrationsModelDiffer : MigrationsModelDiffer
     {
-        //public MyMigrationsModelDiffer()
-        //{
-        //}
-        public MyMigrationsModelDiffer(IRelationalTypeMappingSource typeMappingSource, IMigrationsAnnotationProvider migrationsAnnotationProvider, IRowIdentityMapFactory rowIdentityMapFactory, CommandBatchPreparerDependencies commandBatchPreparerDependencies)
-            : base(typeMappingSource, migrationsAnnotationProvider, rowIdentityMapFactory, commandBatchPreparerDependencies)
+        public DynamicMigrationsModelDiffer(IRelationalTypeMappingSource typeMappingSource, IMigrationsAnnotationProvider migrationsAnnotationProvider, IRowIdentityMapFactory rowIdentityMapFactory, CommandBatchPreparerDependencies commandBatchPreparerDependencies)
+          : base(typeMappingSource, migrationsAnnotationProvider, rowIdentityMapFactory, commandBatchPreparerDependencies)
         {
         }
 
+        //protected override IEnumerable<MigrationOperation> Add(IColumn target, DiffContext diffContext, bool inline = false)
+        //{
+        //    //diffContext.FindColumn
+        //    return base.Add(target, diffContext, inline);
+        //}
+
+        //protected override IEnumerable<MigrationOperation> Diff(IEnumerable<ITable> source, IEnumerable<ITable> target, DiffContext diffContext)
+        //{
+        //   //var d= base.GetDataOperations().Where(m => m.GetType().IsAssignableFrom(typeof(DropTableOperation)));
+        //    return base.Diff(source, target, diffContext);
+        //}
+
         protected override IEnumerable<MigrationOperation> Remove(IColumn source, DiffContext diffContext)
         {
+            //base.Remove()
             //return base.Remove(source, diffContext);
             RenameColumnOperation renameColumnOperation = new RenameColumnOperation
             {
