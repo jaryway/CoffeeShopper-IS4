@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DynamicBuilder.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240625085355_Init")]
+    [Migration("20240625171502_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -23,31 +23,6 @@ namespace DynamicBuilder.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("DynamicBuilder.Models.DynamicEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("EntityProperties")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DynamicEntities");
-                });
 
             modelBuilder.Entity("DynamicBuilder.Models.SourceCode", b =>
                 {

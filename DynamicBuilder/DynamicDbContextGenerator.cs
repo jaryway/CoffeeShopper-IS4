@@ -18,6 +18,11 @@ using DynamicBuilder;
 using DynamicBuilder.Models;
 using SourceCodeKind = DynamicBuilder.Models.SourceCodeKind;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
+using System.Reflection;
+using TypeInfo = System.Reflection.TypeInfo;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using System.Collections.Generic;
 
 namespace DynamicSpace;
 
@@ -115,12 +120,12 @@ public class DynamicDbContextGenerator
         }
     }
 
-    public void RemoveMigration()
+    public void RemoveMigration(bool force)
     {
         EnsureBuild();
         var scaffolder = (DynamicMigrationsScaffolder)GetMigrationsScaffolder(_dbContext!);
 
-        var files = scaffolder.RemoveMigration(true, null);
+        var files = scaffolder.RemoveMigration(force, null);
         var ss = files.Keys.Select(m => Path.Combine(MigrationDirectory, m)).ToList();
         var list = applicationDbContext.SourceCodes.Where(m => ss.Any(s => s == m.Name)).ToList();
 
@@ -147,16 +152,91 @@ public class DynamicDbContextGenerator
         EnsureBuild();
         try
         {
+            var targetMigration = migrationName;
             var migrator = (Migrator)_dbContext.GetService<IMigrator>();
             //var scaffolder = (Migrator)_dbContext.GetService<IMigrationsScaffolder>();
             var migrationsAssembly = _dbContext.GetService<IMigrationsAssembly>();
-            var s = _dbContext.Database.GetPendingMigrations();
-            var m = migrationsAssembly.Migrations;
+            var databaseProvider = _dbContext.GetService<IDatabaseProvider>();
+            var appliedMigrationEntries = _dbContext.Database.GetAppliedMigrations().ToList();
+            //var pendingMigrations = _dbContext.Database.GetPendingMigrations().ToList();
+            var migrations = migrationsAssembly.Migrations.ToList();
+            var _activeProvider = databaseProvider.Name;
 
-            //if (string.IsNullOrEmpty(migrationName)) {
-            //    var mm = migrationsAssembly.GetMigrationId(migrationName);
-               
+            var appliedMigrations = new Dictionary<string, TypeInfo>();
+            var unappliedMigrations = new Dictionary<string, TypeInfo>();
+            var appliedMigrationEntrySet = new HashSet<string>(appliedMigrationEntries, StringComparer.OrdinalIgnoreCase);
+            IReadOnlyList<Migration> migrationsToApply;  // 要应用的迁移
+            IReadOnlyList<Migration> migrationsToRevert;// 待还原的迁移
+            Migration? actualTargetMigration;
+            //if (migrationsAssembly.Migrations.Count == 0)
+            //{
+            //    _logger.MigrationsNotFound(this, _migrationsAssembly);
             //}
+
+            foreach (var (key, typeInfo) in migrationsAssembly.Migrations)
+            {
+                if (appliedMigrationEntrySet.Contains(key))
+                {
+                    appliedMigrations.Add(key, typeInfo);
+                }
+                else
+                {
+                    unappliedMigrations.Add(key, typeInfo);
+                }
+            }
+
+            if (string.IsNullOrEmpty(targetMigration))
+            {
+                migrationsToApply = unappliedMigrations
+                    .OrderBy(m => m.Key)
+                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
+                    .ToList();
+                migrationsToRevert = Array.Empty<Migration>();
+                actualTargetMigration = null;
+            }
+            else if (targetMigration == Migration.InitialDatabase)
+            {
+                migrationsToApply = Array.Empty<Migration>();
+                migrationsToRevert = appliedMigrations
+                    .OrderByDescending(m => m.Key)
+                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
+                    .ToList();
+                actualTargetMigration = null;
+            }
+            else
+            {
+                targetMigration = migrationsAssembly.GetMigrationId(targetMigration);
+                migrationsToApply = unappliedMigrations
+                    .Where(m => string.Compare(m.Key, targetMigration, StringComparison.OrdinalIgnoreCase) <= 0)
+                    .OrderBy(m => m.Key)
+                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
+                    .ToList();
+                migrationsToRevert = appliedMigrations
+                    .Where(m => string.Compare(m.Key, targetMigration, StringComparison.OrdinalIgnoreCase) > 0)
+                    .OrderByDescending(m => m.Key)
+                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
+                    .ToList();
+                actualTargetMigration = appliedMigrations
+                    .Where(m => string.Compare(m.Key, targetMigration, StringComparison.OrdinalIgnoreCase) == 0)
+                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
+                    .SingleOrDefault();
+            }
+
+            List<DropTableOperation> dropTableOperations = new List<DropTableOperation>();
+
+            migrationsToRevert.ToList().ForEach(m =>
+            {
+                var list = m.DownOperations.Where(operation => operation is DropTableOperation)
+                    .Cast<DropTableOperation>();
+                dropTableOperations.AddRange(list);
+            });
+
+            migrationsToApply.ToList().ForEach(m =>
+            {
+                var list = m.UpOperations.Where(operation => operation is DropTableOperation)
+                    .Cast<DropTableOperation>();
+                dropTableOperations.AddRange(list);
+            });
 
             migrator.Migrate(migrationName);
         }

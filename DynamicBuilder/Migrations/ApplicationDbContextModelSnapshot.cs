@@ -21,31 +21,6 @@ namespace DynamicBuilder.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("DynamicBuilder.Models.DynamicEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("EntityProperties")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DynamicEntities");
-                });
-
             modelBuilder.Entity("DynamicBuilder.Models.SourceCode", b =>
                 {
                     b.Property<int>("Id")
@@ -71,7 +46,7 @@ namespace DynamicBuilder.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SourceCodes");
+                    b.ToTable("SourceCodes", (string)null);
                 });
 #pragma warning restore 612, 618
         }

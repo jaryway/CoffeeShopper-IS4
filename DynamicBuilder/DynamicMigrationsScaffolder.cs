@@ -31,7 +31,9 @@ namespace DynamicBuilder
 
         public IDictionary<string, string?> RemoveMigration(bool force, string? language)
         {
-
+            // 1、迁移文件只能一个一个移除
+            // 2、如果已经被应用了，且 force=false 时，不能移除
+            // 3、没有被应用或者 force=true 时，可移除
             var files = new Dictionary<string, string?>();
 
             var modelSnapshot = Dependencies.MigrationsAssembly.ModelSnapshot;
@@ -71,6 +73,7 @@ namespace DynamicBuilder
                     {
                         if (force)
                         {
+                            // 如果是要强制移除迁移文件，则取倒数第二个应用迁移
                             Dependencies.Migrator.Migrate(migrations.Count > 1 ? migrations[^2].GetId() : Migration.InitialDatabase);
                         }
                         else
