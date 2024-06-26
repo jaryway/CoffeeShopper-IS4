@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -49,6 +50,11 @@ namespace DynamicBuilder
             }
         }
 
+        //protected override IEnumerable<MigrationOperation> Add(IColumn target, DiffContext diffContext, bool inline = false)
+        //{
+        //    return base.Add(target, diffContext, inline);
+        //}
+
         protected override IEnumerable<MigrationOperation> Remove(IColumn source, DiffContext diffContext)
         {
             RenameColumnOperation renameColumnOperation = new RenameColumnOperation
@@ -56,7 +62,7 @@ namespace DynamicBuilder
                 Schema = source.Table.Schema,
                 Table = source.Table.Name,
                 Name = source.Name,
-                NewName = source.Name + "_Deprecated"
+                NewName = string.Join("_", source.Name, Guid.NewGuid().ToString().Replace("-", ""), "Deprecated")
             };
             ((AnnotatableBase)renameColumnOperation).AddAnnotations(base.MigrationsAnnotationProvider.ForRename(source));
             //s.Add(renameColumnOperation);
@@ -77,7 +83,7 @@ namespace DynamicBuilder
                     Schema = source.Table.Schema,
                     Table = source.Table.Name,
                     Name = source.Name,
-                    NewName = source.Name + "_Deprecated"
+                    NewName = string.Join("_", source.Name, Guid.NewGuid().ToString().Replace("-", ""), "Deprecated")
                 };
                 ((AnnotatableBase)renameColumnOperation).AddAnnotations(base.MigrationsAnnotationProvider.ForRename(source));
                 s.Add(renameColumnOperation);

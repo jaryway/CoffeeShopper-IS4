@@ -18,13 +18,14 @@ using (var applicationDbContext = new ApplicationDbContext(builder.Options))
 
     var generator = new DynamicSpace.DynamicDbContextGenerator(applicationDbContext);
 
-    generator.AddEntity("Test", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;} public string Name2 {get; set;}", tableName: "Tests");
+    generator.AddEntity("Test", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;} public string Name3 {get; set;} public string Name4 {get; set;} public string Name2 {get; set;}", tableName: "Tests");
     generator.AddMigration();
-    generator.AddEntity("Test01", "public int Id { get; set; } public string Name {get; set;}", tableName: "Tests01");
-    generator.AddMigration();
+    //generator.AddEntity("Test01", "public int Id { get; set; } public string Name {get; set;}", tableName: "Tests01");
+    //generator.AddMigration();
     generator.UpdateDatabase();
-    generator.AddEntity("Test02", "public int Id { get; set; } public string Name {get; set;}", tableName: "Tests02");
-    generator.AddMigration();
+    //generator.AddEntity("Test02", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;}", tableName: "Tests02");
+    //generator.AddEntity("Test03", "public int Id { get; set; } public string Name {get; set;}", tableName: "Test03");
+    //generator.AddMigration();
     //generator.RemoveMigration(false);
     //generator.UpdateDatabase();
 
