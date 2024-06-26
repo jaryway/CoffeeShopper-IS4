@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -34,6 +35,7 @@ namespace DynamicBuilder.Migrations
                 name: "TableName",
                 table: "SourceCodes",
                 newName: "FilePath");
+     
 
             migrationBuilder.AlterColumn<string>(
                 name: "TenantId",

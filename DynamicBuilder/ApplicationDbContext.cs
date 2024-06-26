@@ -10,10 +10,12 @@ using DynamicBuilder.Models;
 using DynamicBuilder;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
+
 namespace DynamicBuilder;
 
 public abstract class EntityBase
 {
+    public virtual int Id { get; set; }
     public virtual string TableName { get; } = string.Empty;
 }
 

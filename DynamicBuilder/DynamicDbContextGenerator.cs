@@ -18,7 +18,6 @@ using DynamicBuilder;
 using DynamicBuilder.Models;
 using SourceCodeKind = DynamicBuilder.Models.SourceCodeKind;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
-using System.Reflection;
 using TypeInfo = System.Reflection.TypeInfo;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -35,44 +34,61 @@ public class DynamicDbContextGenerator
     private readonly static string ModelDirectory = Path.Combine("Models");//
     private readonly static string assemblyName = "DynamicDbContextAssembly";
 
-    private readonly ApplicationDbContext applicationDbContext;
+    private readonly ApplicationDbContext _applicationDbContext;
     private AssemblyLoadContext _context;
-    private DbContext _dbContext;
+    private Compilation? _compilation;
+    private Assembly? _assembly;
+    private DbContext? _dbContext;
     private bool hasPendingModelChanges = false;
     private readonly Dictionary<string, string> sourceCodeDict = new Dictionary<string, string>();
 
-#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
     public DynamicDbContextGenerator(ApplicationDbContext applicationDbContext)
-#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
     {
-        this._context = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
-        this.applicationDbContext = applicationDbContext;
+        _context = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
+        _applicationDbContext = applicationDbContext;
         Initialize();
     }
 
     private void Initialize()
     {
-        //sourceCodeDict.Add("Models/EntityBase.cs", entityBaseStr);
-        //sourceCodeDict.Add("DynamicDbContext.cs", str);
-        //if (!Directory.Exists(outputDir)) return;
-        //string[] filePaths = Directory.GetFiles(outputDir, "*.cs");
-        //foreach (string filePath in filePaths)
-        //{
-        //    string sourceCode = File.ReadAllText(filePath);
-        //    var relativePath = Path.GetRelativePath(projectDir, filePath);
-        //    AddSourceCode(relativePath, sourceCode);
-        //}
-
-        applicationDbContext.SourceCodes.ToList().ForEach(item =>
+        _applicationDbContext.SourceCodes.ToList().ForEach(item =>
         {
             AddSourceCode(item.Name, item.Code);
         });
     }
 
+
+    private Compilation SelfCompilation { get { return _compilation ??= Build(); } }
+
+    public Assembly SelfAssembly
+    {
+        get
+        {
+            return _assembly ??= BuildAssembly(SelfCompilation);
+        }
+    }
+    public DbContext SelfDbContext { get { return _dbContext ??= BuildDbContext(SelfAssembly); } }
+
+    //public object Get(string entityName, int id)
+    //{
+    //    var name = Path.Combine(ModelDirectory, entityName);
+    //    var enity = _applicationDbContext.SourceCodes.FirstOrDefault(m => m.Name == name);
+    //    if (enity == null)
+    //    {
+    //        throw new Exception($"实体 {entityName} 不存在");
+    //    }
+
+    //    //SelfAssembly.get
+
+    //    //_dbContext.
+
+    //}
+
     public DynamicDbContextGenerator AddEntity(string entityName, string entityPropertiesCode, string tableName)
     {
         var sb = new StringBuilder();
         sb.AppendLine("using System;");
+        sb.AppendLine("using System.Collections.Generic;");
         sb.AppendLine($"using {assemblyName};");
         sb.AppendLine($"namespace {assemblyName}.Models;");
         sb.AppendLine($"public class {entityName} : EntityBase{{");
@@ -84,12 +100,10 @@ public class DynamicDbContextGenerator
         var entityCode = sb.ToString();
 
         AddOrUpdateCode(entityFileName, entityCode, SourceCodeKind.Entity, tableName);
-        applicationDbContext.SaveChanges();
+        _applicationDbContext.SaveChanges();
 
         return this;
     }
-
-
 
     public DynamicDbContextGenerator AddMigration(string? name = null)
     {
@@ -113,12 +127,8 @@ public class DynamicDbContextGenerator
             AddOrUpdateCode(migrationFileName, migration.MigrationCode, SourceCodeKind.Migration);
             AddOrUpdateCode(migrationMetadataFileName, migration.MetadataCode, SourceCodeKind.MigrationMetadata);
 
-            applicationDbContext.SaveChanges();
-
-            //scaffolder.Save(projectDir, migration, outputDir);
-
+            _applicationDbContext.SaveChanges();
             return this;
-
         }
     }
 
@@ -128,10 +138,9 @@ public class DynamicDbContextGenerator
         var scaffolder = (DynamicMigrationsScaffolder)GetMigrationsScaffolder(_dbContext!);
 
         var result = scaffolder.RemoveMigration(force, null);
-
         var files = new[] { result.ModelSnapshotFileName, result.MigrationMetadataFileName, result.MigrationFileName };
         var ss = files.Select(m => Path.Combine(MigrationDirectory, m)).ToList();
-        var list = applicationDbContext.SourceCodes.Where(m => ss.Any(s => s == m.Name)).ToList();
+        var list = _applicationDbContext.SourceCodes.Where(m => ss.Any(s => s == m.Name)).ToList();
         // 移除迁移文件
         list.ForEach(entity =>
         {
@@ -140,44 +149,15 @@ public class DynamicDbContextGenerator
             if (isSnapshot && result.ModelSnapshotCode != null)
             {
                 entity.Code = result.ModelSnapshotCode;
-                applicationDbContext.SourceCodes.Update(entity);
+                _applicationDbContext.SourceCodes.Update(entity);
             }
             else
             {
-                applicationDbContext.SourceCodes.Remove(entity);
+                _applicationDbContext.SourceCodes.Remove(entity);
             }
         });
 
-        // 更新实体信息
-        // 1、找到要删除的表
-        // 2、找到要添加的表
-        //foreach (var migration in result.MigrationsToRevert)
-        //{
-        //    var t = migration.DownOperations.Where(m => m is DropTableOperation)
-        //        .Cast<DropTableOperation>()
-        //        .ToList();
-
-        //    t.ForEach(m =>
-        //    {
-        //        var entityName = m?.GetAnnotation("EntityName");
-        //        //var entityClassName = "";
-        //    });
-        //}
-
-        //foreach (var migration in result.MigrationsToApply)
-        //{
-        //    var t = migration.UpOperations.Where(m => m is CreateTableOperation)
-        //        .Cast<CreateTableOperation>()
-        //        .ToList();
-
-        //    t.ForEach(m =>
-        //    {
-        //        var entityName = m?.GetAnnotation("EntityName");
-        //        var entityClassName = "";
-        //    });
-        //}
         UpdateEntity(result.MigrationsToApply, result.MigrationsToRevert);
-        //applicationDbContext.SaveChanges();
     }
 
     public void UpdateDatabase(string? migrationName = null)
@@ -186,7 +166,7 @@ public class DynamicDbContextGenerator
         try
         {
             var targetMigration = migrationName;
-            var migrator = (DynamicMigrator)_dbContext.GetService<IMigrator>();
+            var migrator = (DynamicMigrator)SelfDbContext.GetService<IMigrator>();
 
             var result = migrator.Migrate(migrationName);
             UpdateEntity(result.MigrationsToApply, result.MigrationsToRevert);
@@ -199,7 +179,6 @@ public class DynamicDbContextGenerator
 
     private void UpdateEntity(IReadOnlyList<Migration> migrationsToApply, IReadOnlyList<Migration> migrationsToRevert)
     {
-
         // 更新实体信息
         // 1、找到要删除的表
         // 2、找到要添加的表
@@ -226,7 +205,7 @@ public class DynamicDbContextGenerator
         }).Where(m => m.Name != null).ToList();
 
         var names = temp.Select(m => m.Name);
-        var entities = applicationDbContext.SourceCodes
+        var entities = _applicationDbContext.SourceCodes
             .Where(m => m.SourceCodeKind == SourceCodeKind.Entity && names.Any(n => n == m.Name))
             .ToDictionary(k => k.Name, k => k);
 
@@ -240,40 +219,43 @@ public class DynamicDbContextGenerator
                 return;
             }
             entity.Published = m.Kind == "create";
-            applicationDbContext.SourceCodes.Update(entity);
+            _applicationDbContext.SourceCodes.Update(entity);
         });
 
-        applicationDbContext.SaveChanges();
+        _applicationDbContext.SaveChanges();
 
         Console.WriteLine(entities);
 
     }
 
-    public void Build()
+    public Compilation Build()
     {
         var syntaxTrees = sourceCodeDict.Select(item =>
         {
             return CSharpSyntaxTree.ParseText(item.Value).WithFilePath(item.Key);
         }).ToList();
         _dbContext?.Dispose();
+        _dbContext = null;
+        _assembly = null;
+
         var compilation = CreateCompilation();
         compilation = compilation.AddSyntaxTrees(syntaxTrees);
-        var assembly = BuildAssembly(compilation);
-        _dbContext = BuildDbContext(assembly);
+
         hasPendingModelChanges = false;
+        return compilation;
     }
 
     private void AddOrUpdateCode(string name, string code, SourceCodeKind sourceCodeKind, string tableName = "")
     {
-        var entity = applicationDbContext.SourceCodes.FirstOrDefault(m => m.Name == name);
+        var entity = _applicationDbContext.SourceCodes.FirstOrDefault(m => m.Name == name);
         if (entity != null)
         {
             entity.Code = code;
-            applicationDbContext.SourceCodes.Update(entity);
+            _applicationDbContext.SourceCodes.Update(entity);
         }
         else
         {
-            applicationDbContext.SourceCodes.Add(new SourceCode
+            _applicationDbContext.SourceCodes.Add(new SourceCode
             {
                 Name = name,
                 TableName = tableName,
@@ -321,9 +303,10 @@ public class DynamicDbContextGenerator
             MetadataReference.CreateFromFile(Assembly.Load("System.Linq").Location),
             MetadataReference.CreateFromFile(Assembly.Load("System.Linq.Expressions").Location),
             MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Abstractions").Location),
             MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Relational").Location),
             MetadataReference.CreateFromFile(Assembly.Load("Pomelo.EntityFrameworkCore.MySql").Location),
-            MetadataReference.CreateFromFile(typeof(DbContext).Assembly.Location)
         };
 
         Compilation compilation = CSharpCompilation.Create(assemblyName)
@@ -339,7 +322,6 @@ public class DynamicDbContextGenerator
         if (!sourceCodeDict.TryAdd(key, code))
         {
             sourceCodeDict[key] = code;
-            //sourceCodeDict.Add(key, code);
         }
     }
 
@@ -376,7 +358,7 @@ public class DynamicDbContextGenerator
 
         var dbContextType = assembly.GetTypes().FirstOrDefault(m => m.Name == "DynamicDbContext") ?? throw new NullReferenceException("DynamicDbContext 为空");
 
-        var connectionString = applicationDbContext.Database.GetConnectionString();
+        var connectionString = _applicationDbContext.Database.GetConnectionString();
         var serverVersion = ServerVersion.AutoDetect(connectionString);
 
         var optionsBuilderType = typeof(DbContextOptionsBuilder<>).MakeGenericType(dbContextType);
@@ -399,11 +381,6 @@ public class DynamicDbContextGenerator
         }
 
         return (DbContext)constructor.Invoke(new[] { optionsValue });
-
-        //var connectionString = "server=localhost;uid=root;pwd=123456;database=test";
-        //var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
-        //var builder = new DbContextOptionsBuilder<DynamicDbContext>().UseMySql(connectionString, serverVersion);
-        //return new DynamicDbContext(builder.Options, assembly);
     }
 }
 

@@ -29,8 +29,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using {assemblyName}.Models;
 namespace {assemblyName};
 
-//public abstract class EntityBase {{ }}
-
 public class DynamicDbContext : DbContext
 {{
 
