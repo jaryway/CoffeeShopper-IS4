@@ -23,6 +23,7 @@ dotnet run --project Server /seed
 
 
 ### TODO
+[x] 添加实体，应用迁移和移除迁移后要更新实体的发布状态
 [x] 重命名字段，新增字段，并将原字段标识为 Deprecated
 [x] 字段删除，不删除表字段，并将该字段标为 Deprecated
 [ ] 回滚后删除实体类

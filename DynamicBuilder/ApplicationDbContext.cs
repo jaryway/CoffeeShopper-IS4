@@ -7,32 +7,58 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Runtime.Loader;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using DynamicBuilder.Models;
+using DynamicBuilder;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace DynamicBuilder
+namespace DynamicBuilder;
+
+public abstract class EntityBase
 {
-    public class ApplicationDbContext : DbContext
+    public virtual string TableName { get; } = string.Empty;
+}
+
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext()
+    { }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    { }
+
+    //public DbSet<DynamicEntity> DynamicEntities { get; set; }
+
+    public DbSet<SourceCode> SourceCodes { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        public ApplicationDbContext()
-        { }
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        { }
+        //base.OnConfiguring(optionsBuilder);
+        //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=MyDatabase;Trusted_Connection=True;");
 
-        public DbSet<DynamicEntity> DynamicEntities { get; set; }
+        var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
+        var connectionString = "server=localhost;uid=root;pwd=123456;database=test";
+        optionsBuilder.UseMySql(connectionString, serverVersion);
+    }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        var entityTypes = Assembly.GetExecutingAssembly()
+          .GetTypes()
+          .Where(t => typeof(EntityBase).IsAssignableFrom(t) && !t.IsAbstract)
+          .ToList();
 
-        public DbSet<SourceCode> SourceCodes { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        foreach (var t in entityTypes)
         {
-            //base.OnConfiguring(optionsBuilder);
-            //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=MyDatabase;Trusted_Connection=True;");
 
-            var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
-            var connectionString = "server=localhost;uid=root;pwd=123456;database=test";
-            optionsBuilder.UseMySql(connectionString, serverVersion);
+            var builder = typeof(ModelBuilder).GetMethod("Entity", [])?
+                   .MakeGenericMethod(t)?
+                   .Invoke(modelBuilder, null) as EntityTypeBuilder ?? throw new Exception("modelBuilder.Entity < T > 失败");
+
+            object? entityInstance = Activator.CreateInstance(t);
+            var tableName = t?.GetProperty("TableName")?.GetValue(entityInstance) as string;
+
+            builder.ToTable(tableName ?? t!.Name).HasAnnotation("EntityName", t!.Name);
         }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
+
+        base.OnModelCreating(modelBuilder);
     }
 }
+
+

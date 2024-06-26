@@ -23,6 +23,7 @@ using TypeInfo = System.Reflection.TypeInfo;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System.Collections.Generic;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace DynamicSpace;
 
@@ -68,20 +69,21 @@ public class DynamicDbContextGenerator
         });
     }
 
-    public DynamicDbContextGenerator AddEntity(string entityName, string entityPropertiesCode)
+    public DynamicDbContextGenerator AddEntity(string entityName, string entityPropertiesCode, string tableName)
     {
         var sb = new StringBuilder();
         sb.AppendLine("using System;");
         sb.AppendLine($"using {assemblyName};");
         sb.AppendLine($"namespace {assemblyName}.Models;");
         sb.AppendLine($"public class {entityName} : EntityBase{{");
+        sb.AppendLine($"public override string TableName => \"{tableName}\";");
         sb.AppendLine(entityPropertiesCode);
         sb.AppendLine("}");
 
         var entityFileName = Path.Combine(ModelDirectory, entityName + ".cs");
         var entityCode = sb.ToString();
 
-        AddOrUpdateCode(entityFileName, entityCode, SourceCodeKind.Entity);
+        AddOrUpdateCode(entityFileName, entityCode, SourceCodeKind.Entity, tableName);
         applicationDbContext.SaveChanges();
 
         return this;
@@ -92,7 +94,8 @@ public class DynamicDbContextGenerator
     public DynamicDbContextGenerator AddMigration(string? name = null)
     {
         EnsureBuild();
-        var dbContext = this._dbContext!;
+        var dbContext = _dbContext!;
+        var migrationsAssembly = _dbContext.GetService<IMigrationsAssembly>();
         if (!dbContext.Database.HasPendingModelChanges()) return this;
 
         var migrationName = name ?? ("M" + DateTime.Now.Ticks.ToString());
@@ -101,7 +104,6 @@ public class DynamicDbContextGenerator
 
             var scaffolder = GetMigrationsScaffolder(dbContext);
             var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: assemblyName);
-
 
             var modelSnapshotFileName = Path.Combine(MigrationDirectory, migration.SnapshotName + migration.FileExtension);
             var migrationFileName = Path.Combine(MigrationDirectory, migration.MigrationId + migration.FileExtension);
@@ -125,26 +127,57 @@ public class DynamicDbContextGenerator
         EnsureBuild();
         var scaffolder = (DynamicMigrationsScaffolder)GetMigrationsScaffolder(_dbContext!);
 
-        var files = scaffolder.RemoveMigration(force, null);
-        var ss = files.Keys.Select(m => Path.Combine(MigrationDirectory, m)).ToList();
-        var list = applicationDbContext.SourceCodes.Where(m => ss.Any(s => s == m.Name)).ToList();
+        var result = scaffolder.RemoveMigration(force, null);
 
+        var files = new[] { result.ModelSnapshotFileName, result.MigrationMetadataFileName, result.MigrationFileName };
+        var ss = files.Select(m => Path.Combine(MigrationDirectory, m)).ToList();
+        var list = applicationDbContext.SourceCodes.Where(m => ss.Any(s => s == m.Name)).ToList();
+        // 移除迁移文件
         list.ForEach(entity =>
         {
-            var key = Path.GetFileName(entity.Name);
-            var code = files[key];
-            if (code == null)
+            var isSnapshot = entity.SourceCodeKind == SourceCodeKind.Snapshot;
+
+            if (isSnapshot && result.ModelSnapshotCode != null)
             {
-                applicationDbContext.SourceCodes.Remove(entity);
+                entity.Code = result.ModelSnapshotCode;
+                applicationDbContext.SourceCodes.Update(entity);
             }
             else
             {
-                entity.Code = code;
-                applicationDbContext.SourceCodes.Update(entity);
+                applicationDbContext.SourceCodes.Remove(entity);
             }
         });
 
-        applicationDbContext.SaveChanges();
+        // 更新实体信息
+        // 1、找到要删除的表
+        // 2、找到要添加的表
+        //foreach (var migration in result.MigrationsToRevert)
+        //{
+        //    var t = migration.DownOperations.Where(m => m is DropTableOperation)
+        //        .Cast<DropTableOperation>()
+        //        .ToList();
+
+        //    t.ForEach(m =>
+        //    {
+        //        var entityName = m?.GetAnnotation("EntityName");
+        //        //var entityClassName = "";
+        //    });
+        //}
+
+        //foreach (var migration in result.MigrationsToApply)
+        //{
+        //    var t = migration.UpOperations.Where(m => m is CreateTableOperation)
+        //        .Cast<CreateTableOperation>()
+        //        .ToList();
+
+        //    t.ForEach(m =>
+        //    {
+        //        var entityName = m?.GetAnnotation("EntityName");
+        //        var entityClassName = "";
+        //    });
+        //}
+        UpdateEntity(result.MigrationsToApply, result.MigrationsToRevert);
+        //applicationDbContext.SaveChanges();
     }
 
     public void UpdateDatabase(string? migrationName = null)
@@ -153,97 +186,67 @@ public class DynamicDbContextGenerator
         try
         {
             var targetMigration = migrationName;
-            var migrator = (Migrator)_dbContext.GetService<IMigrator>();
-            //var scaffolder = (Migrator)_dbContext.GetService<IMigrationsScaffolder>();
-            var migrationsAssembly = _dbContext.GetService<IMigrationsAssembly>();
-            var databaseProvider = _dbContext.GetService<IDatabaseProvider>();
-            var appliedMigrationEntries = _dbContext.Database.GetAppliedMigrations().ToList();
-            //var pendingMigrations = _dbContext.Database.GetPendingMigrations().ToList();
-            var migrations = migrationsAssembly.Migrations.ToList();
-            var _activeProvider = databaseProvider.Name;
+            var migrator = (DynamicMigrator)_dbContext.GetService<IMigrator>();
 
-            var appliedMigrations = new Dictionary<string, TypeInfo>();
-            var unappliedMigrations = new Dictionary<string, TypeInfo>();
-            var appliedMigrationEntrySet = new HashSet<string>(appliedMigrationEntries, StringComparer.OrdinalIgnoreCase);
-            IReadOnlyList<Migration> migrationsToApply;  // 要应用的迁移
-            IReadOnlyList<Migration> migrationsToRevert;// 待还原的迁移
-            Migration? actualTargetMigration;
-            //if (migrationsAssembly.Migrations.Count == 0)
-            //{
-            //    _logger.MigrationsNotFound(this, _migrationsAssembly);
-            //}
-
-            foreach (var (key, typeInfo) in migrationsAssembly.Migrations)
-            {
-                if (appliedMigrationEntrySet.Contains(key))
-                {
-                    appliedMigrations.Add(key, typeInfo);
-                }
-                else
-                {
-                    unappliedMigrations.Add(key, typeInfo);
-                }
-            }
-
-            if (string.IsNullOrEmpty(targetMigration))
-            {
-                migrationsToApply = unappliedMigrations
-                    .OrderBy(m => m.Key)
-                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
-                    .ToList();
-                migrationsToRevert = Array.Empty<Migration>();
-                actualTargetMigration = null;
-            }
-            else if (targetMigration == Migration.InitialDatabase)
-            {
-                migrationsToApply = Array.Empty<Migration>();
-                migrationsToRevert = appliedMigrations
-                    .OrderByDescending(m => m.Key)
-                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
-                    .ToList();
-                actualTargetMigration = null;
-            }
-            else
-            {
-                targetMigration = migrationsAssembly.GetMigrationId(targetMigration);
-                migrationsToApply = unappliedMigrations
-                    .Where(m => string.Compare(m.Key, targetMigration, StringComparison.OrdinalIgnoreCase) <= 0)
-                    .OrderBy(m => m.Key)
-                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
-                    .ToList();
-                migrationsToRevert = appliedMigrations
-                    .Where(m => string.Compare(m.Key, targetMigration, StringComparison.OrdinalIgnoreCase) > 0)
-                    .OrderByDescending(m => m.Key)
-                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
-                    .ToList();
-                actualTargetMigration = appliedMigrations
-                    .Where(m => string.Compare(m.Key, targetMigration, StringComparison.OrdinalIgnoreCase) == 0)
-                    .Select(p => migrationsAssembly.CreateMigration(p.Value, _activeProvider))
-                    .SingleOrDefault();
-            }
-
-            List<DropTableOperation> dropTableOperations = new List<DropTableOperation>();
-
-            migrationsToRevert.ToList().ForEach(m =>
-            {
-                var list = m.DownOperations.Where(operation => operation is DropTableOperation)
-                    .Cast<DropTableOperation>();
-                dropTableOperations.AddRange(list);
-            });
-
-            migrationsToApply.ToList().ForEach(m =>
-            {
-                var list = m.UpOperations.Where(operation => operation is DropTableOperation)
-                    .Cast<DropTableOperation>();
-                dropTableOperations.AddRange(list);
-            });
-
-            migrator.Migrate(migrationName);
+            var result = migrator.Migrate(migrationName);
+            UpdateEntity(result.MigrationsToApply, result.MigrationsToRevert);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
         }
+    }
+
+    private void UpdateEntity(IReadOnlyList<Migration> migrationsToApply, IReadOnlyList<Migration> migrationsToRevert)
+    {
+
+        // 更新实体信息
+        // 1、找到要删除的表
+        // 2、找到要添加的表
+        List<MigrationOperation> list = new List<MigrationOperation>();
+        foreach (var migration in migrationsToRevert)
+        {
+            list.AddRange(migration.DownOperations.Where(m => m != null && (m is CreateTableOperation || m is DropTableOperation)));
+        }
+
+        foreach (var migration in migrationsToApply)
+        {
+            list.AddRange(migration.UpOperations.Where(m => m != null && (m is CreateTableOperation || m is DropTableOperation)));
+        }
+
+        var temp = list.Select(m =>
+        {
+            var name = m.GetAnnotation("EntityName").Value as string;
+            name = name == null ? name : Path.Combine(ModelDirectory, name + ".cs");
+            return new
+            {
+                Kind = (m is CreateTableOperation) ? "create" : "drop",
+                Name = name
+            };
+        }).Where(m => m.Name != null).ToList();
+
+        var names = temp.Select(m => m.Name);
+        var entities = applicationDbContext.SourceCodes
+            .Where(m => m.SourceCodeKind == SourceCodeKind.Entity && names.Any(n => n == m.Name))
+            .ToDictionary(k => k.Name, k => k);
+
+        List<SourceCode> sources = new();
+
+        temp.ForEach(m =>
+        {
+            var entity = entities[m.Name ?? ""];
+            if (entity == null)
+            {
+                return;
+            }
+            entity.Published = m.Kind == "create";
+            applicationDbContext.SourceCodes.Update(entity);
+        });
+
+        applicationDbContext.SaveChanges();
+
+        Console.WriteLine(entities);
+
     }
 
     public void Build()
@@ -260,7 +263,7 @@ public class DynamicDbContextGenerator
         hasPendingModelChanges = false;
     }
 
-    private void AddOrUpdateCode(string name, string code, SourceCodeKind sourceCodeKind)
+    private void AddOrUpdateCode(string name, string code, SourceCodeKind sourceCodeKind, string tableName = "")
     {
         var entity = applicationDbContext.SourceCodes.FirstOrDefault(m => m.Name == name);
         if (entity != null)
@@ -273,6 +276,7 @@ public class DynamicDbContextGenerator
             applicationDbContext.SourceCodes.Add(new SourceCode
             {
                 Name = name,
+                TableName = tableName,
                 Code = code,
                 SourceCodeKind = sourceCodeKind,
             });
@@ -284,16 +288,19 @@ public class DynamicDbContextGenerator
     private IMigrationsScaffolder GetMigrationsScaffolder(DbContext dbContext)
     {
         var serviceCollection = new ServiceCollection();
+
         serviceCollection.AddEntityFrameworkDesignTimeServices();
         serviceCollection.AddDbContextDesignTimeServices(dbContext);
+        serviceCollection.RemoveAll<IMigrator>();
+        serviceCollection.AddScoped<IMigrator, DynamicMigrator>();
         serviceCollection.AddScoped<IMigrationsModelDiffer, DynamicMigrationsModelDiffer>();
         serviceCollection.AddScoped<IMigrationsScaffolder, DynamicMigrationsScaffolder>();
+
         new MySqlDesignTimeServices().ConfigureDesignTimeServices(serviceCollection);
+
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
         var migrationsScaffolder = serviceProvider.GetRequiredService<IMigrationsScaffolder>();
-        //var migrationsAssembly = serviceProvider.GetRequiredService<IMigrationsAssembly>();
-        //var m = migrationsAssembly.Migrations;
 
         return migrationsScaffolder;
     }
@@ -368,18 +375,19 @@ public class DynamicDbContextGenerator
         if (assembly == null) throw new NullReferenceException("assembly is null");
 
         var dbContextType = assembly.GetTypes().FirstOrDefault(m => m.Name == "DynamicDbContext") ?? throw new NullReferenceException("DynamicDbContext 为空");
-        var serverVersion = new MySqlServerVersion(Version.Parse("8.4.0"));
+
+        var connectionString = applicationDbContext.Database.GetConnectionString();
+        var serverVersion = ServerVersion.AutoDetect(connectionString);
+
         var optionsBuilderType = typeof(DbContextOptionsBuilder<>).MakeGenericType(dbContextType);
         var optionsBuilderInstance = Activator.CreateInstance(optionsBuilderType) ?? throw new NullReferenceException("OptionsBuilderInstance 为空");
-        //var dbConnection = applicationDbContext.Database.GetDbConnection()!;
-        //dbConnection.ServerVersion 
-
-        //applicationDbContext.Database.GetDbConnection
 
         // Get the UseMySql extension method
         optionsBuilderInstance = typeof(MySqlDbContextOptionsBuilderExtensions)?
             .GetMethod("UseMySql", new[] { optionsBuilderType, typeof(string), typeof(ServerVersion), typeof(Action<MySqlDbContextOptionsBuilder>) })?
-            .Invoke(null, [optionsBuilderInstance, "server=localhost;uid=root;pwd=123456;database=test", serverVersion, null]);
+            .Invoke(null, [optionsBuilderInstance, connectionString, serverVersion, null]);
+
+        (optionsBuilderInstance as DbContextOptionsBuilder)?.ReplaceService<IMigrator, DynamicMigrator>();
 
         var dbContextOptionsType = typeof(DbContextOptions<>).MakeGenericType(dbContextType);
         var optionsValue = optionsBuilderType.GetProperty("Options", dbContextOptionsType)?.GetValue(optionsBuilderInstance);

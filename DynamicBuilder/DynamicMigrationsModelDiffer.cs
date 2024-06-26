@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.Update.Internal;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 //using Microsoft.EntityFrameworkCore.Relational;
 
 namespace DynamicBuilder
@@ -23,22 +24,33 @@ namespace DynamicBuilder
         {
         }
 
-        //protected override IEnumerable<MigrationOperation> Add(IColumn target, DiffContext diffContext, bool inline = false)
-        //{
-        //    //diffContext.FindColumn
-        //    return base.Add(target, diffContext, inline);
-        //}
+        protected override IEnumerable<MigrationOperation> Add(ITable target, DiffContext diffContext)
+        {
+            var entityType = target.EntityTypeMappings.FirstOrDefault();
+            var entityName = entityType?.TypeBase.ClrType.Name;
 
-        //protected override IEnumerable<MigrationOperation> Diff(IEnumerable<ITable> source, IEnumerable<ITable> target, DiffContext diffContext)
-        //{
-        //   //var d= base.GetDataOperations().Where(m => m.GetType().IsAssignableFrom(typeof(DropTableOperation)));
-        //    return base.Diff(source, target, diffContext);
-        //}
+            var result = base.Add(target, diffContext);
+            foreach (var item in result)
+            {
+                item.AddAnnotation("EntityName", entityName);
+                yield return item;
+            }
+        }
+
+        protected override IEnumerable<MigrationOperation> Remove(ITable target, DiffContext diffContext)
+        {
+            var entityType = target.EntityTypeMappings.FirstOrDefault();
+            var entityName = entityType?.TypeBase.ClrType.Name;
+            var result = base.Remove(target, diffContext);
+            foreach (var item in result)
+            {
+                item.AddAnnotation("EntityName", entityName);
+                yield return item;
+            }
+        }
 
         protected override IEnumerable<MigrationOperation> Remove(IColumn source, DiffContext diffContext)
         {
-            //base.Remove()
-            //return base.Remove(source, diffContext);
             RenameColumnOperation renameColumnOperation = new RenameColumnOperation
             {
                 Schema = source.Table.Schema,
