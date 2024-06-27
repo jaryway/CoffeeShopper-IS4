@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using DynamicBuilder.Models;
 using DynamicBuilder;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace DynamicBuilder;
@@ -16,7 +19,18 @@ namespace DynamicBuilder;
 public abstract class EntityBase
 {
     public virtual int Id { get; set; }
-    public virtual string TableName { get; } = string.Empty;
+    //public virtual string TableName { get; } = string.Empty;
+}
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public class TableNameAttribute : Attribute
+{
+    public string TableName { get; }
+
+    public TableNameAttribute(string tableName)
+    {
+        TableName = tableName;
+    }
 }
 
 public class ApplicationDbContext : DbContext
@@ -25,6 +39,14 @@ public class ApplicationDbContext : DbContext
     { }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     { }
+
+    public Assembly Assembly
+    {
+        get
+        {
+            return new DynamicAssemblyBuilder().Build();
+        }
+    }
 
     //public DbSet<DynamicEntity> DynamicEntities { get; set; }
 
@@ -38,10 +60,13 @@ public class ApplicationDbContext : DbContext
         var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
         var connectionString = "server=localhost;uid=root;pwd=123456;database=test";
         optionsBuilder.UseMySql(connectionString, serverVersion);
+        optionsBuilder.ReplaceService<IMigrationsAssembly, DynamicMigrationsAssembly>();
+        //optionsBuilder.ReplaceService<IMigrationsAssembly, DynamicMigrationsAssembly>();
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var entityTypes = Assembly.GetExecutingAssembly()
+        //this.GetService<ApplicationDbContext>();
+        var entityTypes = Assembly
           .GetTypes()
           .Where(t => typeof(EntityBase).IsAssignableFrom(t) && !t.IsAbstract)
           .ToList();
@@ -51,12 +76,12 @@ public class ApplicationDbContext : DbContext
 
             var builder = typeof(ModelBuilder).GetMethod("Entity", [])?
                    .MakeGenericMethod(t)?
-                   .Invoke(modelBuilder, null) as EntityTypeBuilder ?? throw new Exception("modelBuilder.Entity < T > 失败");
+                   .Invoke(modelBuilder, null) as EntityTypeBuilder ?? throw new Exception("modelBuilder.Entity<T> 失败");
 
-            object? entityInstance = Activator.CreateInstance(t);
-            var tableName = t?.GetProperty("TableName")?.GetValue(entityInstance) as string;
-
-            builder.ToTable(tableName ?? t!.Name).HasAnnotation("EntityName", t!.Name);
+            var entityName = t!.Name!;
+            var tableName = t.GetCustomAttribute<TableNameAttribute>()!.TableName;
+           
+            builder.ToTable(tableName ?? entityName).HasAnnotation("EntityName", entityName);
         }
 
         base.OnModelCreating(modelBuilder);

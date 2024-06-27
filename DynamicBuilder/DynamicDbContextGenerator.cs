@@ -23,6 +23,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System.Collections.Generic;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
+using System.Linq.Dynamic.Core;
 
 namespace DynamicSpace;
 
@@ -32,10 +33,11 @@ public class DynamicDbContextGenerator
     //private readonly string outputDir = Path.GetFullPath(Path.Combine(projectDir, "./_Migrations"));
     private readonly static string MigrationDirectory = Path.Combine("_Migrations");
     private readonly static string ModelDirectory = Path.Combine("Models");//
-    private readonly static string assemblyName = "DynamicDbContextAssembly";
+    private readonly static string AssemblyName = "DynamicDbContextAssembly";
+    private readonly static string DbContextName = "DynamicDbContext";
 
     private readonly ApplicationDbContext _applicationDbContext;
-    private AssemblyLoadContext _context;
+    private AssemblyLoadContext _assemblyLoadContext;
     private Compilation? _compilation;
     private Assembly? _assembly;
     private DbContext? _dbContext;
@@ -44,7 +46,7 @@ public class DynamicDbContextGenerator
 
     public DynamicDbContextGenerator(ApplicationDbContext applicationDbContext)
     {
-        _context = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
+        _assemblyLoadContext = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
         _applicationDbContext = applicationDbContext;
         Initialize();
     }
@@ -69,28 +71,55 @@ public class DynamicDbContextGenerator
     }
     public DbContext SelfDbContext { get { return _dbContext ??= BuildDbContext(SelfAssembly); } }
 
-    //public object Get(string entityName, int id)
-    //{
-    //    var name = Path.Combine(ModelDirectory, entityName);
-    //    var enity = _applicationDbContext.SourceCodes.FirstOrDefault(m => m.Name == name);
-    //    if (enity == null)
-    //    {
-    //        throw new Exception($"实体 {entityName} 不存在");
-    //    }
+    public object? Get(string entityName, int id)
+    {
+        var name = Path.Combine(ModelDirectory, entityName + ".cs");
+        var enity = _applicationDbContext.SourceCodes.FirstOrDefault(m => m.Name == name);
+        if (enity == null)
+        {
+            throw new Exception($"实体 {entityName} 不存在");
+        }
 
-    //    //SelfAssembly.get
+        //_applicationDbContext.Set<SourceCode>()
 
-    //    //_dbContext.
+        return GetQueryable(entityName)
+            .Where("Id == @0", id)
+            .FirstOrDefault();
+    }
 
-    //}
+    private Type GetEntityType(string entityName)
+    {
+        return SelfAssembly.GetType($"{AssemblyName}.Models.{entityName}") ?? throw new NullReferenceException($"实体 {entityName} 为空");
+    }
+
+    private Type GetDbContextType()
+    {
+        return SelfAssembly.GetType($"{AssemblyName}.{DbContextName}") ?? throw new NullReferenceException("DbContext 为空");
+    }
+
+    public IQueryable<object> GetQueryable(string entityName)
+    {
+        var dbContextType = GetDbContextType();
+        var entityType = GetEntityType(entityName);
+        var query = dbContextType.GetMethod("Set", 1, [])?
+                .MakeGenericMethod(entityType)?
+                .Invoke(SelfDbContext, null); // DbSet<T>
+
+        return (query as IQueryable<object>) ?? throw new NullReferenceException("IQueryable<object> 为空");
+        //var queryable = typeof(DbSet<>).MakeGenericType(entityType)?
+        //   .GetMethod("AsQueryable")?
+        //   .Invoke(query, []); //IQueryable<T>
+
+        //return (IQueryable)(queryable ?? throw new NullReferenceException($"实体 IQueryable 为空"));
+    }
 
     public DynamicDbContextGenerator AddEntity(string entityName, string entityPropertiesCode, string tableName)
     {
         var sb = new StringBuilder();
         sb.AppendLine("using System;");
         sb.AppendLine("using System.Collections.Generic;");
-        sb.AppendLine($"using {assemblyName};");
-        sb.AppendLine($"namespace {assemblyName}.Models;");
+        sb.AppendLine($"using {AssemblyName};");
+        sb.AppendLine($"namespace {AssemblyName}.Models;");
         sb.AppendLine($"public class {entityName} : EntityBase{{");
         sb.AppendLine($"public override string TableName => \"{tableName}\";");
         sb.AppendLine(entityPropertiesCode);
@@ -108,16 +137,19 @@ public class DynamicDbContextGenerator
     public DynamicDbContextGenerator AddMigration(string? name = null)
     {
         EnsureBuild();
-        var dbContext = _dbContext!;
-        var migrationsAssembly = _dbContext.GetService<IMigrationsAssembly>();
-        if (!dbContext.Database.HasPendingModelChanges()) return this;
+        //var dbContext = _dbContext!;
+        var migrationsAssembly = SelfDbContext.GetService<IMigrationsAssembly>();
+        var tttt = migrationsAssembly.GetType();
+        var m = migrationsAssembly.Migrations;
+
+        if (!SelfDbContext.Database.HasPendingModelChanges()) return this;
 
         var migrationName = name ?? ("M" + DateTime.Now.Ticks.ToString());
-        using (var scope = dbContext.GetService<IServiceScopeFactory>().CreateScope())
+        using (var scope = SelfDbContext.GetService<IServiceScopeFactory>().CreateScope())
         {
 
-            var scaffolder = GetMigrationsScaffolder(dbContext);
-            var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: assemblyName);
+            var scaffolder = GetMigrationsScaffolder(SelfDbContext);
+            var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: AssemblyName);
 
             var modelSnapshotFileName = Path.Combine(MigrationDirectory, migration.SnapshotName + migration.FileExtension);
             var migrationFileName = Path.Combine(MigrationDirectory, migration.MigrationId + migration.FileExtension);
@@ -273,8 +305,8 @@ public class DynamicDbContextGenerator
 
         serviceCollection.AddEntityFrameworkDesignTimeServices();
         serviceCollection.AddDbContextDesignTimeServices(dbContext);
-        serviceCollection.RemoveAll<IMigrator>();
         serviceCollection.AddScoped<IMigrator, DynamicMigrator>();
+        serviceCollection.AddScoped<IMigrationsAssembly, DynamicMigrationsAssembly>();
         serviceCollection.AddScoped<IMigrationsModelDiffer, DynamicMigrationsModelDiffer>();
         serviceCollection.AddScoped<IMigrationsScaffolder, DynamicMigrationsScaffolder>();
 
@@ -309,7 +341,7 @@ public class DynamicDbContextGenerator
             MetadataReference.CreateFromFile(Assembly.Load("Pomelo.EntityFrameworkCore.MySql").Location),
         };
 
-        Compilation compilation = CSharpCompilation.Create(assemblyName)
+        Compilation compilation = CSharpCompilation.Create(AssemblyName)
             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Release))
             .AddReferences(references);
 
@@ -327,8 +359,34 @@ public class DynamicDbContextGenerator
 
     private Assembly BuildAssembly(Compilation compilation)
     {
+
+        var references = new[] {
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(ApplicationDbContext).Assembly.Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System.Reflection").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System.Collections").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System.Linq").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System.Linq.Expressions").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Abstractions").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Relational").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("Pomelo.EntityFrameworkCore.MySql").Location),
+        };
+
+        var syntaxTrees = sourceCodeDict.Select(item =>
+        {
+            return CSharpSyntaxTree.ParseText(item.Value).WithFilePath(item.Key);
+        }).ToList();
+
+        Compilation _compilation = CSharpCompilation.Create(AssemblyName)
+            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Release))
+            .AddReferences(references)
+            .AddSyntaxTrees(syntaxTrees);
+
         using var ms = new MemoryStream();
-        EmitResult result = compilation.Emit(ms);
+        EmitResult result = _compilation.Emit(ms);
         ms.Seek(0, SeekOrigin.Begin);
 
         if (!result.Success)
@@ -341,15 +399,15 @@ public class DynamicDbContextGenerator
             }
         }
 
-        Console.WriteLine($"Successfully created Assembly: {assemblyName}");
+        Console.WriteLine($"Successfully created Assembly: {AssemblyName}");
 
-        if (_context != null)
+        if (_assemblyLoadContext != null)
         {
-            _context.Unload();
-            _context = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
+            _assemblyLoadContext.Unload();
+            _assemblyLoadContext = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
         }
 
-        return _context!.LoadFromStream(ms);
+        return _assemblyLoadContext!.LoadFromStream(ms);
     }
 
     private DbContext BuildDbContext(Assembly assembly)
@@ -370,6 +428,7 @@ public class DynamicDbContextGenerator
             .Invoke(null, [optionsBuilderInstance, connectionString, serverVersion, null]);
 
         (optionsBuilderInstance as DbContextOptionsBuilder)?.ReplaceService<IMigrator, DynamicMigrator>();
+        (optionsBuilderInstance as DbContextOptionsBuilder)?.ReplaceService<IMigrationsAssembly, DynamicMigrationsAssembly>();
 
         var dbContextOptionsType = typeof(DbContextOptions<>).MakeGenericType(dbContextType);
         var optionsValue = optionsBuilderType.GetProperty("Options", dbContextOptionsType)?.GetValue(optionsBuilderInstance);
