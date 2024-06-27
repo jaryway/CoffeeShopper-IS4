@@ -7,14 +7,14 @@ using System.Reflection;
 
 namespace DynamicBuilder.Data
 {
-    public class DynamicDbContext : DbContext
+    public class DynamicDbContext : ApplicationDbContext
     {
 
-
         string? _version;
-        public DynamicDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public DynamicDbContext(DbContextOptions<DynamicDbContext> options) : base(options)
         {
         }
+
         public List<MetadataEntity> _metaDataEntityList = new List<MetadataEntity>();
 
         public Assembly Assembly
@@ -28,7 +28,6 @@ namespace DynamicBuilder.Data
         public void AddMetadata(MetadataEntity metadataEntity) => _metaDataEntityList.Add(metadataEntity);
 
         public MetadataEntity? GetMetadaEntity(Type type) => _metaDataEntityList.FirstOrDefault(p => p.EntityType == type);
-
 
         public void SetContextVersion(string version) => _version = version;
 

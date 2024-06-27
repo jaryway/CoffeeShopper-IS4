@@ -11,11 +11,11 @@ namespace DynamicBuilder
 {
     public class DynamicClassFactory
     {
-        private AppDomain _appDomain;
-        private AssemblyBuilder _assemblyBuilder;
-        private ModuleBuilder _moduleBuilder;
-        private TypeBuilder _typeBuilder;
-        private string _assemblyName;
+        private readonly AppDomain _appDomain;
+        private AssemblyBuilder? _assemblyBuilder;
+        private ModuleBuilder? _moduleBuilder;
+        private TypeBuilder? _typeBuilder;
+        private readonly string _assemblyName;
 
         public DynamicClassFactory() : this("Dynamic.Objects")
         {
@@ -63,10 +63,10 @@ namespace DynamicBuilder
                                                             | TypeAttributes.Class
                                                             | TypeAttributes.AutoClass
                                                             | TypeAttributes.AnsiClass
-                                                            | TypeAttributes.Serializable
+                                                            //| TypeAttributes.Serializable
                                                             | TypeAttributes.BeforeFieldInit, typeof(T));
 
-
+            //_assemblyBuilder.
             //if there is a property on the base class and also in the dictionary, remove them from the dictionary
             var pis = typeof(T).GetProperties();
             foreach (var pi in pis)
@@ -92,7 +92,7 @@ namespace DynamicBuilder
             properties.ToList().ForEach(p => CreateFieldForTypeBuilder(typeBuilder, p.Value, p.Key, raisePropertyChanged));
         }
 
-        private void CreateFieldForTypeBuilder(TypeBuilder typeBuilder, Type type, String name, MethodInfo raisePropertyChanged)
+        private void CreateFieldForTypeBuilder(TypeBuilder typeBuilder, Type type, string name, MethodInfo raisePropertyChanged)
         {
             FieldBuilder fieldBuilder = typeBuilder.DefineField("_" + name.ToLowerInvariant(), type, FieldAttributes.Private);
 
@@ -106,8 +106,10 @@ namespace DynamicBuilder
             //creates the Set Method for the property and also adds the invocation of the property change
             propertyBuilder.SetSetMethod(CreateSetMethodForTypeBuilder(typeBuilder, getterAndSetterAttributes, name, type, fieldBuilder, raisePropertyChanged));
         }
-        private void CreateFieldForType(Type type, String name, MethodInfo raisePropertyChanged)
+        private void CreateFieldForType(Type type, string name, MethodInfo raisePropertyChanged)
         {
+            //_typeBuilder ==null throw new Exception("");
+
             FieldBuilder fieldBuilder = _typeBuilder.DefineField("_" + name.ToLowerInvariant(), type, FieldAttributes.Private);
 
             PropertyBuilder propertyBuilder = _typeBuilder.DefineProperty(name, PropertyAttributes.HasDefault, type, null);
@@ -126,7 +128,7 @@ namespace DynamicBuilder
         private void AddDataMemberAttribute(PropertyBuilder propertyBuilder)
         {
             Type attrType = typeof(DataMemberAttribute);
-            var attr = new CustomAttributeBuilder(attrType.GetConstructor(Type.EmptyTypes), new object[] { });
+            var attr = new CustomAttributeBuilder(attrType.GetConstructor(Type.EmptyTypes)!, new object[] { });
             propertyBuilder.SetCustomAttribute(attr);
         }
 

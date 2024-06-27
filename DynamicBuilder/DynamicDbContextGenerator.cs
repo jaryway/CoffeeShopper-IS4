@@ -138,9 +138,9 @@ public class DynamicDbContextGenerator
     {
         EnsureBuild();
         //var dbContext = _dbContext!;
-        var migrationsAssembly = SelfDbContext.GetService<IMigrationsAssembly>();
-        var tttt = migrationsAssembly.GetType();
-        var m = migrationsAssembly.Migrations;
+        //var migrationsAssembly = SelfDbContext.GetService<IMigrationsAssembly>();
+        //var tttt = migrationsAssembly.GetType();
+        //var m = migrationsAssembly.Migrations;
 
         if (!SelfDbContext.Database.HasPendingModelChanges()) return this;
 

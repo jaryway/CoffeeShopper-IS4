@@ -10,6 +10,11 @@ using System.Xml.Linq;
 namespace DynamicBuilder
 {
 
+    public class MyServicePrivoder : IServiceProvider
+    {
+        public object? GetService(Type serviceType) => throw new NotImplementedException();
+    }
+
     public class Config
     {
         private readonly static string assemblyName = "DynamicDbContextAssembly";

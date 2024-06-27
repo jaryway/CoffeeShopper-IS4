@@ -38,6 +38,11 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(defaultConnString, b => b.MigrationsAssembly(dataAccessAssembyName)));
+
+builder.Services.AddDbContext<ApplicationDbContext>(o => {
+    o.UseInternalServiceProvider(null);
+});
+
 //builder.Services.AddDbContext<LowCodeUserDbContext>(options =>
 //    options.UseSqlite(defaultConnString, b => b.MigrationsAssembly(lowCodeUserAssembyName)));
 
