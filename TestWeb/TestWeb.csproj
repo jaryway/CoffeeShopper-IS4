@@ -26,6 +26,6 @@
     <None Remove="Models\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
+    <ProjectReference Include="..\DynamicSpace\DynamicSpace.csproj" />
   </ItemGroup>
 </Project>

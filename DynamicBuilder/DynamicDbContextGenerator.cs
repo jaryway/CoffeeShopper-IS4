@@ -24,6 +24,8 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System.Collections.Generic;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 using System.Linq.Dynamic.Core;
+using DynamicBuilder.Data;
+using DynamicBuilder.Attributes;
 
 namespace DynamicSpace;
 
@@ -118,10 +120,15 @@ public class DynamicDbContextGenerator
         var sb = new StringBuilder();
         sb.AppendLine("using System;");
         sb.AppendLine("using System.Collections.Generic;");
+        sb.AppendLine("using DynamicBuilder.Models;");
+        sb.AppendLine("using System.ComponentModel.DataAnnotations.Schema;");
+        sb.AppendLine(string.Format("using {0};", typeof(EntityIdAttribute).Namespace));
         sb.AppendLine($"using {AssemblyName};");
         sb.AppendLine($"namespace {AssemblyName}.Models;");
+        sb.AppendLine(string.Format($"[EntityId(123456)]"));
+        sb.AppendLine(string.Format("[Table(\"{0}\")]", tableName));
         sb.AppendLine($"public class {entityName} : EntityBase{{");
-        sb.AppendLine($"public override string TableName => \"{tableName}\";");
+        //sb.AppendLine($"public override string TableName => \"{tableName}\";");
         sb.AppendLine(entityPropertiesCode);
         sb.AppendLine("}");
 
@@ -142,7 +149,7 @@ public class DynamicDbContextGenerator
         //var tttt = migrationsAssembly.GetType();
         //var m = migrationsAssembly.Migrations;
 
-        if (!SelfDbContext.Database.HasPendingModelChanges()) return this;
+        //if (!SelfDbContext.Database.HasPendingModelChanges()) return this;
 
         var migrationName = name ?? ("M" + DateTime.Now.Ticks.ToString());
         using (var scope = SelfDbContext.GetService<IServiceScopeFactory>().CreateScope())
@@ -339,6 +346,7 @@ public class DynamicDbContextGenerator
             MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Abstractions").Location),
             MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Relational").Location),
             MetadataReference.CreateFromFile(Assembly.Load("Pomelo.EntityFrameworkCore.MySql").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System.ComponentModel.Annotations").Location),
         };
 
         Compilation compilation = CSharpCompilation.Create(AssemblyName)
@@ -373,6 +381,7 @@ public class DynamicDbContextGenerator
             MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Abstractions").Location),
             MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Relational").Location),
             MetadataReference.CreateFromFile(Assembly.Load("Pomelo.EntityFrameworkCore.MySql").Location),
+            MetadataReference.CreateFromFile(Assembly.Load("System.ComponentModel.Annotations").Location),
         };
 
         var syntaxTrees = sourceCodeDict.Select(item =>

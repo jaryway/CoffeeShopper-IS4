@@ -3,24 +3,21 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using TestWeb;
+using DynamicSpace;
+using Microsoft.EntityFrameworkCore.Migrations;
+using DynamicSpace.Design;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("mysql");
+var connectionString = builder.Configuration.GetConnectionString("MySql");
 // Add services to the container.
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    //var migrationsAssembly = typeof(Program).Assembly.GetName().Name;
-    //Action<SqliteDbContextOptionsBuilder> sqliteOptionsAction = o => o.MigrationsAssembly(migrationsAssembly);
-    //options.UseSqlite(builder.Configuration.GetConnectionString("sqlite"), sqliteOptionsAction);
-
-    var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
-    var builder = new DbContextOptionsBuilder<ApplicationDbContext>().UseMySql(connectionString, serverVersion);
-    //var context = new ApplicationDbContext(builder.Options);
-    options.UseMySql(connectionString, serverVersion);
-
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<DynamicDbContext>(options => {
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    options.ReplaceService<IMigrator, DynamicMySqlMigrator>();
+    options.ReplaceService<IMigrationsAssembly, DynamicMigrationsAssembly>();
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

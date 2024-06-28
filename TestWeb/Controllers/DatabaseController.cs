@@ -20,6 +20,9 @@ using Pomelo.EntityFrameworkCore.MySql;
 using Pomelo.EntityFrameworkCore.MySql.Design.Internal;
 using System.Xml.Linq;
 using Pomelo.EntityFrameworkCore.MySql.Storage.Internal;
+using DynamicSpace;
+using DynamicSpace.Models;
+using TestWeb.ViewModels;
 
 namespace TestWeb.Controllers
 {
@@ -30,40 +33,31 @@ namespace TestWeb.Controllers
 
         private readonly ILogger<DatabaseController> _logger;
 
-        private readonly ApplicationDbContext _context;
+        private readonly DynamicDbContext _context;
 
-        private readonly IServiceProvider _serviceProvider;
-
-        private readonly string rootNamespace = "TestWeb";
-        private readonly string projectDir = Directory.GetCurrentDirectory();
-        private readonly string outputDir = "./Migrations/";
-
-        public DatabaseController(ILogger<DatabaseController> logger, ApplicationDbContext context, IServiceProvider serviceProvider)
+        public DatabaseController(ILogger<DatabaseController> logger, DynamicDbContext context, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _context = context;
-            _serviceProvider = serviceProvider;
         }
 
-        private IMigrationsScaffolder GetMigrationsScaffolder(ApplicationDbContext context)
+        [HttpPost]
+        [Route("/DynamicEntity/Add")]
+        public ActionResult<DynamicEntityModel> AddDynamicEntity([FromBody] DynamicEntityModel model)
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddEntityFrameworkDesignTimeServices();
-            serviceCollection.AddDbContextDesignTimeServices(context);
-            new MySqlDesignTimeServices().ConfigureDesignTimeServices(serviceCollection);
 
-            //serviceCollection.AddScoped<AnnotationCodeGeneratorDependencies>();
-            //serviceCollection.AddScoped<TypeMappingSourceDependencies>();
-            //serviceCollection.AddScoped<ValueConverterSelectorDependencies>();
-            //serviceCollection.AddScoped<RelationalTypeMappingSourceDependencies>();
-            //serviceCollection.AddSingleton<IValueConverterSelector, ValueConverterSelector>();
-            //serviceCollection.AddSingleton<ITypeMappingSource, MySqlTypeMappingSource>();
-            //serviceCollection.AddSingleton<IAnnotationCodeGenerator, MySqlAnnotationCodeGenerator>();
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
 
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            var migrationsScaffolder = serviceProvider.GetRequiredService<IMigrationsScaffolder>();
+            var entity = new DynamicEntity();
+            entity.Name = model.Name;
+            entity.TableName = model.TableName;
+            entity.EntityProperties = model.EntityProperties;
 
-            return migrationsScaffolder;
+           _context.AddDynamicEntity(entity);
+
+            return Ok(entity);
         }
 
         [HttpGet]
@@ -72,7 +66,6 @@ namespace TestWeb.Controllers
         {
             return _context.Database.GetMigrations();
         }
-
 
         // GET: DatabaseController
         [HttpPost]
@@ -85,18 +78,14 @@ namespace TestWeb.Controllers
                 return BadRequest("参数 name 不能为空");
             }
 
-            if (!_context.Database.HasPendingModelChanges())
+            try
             {
-                return NoContent();
+                _context.AddMigration(name);
             }
-
-            var migrationName = (name ?? "") + DateTime.Now.Ticks.ToString();
-            using (var scope = _serviceProvider.CreateScope())
+            catch (Exception ex)
             {
-                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var migrationsScaffolder = GetMigrationsScaffolder(db);
-                var migration = migrationsScaffolder.ScaffoldMigration(migrationName, rootNamespace);
-                var files = migrationsScaffolder.Save(projectDir, migration, outputDir);
+                _logger.LogError("AddMigration 报错：" + ex.Message);
+                return BadRequest(ex.Message);
             }
 
             return Ok();
@@ -106,39 +95,7 @@ namespace TestWeb.Controllers
         [Route("/Migration/Remove")]
         public ActionResult RemoveMigration()
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                //_serviceProvider.GetService
-                //var context = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-                var serverVersion = new MySqlServerVersion(Version.Parse("8.0.0"));
-                var builder = new DbContextOptionsBuilder<ApplicationDbContext>().UseMySql("server=localhost;uid=root;pwd=123456;database=test", serverVersion);
-                var context = new ApplicationDbContext(builder.Options);
-                //var migrationsScaffolder = GetMigrationsScaffolder(context);
-                var serviceCollection = new ServiceCollection();
-                serviceCollection.AddEntityFrameworkDesignTimeServices();
-                serviceCollection.AddDbContextDesignTimeServices(context);
-                var designTimeServices = new MySqlDesignTimeServices();
-                designTimeServices.ConfigureDesignTimeServices(serviceCollection);
-
-
-                //serviceCollection.AddScoped<AnnotationCodeGeneratorDependencies>();
-                //serviceCollection.AddScoped<TypeMappingSourceDependencies>();
-                //serviceCollection.AddScoped<ValueConverterSelectorDependencies>();
-                //serviceCollection.AddScoped<RelationalTypeMappingSourceDependencies>();
-                //serviceCollection.AddSingleton<IValueConverterSelector, ValueConverterSelector>();
-                //serviceCollection.AddSingleton<ITypeMappingSource, MySqlTypeMappingSource>();
-                //serviceCollection.AddSingleton<IAnnotationCodeGenerator, MySqlAnnotationCodeGenerator>();
-
-                var serviceProvider = serviceCollection.BuildServiceProvider();
-
-                var migrationsScaffolder = serviceProvider.GetRequiredService<IMigrationsScaffolder>();
-                var fiels = migrationsScaffolder.RemoveMigration(projectDir, null, true, null);
-
-                designTimeServices = null;
-                serviceProvider.Dispose();
-                scope.Dispose();
-            }
-
+            _context.RemoveMigration(true);
             return Ok();
         }
 
@@ -146,7 +103,7 @@ namespace TestWeb.Controllers
         [Route("Update")]
         public ActionResult Update()
         {
-            _context.Database.Migrate();
+            _context.UpdateDatabase();
             return Ok();
         }
 

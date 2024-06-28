@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
+using DynamicSpace.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -15,10 +17,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 //using Microsoft.EntityFrameworkCore.Relational;
-using System.Reflection;
-using DynamicBuilder.Attributes;
 
-namespace DynamicBuilder
+namespace DynamicSpace.Design
 {
     public class DynamicMigrationsModelDiffer : MigrationsModelDiffer
     {
@@ -30,13 +30,12 @@ namespace DynamicBuilder
         protected override IEnumerable<MigrationOperation> Add(ITable target, DiffContext diffContext)
         {
             var entityType = target.EntityTypeMappings.FirstOrDefault();
-            var entityName = entityType?.TypeBase.ClrType.Name;
-            var entityId = entityType.TypeBase.ClrType.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
+            var entityId = entityType?.TypeBase.ClrType.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
 
             var result = base.Add(target, diffContext);
             foreach (var item in result)
             {
-                item.AddAnnotation("EntityName", entityName);
+                item.AddAnnotation("EntityId", entityId);
                 yield return item;
             }
         }
@@ -44,11 +43,12 @@ namespace DynamicBuilder
         protected override IEnumerable<MigrationOperation> Remove(ITable target, DiffContext diffContext)
         {
             var entityType = target.EntityTypeMappings.FirstOrDefault();
-            var entityName = entityType?.TypeBase.ClrType.Name;
+            var entityId = entityType?.TypeBase.ClrType.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
+
             var result = base.Remove(target, diffContext);
             foreach (var item in result)
             {
-                item.AddAnnotation("EntityName", entityName);
+                item.AddAnnotation("EntityId", entityId);
                 yield return item;
             }
         }

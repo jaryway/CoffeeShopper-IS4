@@ -20,6 +20,8 @@ var builder = new DbContextOptionsBuilder<ApplicationDbContext>().UseMySql(conne
 
 using (var applicationDbContext = new ApplicationDbContext(builder.Options))
 {
+    var t =  applicationDbContext.GetType();
+    var name = t.FullName;
     SeedData.Initialize(applicationDbContext);
     //var dbConnection = applicationDbContext.Database.GetDbConnection();
     //var list = applicationDbContext.DynamicEntities.Select(m => m.Name).ToList();
@@ -43,27 +45,27 @@ using (var applicationDbContext = new ApplicationDbContext(builder.Options))
     ////System.Linq.Dynamic.Core.DynamicClassFactory.
     ////AppDomain.CurrentDomain.CreateInstance("",)
 
-    AssemblyName assemblyName = new AssemblyName("MyDynamicAssembly");
-    AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
+    //AssemblyName assemblyName = new AssemblyName("MyDynamicAssembly");
+    //AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
 
-    //// 创建一个动态模块
-    ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("MyDynamicAssembly.dll");
+    ////// 创建一个动态模块
+    //ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("MyDynamicAssembly.dll");
 
-    // 创建一个动态类型
-    TypeBuilder typeBuilder = moduleBuilder.DefineType("MyDynamicType", TypeAttributes.Public);
+    //// 创建一个动态类型
+    //TypeBuilder typeBuilder = moduleBuilder.DefineType("MyDynamicType", TypeAttributes.Public);
 
-    // 定义一个字段
-    FieldBuilder fieldBuilder = typeBuilder.DefineField("myField", typeof(string), FieldAttributes.Public);
+    //// 定义一个字段
+    //FieldBuilder fieldBuilder = typeBuilder.DefineField("myField", typeof(string), FieldAttributes.Public);
 
-    // 定义一个方法
-    MethodBuilder methodBuilder = typeBuilder.DefineMethod("MyMethod", MethodAttributes.Public, typeof(int), new[] { typeof(int), typeof(int) });
-    ILGenerator ilGenerator = methodBuilder.GetILGenerator();
-    ilGenerator.Emit(OpCodes.Ldarg_1); // 将第一个参数推送到栈上
-    ilGenerator.Emit(OpCodes.Ldarg_2); // 将第二个参数推送到栈上
-    ilGenerator.Emit(OpCodes.Add); // 执行加法操作
-    ilGenerator.Emit(OpCodes.Ret); // 返回结果
+    //// 定义一个方法
+    //MethodBuilder methodBuilder = typeBuilder.DefineMethod("MyMethod", MethodAttributes.Public, typeof(int), new[] { typeof(int), typeof(int) });
+    //ILGenerator ilGenerator = methodBuilder.GetILGenerator();
+    //ilGenerator.Emit(OpCodes.Ldarg_1); // 将第一个参数推送到栈上
+    //ilGenerator.Emit(OpCodes.Ldarg_2); // 将第二个参数推送到栈上
+    //ilGenerator.Emit(OpCodes.Add); // 执行加法操作
+    //ilGenerator.Emit(OpCodes.Ret); // 返回结果
 
-    var ddd = (Assembly) assemblyBuilder;
+    //var ddd = (Assembly)assemblyBuilder;
     //var ss= Assembly.Load("MyDynamicAssembly.dll");
     //assemblyBuilder.
 
@@ -79,7 +81,7 @@ using (var applicationDbContext = new ApplicationDbContext(builder.Options))
     // 保存动态程序集
     //assemblyBuil
 
-    //var generator = new DynamicSpace.DynamicDbContextGenerator(applicationDbContext);
+    var generator = new DynamicSpace.DynamicDbContextGenerator(applicationDbContext);
 
     //generator.AddEntity("Test", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;} public string Name3 {get; set;} public string Name4 {get; set;} public string Name2 {get; set;}", tableName: "Tests");
     //generator.AddEntity("Author", "public int Id { get; set; } public string FirstName {get; set;} public string LastName {get; set;} public ICollection<Book> Books { get; set; }", tableName: "Authors");
@@ -89,11 +91,11 @@ using (var applicationDbContext = new ApplicationDbContext(builder.Options))
     //generator.AddEntity("Test01", "public int Id { get; set; } public string Name {get; set;}", tableName: "Tests01");
     //generator.AddMigration();
     //generator.UpdateDatabase();
-    //generator.AddEntity("Test02", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;}", tableName: "Tests02");
+    generator.AddEntity("Test02", "public int Id { get; set; } public string Name {get; set;} public string Name1 {get; set;}", tableName: "Tests02");
     //generator.AddEntity("Test03", "public int Id { get; set; } public string Name {get; set;}", tableName: "Test03");
-    //generator.AddMigration();
+    generator.AddMigration();
     //generator.RemoveMigration(false);
-    //generator.UpdateDatabase();
+    generator.UpdateDatabase();
 
     //var list = new List<bool>().Where
 
