@@ -12,19 +12,19 @@ namespace DynamicSpace
 {
     public static class DynamicEntityExtensions
     {
-        public static string GenerateCode(this DynamicEntity entity)
+        public static string GenerateCode(this DynamicClass entity, bool designTime = false)
         {
 
             var code = $@"
 using System;
 using System.Collections.Generic;
-using {typeof(EntityBase).Namespace};
+using {typeof(DynamicClassBase).Namespace};
 using {typeof(EntityIdAttribute).Namespace};
 using {typeof(TableAttribute).Namespace};
 [EntityId({entity.Id})]
 [Table(""Dynamic_{entity.TableName}"")]
-public class {entity.Name} : EntityBase{{
-    {entity.EntityProperties}
+public class {entity.Name} : DynamicClassBase{{
+    {(designTime ? entity.EntityProperties_ : entity.EntityProperties)}
 }}";
             return code;
         }

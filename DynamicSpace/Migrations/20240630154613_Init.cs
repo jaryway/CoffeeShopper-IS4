@@ -15,7 +15,7 @@ namespace DynamicSpace.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "DynamicEntities",
+                name: "DynamicClasses",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -28,6 +28,8 @@ namespace DynamicSpace.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     EntityProperties = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    EntityProperties_ = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     JSON = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Published = table.Column<bool>(type: "tinyint(1)", nullable: false),
@@ -37,7 +39,7 @@ namespace DynamicSpace.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DynamicEntities", x => x.Id);
+                    table.PrimaryKey("PK_DynamicClasses", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -64,7 +66,7 @@ namespace DynamicSpace.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DynamicEntities");
+                name: "DynamicClasses");
 
             migrationBuilder.DropTable(
                 name: "MigrationEntries");

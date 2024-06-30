@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DynamicSpace.Models
 {
-    public abstract class EntityBase
+    public abstract class DynamicClassBase
     {
         [Key]
         public long Id { get; set; }

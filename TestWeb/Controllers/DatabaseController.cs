@@ -30,12 +30,11 @@ namespace TestWeb.Controllers
     [Route("[controller]")]
     public class DatabaseController : ControllerBase
     {
-
         private readonly ILogger<DatabaseController> _logger;
 
-        private readonly DynamicDbContext _context;
+        private readonly DynamicDesignTimeDbContext _context;
 
-        public DatabaseController(ILogger<DatabaseController> logger, DynamicDbContext context, IServiceProvider serviceProvider)
+        public DatabaseController(ILogger<DatabaseController> logger, DynamicDesignTimeDbContext context)
         {
             _logger = logger;
             _context = context;
@@ -46,16 +45,19 @@ namespace TestWeb.Controllers
         public ActionResult<DynamicEntityModel> AddDynamicEntity([FromBody] DynamicEntityModel model)
         {
 
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
             }
 
-            var entity = new DynamicEntity();
+            var entity = new DynamicClass();
             entity.Name = model.Name;
             entity.TableName = model.TableName;
-            entity.EntityProperties = model.EntityProperties;
+            entity.EntityProperties_ = model.EntityProperties;
 
-           _context.AddDynamicEntity(entity);
+            //var builder = DynamicAssemblyBuilder.GetInstance(true);
+            //builder.AddDynamicClasses(entity);
+            _context.AddDynamicClass(entity);
 
             return Ok(entity);
         }
@@ -72,7 +74,6 @@ namespace TestWeb.Controllers
         [Route("/Migration/Addition")]
         public ActionResult AddMigration(string name)
         {
-
             if (string.IsNullOrEmpty(name))
             {
                 return BadRequest("参数 name 不能为空");
@@ -106,7 +107,5 @@ namespace TestWeb.Controllers
             _context.UpdateDatabase();
             return Ok();
         }
-
-
     }
 }

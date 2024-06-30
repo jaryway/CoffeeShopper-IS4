@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DynamicSpace.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240628091235_Init")]
+    [Migration("20240630154613_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace DynamicSpace.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("DynamicSpace.Models.DynamicEntity", b =>
+            modelBuilder.Entity("DynamicSpace.Models.DynamicClass", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,6 +38,10 @@ namespace DynamicSpace.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("EntityProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("EntityProperties_")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -65,7 +69,7 @@ namespace DynamicSpace.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DynamicEntities");
+                    b.ToTable("DynamicClasses");
                 });
 
             modelBuilder.Entity("DynamicSpace.Models.MigrationEntry", b =>

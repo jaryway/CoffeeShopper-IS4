@@ -8,14 +8,12 @@ public class ApplicationDbContext : DbContext
 
     public ApplicationDbContext()
     { }
-    //public ApplicationDbContext(DbContextOptions options) : base(options)
-    //{ }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     { }
 
+    public DbSet<DynamicClass> DynamicClasses { get; set; }
 
-    public DbSet<DynamicEntity> DynamicEntities { get; set; }
-   
     public DbSet<MigrationEntry> MigrationEntries { get; set; }
 
     //public DbSet<SourceCode> SourceCodes { get; set; }
