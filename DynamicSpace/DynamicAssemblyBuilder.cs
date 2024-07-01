@@ -17,16 +17,17 @@ namespace DynamicSpace
 {
     public class DynamicAssemblyBuilder
     {
-        private readonly string _assemblyName = "DynamicAssembly";
+        //private readonly string _assemblyName = "DynamicAssembly";
         private AssemblyLoadContext _assemblyLoadContext;
         private bool hasChanged = false;
         private Assembly? assembly;
-        private readonly Dictionary<string, MigrationEntry> migrationEntries = new();
-        private readonly Dictionary<long, DynamicClass> dynamicClasses = new();
+        //private readonly Dictionary<string, MigrationEntry> migrationEntries = new();
+        //private readonly Dictionary<long, DynamicClass> dynamicClasses = new();
         private static DynamicAssemblyBuilder? instance;
         private static DynamicAssemblyBuilder? designTimeInstance;
         //private readonly ApplicationDbContext _applicationDbContext;
         private static IServiceProvider? _serviceProvider;
+        //private int version = 0;
 
         public static void Initialize(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
@@ -34,17 +35,6 @@ namespace DynamicSpace
         {
             _assemblyLoadContext = new(Guid.NewGuid().ToString(), true);
             DesignTime = disignTime;
-            using (var scope = _serviceProvider!.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()!;
-
-                AddMigrations(context.MigrationEntries.ToArray());
-                var query = context.DynamicClasses.AsQueryable();
-
-                query = DesignTime ? query.Where(p => p.EntityProperties_ != "") : query.Where(p => p.EntityProperties != "");
-
-                AddDynamicClasses(query.ToArray());
-            }
         }
 
         public static DynamicAssemblyBuilder GetInstance(bool disignTime = false)
@@ -57,6 +47,9 @@ namespace DynamicSpace
         }
 
         public bool DesignTime { get; }
+        public static string AssemblyName => "DynamicAssembly";
+
+        public void SetVersion() => hasChanged = true;
 
         public Assembly Assembly
         {
@@ -69,79 +62,6 @@ namespace DynamicSpace
 
                 assembly = Build();
                 return assembly;
-            }
-        }
-
-        public void AddDynamicClasses(params DynamicClass[] classes)
-        {
-            if (classes.Length == 0)
-            {
-                return;
-            }
-
-            foreach (var item in classes)
-            {
-                if (!dynamicClasses.TryAdd(item.Id, item))
-                {
-                    dynamicClasses[item.Id] = item;
-                }
-            }
-
-            hasChanged = true;
-        }
-
-        public void RemoveDynamicClasses(params DynamicClass[] classes) => RemoveDynamicClasses(classes.Select(m => m.Id).ToArray());
-
-        public void RemoveDynamicClasses(params long[] ids)
-        {
-            if (ids.Length == 0)
-            {
-                return;
-            }
-
-            foreach (var item in ids)
-            {
-                if (dynamicClasses.Remove(item))
-                {
-                    hasChanged = true;
-                }
-            }
-
-        }
-
-        public void AddMigrations(params MigrationEntry[] migrations)
-        {
-            if (migrations.Length == 0)
-            {
-                return;
-            }
-
-            foreach (var item in migrations)
-            {
-                if (!migrationEntries.TryAdd(item.MigrationId, item))
-                {
-                    migrationEntries[item.MigrationId] = item;
-                }
-            }
-
-            hasChanged = true;
-        }
-
-        public void RemoveMigrations(params MigrationEntry[] migrations) => RemoveMigrations(migrations.Select(m => m.MigrationId).ToArray());
-
-        public void RemoveMigrations(params string[] migrationIds)
-        {
-            if (migrationIds.Length == 0)
-            {
-                return;
-            }
-
-            foreach (var item in migrationIds)
-            {
-                if (migrationEntries.Remove(item))
-                {
-                    hasChanged = true;
-                }
             }
         }
 
@@ -167,17 +87,27 @@ namespace DynamicSpace
 
             var syntaxTrees = new List<SyntaxTree>();
 
-            migrationEntries.ToList().ForEach(item =>
+            using (var scope = _serviceProvider!.CreateScope())
             {
-                syntaxTrees.Add(CSharpSyntaxTree.ParseText(item.Value.Code).WithFilePath(item.Value.MigrationId));
-            });
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()!;
 
-            dynamicClasses.ToList().ForEach(item =>
-            {
-                syntaxTrees.Add(CSharpSyntaxTree.ParseText(item.Value.GenerateCode()).WithFilePath(item.Value.Name));
-            });
 
-            var compilation = CSharpCompilation.Create(_assemblyName)
+                context.MigrationEntries.ToList().ForEach(item =>
+                {
+                    syntaxTrees.Add(CSharpSyntaxTree.ParseText(item.Code).WithFilePath(item.MigrationId));
+                });
+
+                var query = context.DynamicClasses.AsQueryable();
+
+                query = DesignTime ? query.Where(p => p.EntityProperties_ != "") : query.Where(p => p.EntityProperties != "");
+
+                query.ToList().ForEach(item =>
+                {
+                    syntaxTrees.Add(CSharpSyntaxTree.ParseText(item.GenerateCode(DesignTime)).WithFilePath(item.Name));
+                });
+            }
+
+            var compilation = CSharpCompilation.Create(AssemblyName)
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Release))
                 .AddReferences(references)
                 .AddSyntaxTrees(syntaxTrees);
@@ -198,7 +128,7 @@ namespace DynamicSpace
                 }
             }
 
-            Console.WriteLine($"Successfully created Assembly: {_assemblyName}");
+            Console.WriteLine($"Successfully created Assembly: {AssemblyName}");
 
             if (_assemblyLoadContext != null)
             {

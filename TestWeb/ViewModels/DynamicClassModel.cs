@@ -2,7 +2,7 @@
 
 namespace TestWeb.ViewModels
 {
-    public class DynamicEntityModel
+    public class DynamicClassModel
     {
         public int? Id { get; set; } = null;
 

@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<DynamicClass> DynamicClasses { get; set; }
 
     public DbSet<MigrationEntry> MigrationEntries { get; set; }
+    public DbSet<Test> Tests { get; set; }
 
     //public DbSet<SourceCode> SourceCodes { get; set; }
 

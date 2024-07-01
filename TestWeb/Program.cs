@@ -1,5 +1,7 @@
 ﻿using DynamicSpace;
 using DynamicSpace.Design;
+using DynamicSpace.Services;
+using DynamicSpace.Services.Impl;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -9,6 +11,8 @@ var connectionString = builder.Configuration.GetConnectionString("MySql");
 // Add services to the container.
 
 //builder.Services.AddSingleton<DynamicAssemblyBuilder>(new DynamicAssemblyBuilder("DynamicAssembly"));
+
+builder.Services.AddScoped<IDynamicDesignTimeService, DynamicDesignTimeService>();
 
 builder.Services.AddControllers();
 

@@ -23,26 +23,46 @@ using Pomelo.EntityFrameworkCore.MySql.Storage.Internal;
 using DynamicSpace;
 using DynamicSpace.Models;
 using TestWeb.ViewModels;
+using DynamicSpace.Services;
 
 namespace TestWeb.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DatabaseController : ControllerBase
+    public class DynamicClassController : ControllerBase
     {
-        private readonly ILogger<DatabaseController> _logger;
+        private readonly ILogger<DynamicClassController> _logger;
+        //private readonly ApplicationDbContext _applicationDbContext;
+        //private readonly DynamicDesignTimeDbContext _context;
+        private readonly IDynamicDesignTimeService _dynamicDesignTimeService;
 
-        private readonly DynamicDesignTimeDbContext _context;
-
-        public DatabaseController(ILogger<DatabaseController> logger, DynamicDesignTimeDbContext context)
+        public DynamicClassController(ILogger<DynamicClassController> logger, IDynamicDesignTimeService dynamicDesignTimeService)
         {
             _logger = logger;
-            _context = context;
+            //_context = context;
+            //_applicationDbContext = applicationDbContext;
+            _dynamicDesignTimeService = dynamicDesignTimeService;
+        }
+
+        [HttpGet]
+        [Route("List")]
+        public ActionResult<IEnumerable<DynamicClass>> DynamicClassList()
+        {
+
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+
+            var list = _dynamicDesignTimeService.GetList();
+            //_context.AddDynamicClass(entity);
+
+            return Ok(list);
         }
 
         [HttpPost]
-        [Route("/DynamicEntity/Add")]
-        public ActionResult<DynamicEntityModel> AddDynamicEntity([FromBody] DynamicEntityModel model)
+        [Route("Addition")]
+        public ActionResult<DynamicClassModel> AddDynamicClass([FromBody] DynamicClassModel model)
         {
 
             if (!ModelState.IsValid)
@@ -57,54 +77,102 @@ namespace TestWeb.Controllers
 
             //var builder = DynamicAssemblyBuilder.GetInstance(true);
             //builder.AddDynamicClasses(entity);
-            _context.AddDynamicClass(entity);
+            _dynamicDesignTimeService.Create(entity);
 
             return Ok(entity);
         }
 
-        [HttpGet]
-        [Route("/Migration/List")]
-        public IEnumerable<string> GetMigrations()
+        [HttpPut]
+        [Route("Update/{id}")]
+        public ActionResult<DynamicClassModel> UpdateDynamicClass([FromRoute] long id, [FromBody] DynamicClassModel model)
         {
-            return _context.Database.GetMigrations();
+            var e = _dynamicDesignTimeService.Get(id);
+            if (e == null)
+            {
+                return NotFound($"对象-{id}不存在");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var entity = new DynamicClass();
+            //entity.Name = model.Name;
+            //entity.TableName = model.TableName;
+            entity.EntityProperties_ = model.EntityProperties;
+
+            //var builder = DynamicAssemblyBuilder.GetInstance(true);
+            //builder.AddDynamicClasses(entity);
+            _dynamicDesignTimeService.Update(entity);
+
+            return Ok(entity);
         }
 
-        // GET: DatabaseController
-        [HttpPost]
-        [Route("/Migration/Addition")]
-        public ActionResult AddMigration(string name)
+        [HttpDelete]
+        [Route("Remove")]
+        public ActionResult<DynamicClassModel> RemoveDynamicClass(long id)
         {
-            if (string.IsNullOrEmpty(name))
+
+            if (id <= 0)
             {
-                return BadRequest("参数 name 不能为空");
+                return BadRequest(ModelState);
             }
 
-            try
+            var e = _dynamicDesignTimeService.Get(id);
+            if (e == null)
             {
-                _context.AddMigration(name);
+                return BadRequest("未找到记录");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError("AddMigration 报错：" + ex.Message);
-                return BadRequest(ex.Message);
-            }
-
+            //_applicationDbContext.DynamicClasses.Remove(e);
+            //_applicationDbContext.SaveChanges();
+            _dynamicDesignTimeService.Remove(e);
             return Ok();
         }
 
-        [HttpPost]
-        [Route("/Migration/Remove")]
-        public ActionResult RemoveMigration()
-        {
-            _context.RemoveMigration(true);
-            return Ok();
-        }
+        //[HttpGet]
+        //[Route("/Migration/List")]
+        //public IEnumerable<string> GetMigrations()
+        //{
+        //    return _context.Database.GetMigrations();
+        //}
+
+        //// GET: DatabaseController
+        //[HttpPost]
+        //[Route("/Migration/Addition")]
+        //public ActionResult AddMigration(string name)
+        //{
+        //    if (string.IsNullOrEmpty(name))
+        //    {
+        //        return BadRequest("参数 name 不能为空");
+        //    }
+
+        //    try
+        //    {
+        //        _context.AddMigration(name);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError("AddMigration 报错：" + ex.Message);
+        //        return BadRequest(ex.Message);
+        //    }
+
+        //    return Ok();
+        //}
+
+        //[HttpPost]
+        //[Route("/Migration/Remove")]
+        //public ActionResult RemoveMigration()
+        //{
+        //    _context.RemoveMigration(false);
+        //    return Ok();
+        //}
 
         [HttpPost]
-        [Route("Update")]
-        public ActionResult Update()
+        [Route("Generate")]
+        public ActionResult Generate()
         {
-            _context.UpdateDatabase();
+            _dynamicDesignTimeService.Generate();
             return Ok();
         }
     }

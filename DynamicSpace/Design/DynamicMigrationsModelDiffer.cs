@@ -30,7 +30,7 @@ namespace DynamicSpace.Design
         protected override IEnumerable<MigrationOperation> Add(ITable target, DiffContext diffContext)
         {
             var entityType = target.EntityTypeMappings.FirstOrDefault();
-            var entityId = entityType?.TypeBase.ClrType.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
+            var entityId = entityType?.TypeBase.ClrType.GetCustomAttribute<EntityIdAttribute>()?.EntityId;
 
             var result = base.Add(target, diffContext);
             foreach (var item in result)
@@ -43,7 +43,7 @@ namespace DynamicSpace.Design
         protected override IEnumerable<MigrationOperation> Remove(ITable target, DiffContext diffContext)
         {
             var entityType = target.EntityTypeMappings.FirstOrDefault();
-            var entityId = entityType?.TypeBase.ClrType.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
+            var entityId = entityType?.TypeBase.ClrType.GetCustomAttribute<EntityIdAttribute>()?.EntityId;
 
             var result = base.Remove(target, diffContext);
             foreach (var item in result)
