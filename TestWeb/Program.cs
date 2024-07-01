@@ -3,6 +3,7 @@ using DynamicSpace.Design;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using TestWeb;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MySql");
@@ -11,6 +12,8 @@ var connectionString = builder.Configuration.GetConnectionString("MySql");
 //builder.Services.AddSingleton<DynamicAssemblyBuilder>(new DynamicAssemblyBuilder("DynamicAssembly"));
 
 builder.Services.AddControllers();
+builder.Services.AddMvc(o => o.Conventions.Add(new GenericControllerRouteConvention()))
+    .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 builder.Services.AddDbContext<DynamicDesignTimeDbContext>(options =>
