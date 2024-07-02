@@ -67,11 +67,11 @@ namespace DynamicSpace.Services.Impl
         {
             try
             {
-                _dynamicAssemblyBuilder.SetVersion();
+                _dynamicAssemblyBuilder.IncreaseVersion();
 
                 if (AddMigration(migrationName))
                 {
-                    _dynamicAssemblyBuilder.SetVersion();
+                    _dynamicAssemblyBuilder.IncreaseVersion();
                 }
 
                 using var scope = _serviceProvider.CreateScope();

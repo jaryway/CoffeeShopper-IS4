@@ -24,11 +24,18 @@ using DynamicSpace;
 using DynamicSpace.Models;
 using TestWeb.ViewModels;
 using DynamicSpace.Services;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using DynamicSpace.Controllers;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
+using System.Reflection;
+using System.Text;
 
 namespace TestWeb.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]", Name = "DynamicClass1")]
     public class DynamicClassController : ControllerBase
     {
         private readonly ILogger<DynamicClassController> _logger;
@@ -42,6 +49,125 @@ namespace TestWeb.Controllers
             //_context = context;
             //_applicationDbContext = applicationDbContext;
             _dynamicDesignTimeService = dynamicDesignTimeService;
+        }
+
+        private Assembly CreateController(string name)
+        {
+
+            string code = new StringBuilder()
+                .AppendLine("using System;")
+                .AppendLine("using Microsoft.AspNetCore.Mvc;")
+                .AppendLine("namespace TestBlocklyHtml.Controllers")
+                .AppendLine("{")
+                .AppendLine("[Route(\"api/[controller]\")]")
+                .AppendLine("[ApiController]")
+                .AppendLine(string.Format("public class {0} : ControllerBase", name))
+
+                .AppendLine(" {")
+                 .AppendLine(" [HttpGet]")
+                .AppendLine("  public string Get()")
+                .AppendLine("  {")
+                .AppendLine(string.Format("return \"test - {0}\";", name))
+                .AppendLine("  }")
+                .AppendLine(" }")
+                .AppendLine("}")
+                .ToString();
+
+            var codeString = SourceText.From(code);
+            var options = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp7_3);
+
+            var parsedSyntaxTree = SyntaxFactory.ParseSyntaxTree(codeString, options);
+
+            var references = new MetadataReference[]
+             {
+                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                 MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+                 MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location),
+                 MetadataReference.CreateFromFile(typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly.Location),
+                 MetadataReference.CreateFromFile(typeof(RouteAttribute).Assembly.Location),
+                 MetadataReference.CreateFromFile(typeof(ApiControllerAttribute).Assembly.Location),
+                 MetadataReference.CreateFromFile(typeof(ControllerBase).Assembly.Location),
+                //MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                //MetadataReference.CreateFromFile(typeof(ApplicationDbContext).Assembly.Location),
+                MetadataReference.CreateFromFile(Assembly.Load("System").Location),
+
+                MetadataReference.CreateFromFile(Assembly.Load("System.Reflection").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("System.Collections").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("System.Linq").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("System.Linq.Expressions").Location),
+                MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Abstractions").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("Microsoft.EntityFrameworkCore.Relational").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("Pomelo.EntityFrameworkCore.MySql").Location),
+                //MetadataReference.CreateFromFile(Assembly.Load("System.ComponentModel.Annotations").Location),
+             };
+
+
+            var compilation = CSharpCompilation.Create("Hello.dll")
+                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Release))
+                .AddReferences(references)
+                .AddSyntaxTrees([parsedSyntaxTree]);
+
+            using var ms = new MemoryStream();
+            var result = compilation.Emit(ms);
+
+            //Console.WriteLine("DynamicAssemblyBuilder.Build.count" + syntaxTrees.Count());
+            ms.Seek(0, SeekOrigin.Begin);
+
+            if (!result.Success)
+            {
+                var errors = result.Diagnostics.Where(d => d.IsWarningAsError || d.Severity == DiagnosticSeverity.Error);
+                foreach (var diagnostic in errors)
+                {
+                    Console.WriteLine(diagnostic.ToString());
+                    throw new Exception(diagnostic.ToString());
+                }
+            }
+
+
+            return Assembly.Load(ms.ToArray());
+
+            //var codeRun = CSharpCompilation.Create("Hello.dll",
+            //     new[] { parsedSyntaxTree },
+            //     references: references,
+            //     options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
+            //         optimizationLevel: OptimizationLevel.Release,
+            //         assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
+
+
+
+
+            //using (var peStream = new MemoryStream())
+            //{
+            //    if (!codeRun.Emit(peStream).Success)
+            //    {
+            //        return null;
+            //    }
+            //    return Assembly.Load(peStream.ToArray());
+            //}
+
+
+
+        }
+
+        [HttpGet]
+        [Route("add")]
+        public string AddRuntimeController([FromServices] ApplicationPartManager partManager, [FromServices] DynamicActionDescriptorChangeProvider provider)
+        {
+            string name = "andrei" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            //var ass = CreateController(name);
+            var ass= DynamicAssemblyBuilder.GetInstance(true).Assembly;
+
+            if (ass != null)
+            {
+                partManager.ApplicationParts.Add(new AssemblyPart(ass));
+                // Notify change
+                provider.HasChanged = true;
+                provider.TokenSource.Cancel();
+                return "api/" + name;
+            }
+            throw new Exception("controller not generated");
         }
 
         [HttpGet]

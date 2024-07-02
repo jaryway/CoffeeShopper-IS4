@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using DynamicSpace.Models;
 using DynamicSpace.Attributes;
 using System.ComponentModel.DataAnnotations.Schema;
+using DynamicSpace.Controllers;
 
 namespace DynamicSpace
 {
@@ -21,8 +22,10 @@ using System.Collections.Generic;
 using {typeof(DynamicClassBase).Namespace};
 using {typeof(EntityIdAttribute).Namespace};
 using {typeof(TableAttribute).Namespace};
+using {typeof(GeneratedControllerAttribute).Namespace};
 [EntityId({entity.Id})]
 [Table(""Dynamic_{entity.TableName}"")]
+[GeneratedController(""api/{entity.Name}"")]
 public class {entity.Name} : DynamicClassBase{{
     {(designTime ? entity.EntityProperties_ : entity.EntityProperties)}
 }}";

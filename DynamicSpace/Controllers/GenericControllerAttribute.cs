@@ -1,5 +1,5 @@
 ﻿using System;
-namespace TestWeb.Attributes;
+namespace DynamicSpace.Controllers;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class GeneratedControllerAttribute : Attribute
@@ -10,6 +10,7 @@ public class GeneratedControllerAttribute : Attribute
     }
 
     public string Route { get; set; }
+    public string? Name { get; set; }
 }
 
 

@@ -12,6 +12,9 @@ using DynamicSpace.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using DynamicSpace.Controllers;
 
 namespace DynamicSpace
 {
@@ -19,7 +22,7 @@ namespace DynamicSpace
     {
         //private readonly string _assemblyName = "DynamicAssembly";
         private AssemblyLoadContext _assemblyLoadContext;
-        private bool hasChanged = false;
+        //private bool hasChanged = false;
         private Assembly? assembly;
         //private readonly Dictionary<string, MigrationEntry> migrationEntries = new();
         //private readonly Dictionary<long, DynamicClass> dynamicClasses = new();
@@ -27,9 +30,16 @@ namespace DynamicSpace
         private static DynamicAssemblyBuilder? designTimeInstance;
         //private readonly ApplicationDbContext _applicationDbContext;
         private static IServiceProvider? _serviceProvider;
+        private static IServiceCollection? _services;
+        private int currentVersion = 0;
+        private int nextVersion = 0;
         //private int version = 0;
 
-        public static void Initialize(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+        public static void Initialize(IServiceCollection services)
+        {
+            _serviceProvider = services.BuildServiceProvider();
+            _services = services;
+        }
 
         private DynamicAssemblyBuilder(bool disignTime = false)
         {
@@ -49,13 +59,15 @@ namespace DynamicSpace
         public bool DesignTime { get; }
         public static string AssemblyName => "DynamicAssembly";
 
-        public void SetVersion() => hasChanged = true;
+        public void IncreaseVersion() => nextVersion++;
+
+        private bool HasChanged => currentVersion != nextVersion;
 
         public Assembly Assembly
         {
             get
             {
-                if (!hasChanged && assembly != null)
+                if (!HasChanged && assembly != null)
                 {
                     return assembly;
                 }
@@ -137,7 +149,19 @@ namespace DynamicSpace
             }
 
             assembly = _assemblyLoadContext!.LoadFromStream(ms);
-            hasChanged = false;
+            //var part = new AssemblyPart(assembly);
+            //_services!.AddControllers().AddApplicationPart(assembly);
+            //var partManager = _serviceProvider.GetService<ApplicationPartManager>();
+
+
+            var provider = _serviceProvider?.GetService<IActionDescriptorChangeProvider>() as DynamicActionDescriptorChangeProvider;
+            if (provider != null && currentVersion > 0)
+            {
+                provider.HasChanged = true;
+                provider.TokenSource.Cancel();
+            }
+
+            currentVersion = nextVersion;
             return assembly;
         }
     }

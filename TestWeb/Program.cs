@@ -1,11 +1,12 @@
 ﻿using DynamicSpace;
+using DynamicSpace.Controllers;
 using DynamicSpace.Design;
 using DynamicSpace.Services;
 using DynamicSpace.Services.Impl;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using TestWeb;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MySql");
@@ -15,9 +16,14 @@ var connectionString = builder.Configuration.GetConnectionString("MySql");
 
 builder.Services.AddScoped<IDynamicDesignTimeService, DynamicDesignTimeService>();
 
-builder.Services.AddControllers();
-builder.Services.AddMvc(o => o.Conventions.Add(new GenericControllerRouteConvention()))
-    .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()));
+builder.Services.AddControllers(o => o.Conventions.Add(new GenericControllerRouteConvention()))
+    .ConfigureApplicationPartManager(app =>
+    {
+        app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider());
+    });
+
+builder.Services.AddSingleton<IActionDescriptorChangeProvider>(DynamicActionDescriptorChangeProvider.Instance);
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 builder.Services.AddDbContext<DynamicDesignTimeDbContext>(options =>
@@ -32,27 +38,14 @@ builder.Services.AddDbContext<DynamicDesignTimeDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//var s1 = DynamicAssemblyBuilder.GetInstance();
-//var s2 = DynamicAssemblyBuilder.GetInstance();
-//var s3 = DynamicAssemblyBuilder.GetInstance(true);
 
-//s2.AddDynamicEntities(new DynamicSpace.Models.DynamicClass { Id = 1, Name = "1" });
-
+DynamicAssemblyBuilder.Initialize(builder.Services);
 
 var app = builder.Build();
-DynamicAssemblyBuilder.Initialize(app.Services);
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<DynamicDesignTimeDbContext>();
-    //var h1 = context.Database.HasPendingModelChanges();
-    //var h2 = context.Database.HasPendingModelChanges();
-    //var migrations = context.MigrationEntries.ToList() ?? [];
-    //var entities = context.DynamicEntities.ToList() ?? [];
-
-    //var migrationsCode = migrations.Select(p => new KeyValuePair<string, string>(p.MigrationId, p.Code));
-    //var entitiesCode = entities.Select(p => new KeyValuePair<string, string>(string.Join(".", "DynamicAssembly", p.Name), p.GenerateCode()));
-
-    //DynamicAssemblyBuilder.Initialize(migrationsCode.Concat(entitiesCode));
 }
 
 
