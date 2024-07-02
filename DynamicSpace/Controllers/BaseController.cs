@@ -28,24 +28,46 @@ public class BaseController<T> : ControllerBase where T : DynamicClassBase
         var typeInfo = typeof(T)!;
         var classId = typeInfo.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
         return _dynamicDbContext.Query<T>().ToList();
-        //throw new NotImplementedException();
-
     }
 
     [HttpGet]
     [Route("{id}")]
-    public T Get(long id)
+    public ActionResult<T?> Get(long id)
     {
-        //return _storage.GetById(id);
-        throw new NotImplementedException();
+        try
+        {
+            return _dynamicDbContext.Set<T>().FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Get by id");
+            return BadRequest("ex:" + ex.Message);
+        }
     }
 
     [HttpPost()]
     [Route("{id}")]
-    public void Post(long id, [FromBody] T value)
+    public ActionResult<T> Post(long id, [FromBody] T value)
     {
         //_storage.Add(id, value);
-        throw new NotImplementedException();
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var entity = _dynamicDbContext.Set<T>().FirstOrDefault();
+        if (entity == null)
+        {
+            return BadRequest($"对象 {id} 未找到");
+        }
+        
+
+        _dynamicDbContext.Set<T>().Update(value);
+
+        return value;
+
+        //throw new NotImplementedException();
     }
 }
 

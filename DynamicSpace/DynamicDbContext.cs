@@ -32,34 +32,27 @@ namespace DynamicSpace
         //    //var dd = this.Set(classType);
         //}
 
-        //public object UpdateDynamicClass(Type entityType, object entity)
-        //{
-        //    throw new NotImplementedException();
-        //    // TODO: dbContext.Set<Type>().Update();
-        //    //var dbSet = base.Set(classType);
-        //    var s = (DynamicClassBase)entity;
-        //    //var existingEntity = Find(entityType, s.Id) ?? throw new InvalidOperationException($"The entity of type '{entityType.Name}' with the primary key value '{s.Id}' does not exist in the database.");
+        public TEntity Update<TEntity>(TEntity entity) where TEntity : DynamicClassBase
+        {
+            Set<TEntity>().Update(entity);
+        }
 
-        //}
+        public void Delete<TEntity>(long id) where TEntity : DynamicClassBase
+        {
+            var entity = GetByKey<TEntity>(id);
 
-        //public int RemoveDynamicClass(Type classType, long id)
-        //{
-        //    throw new NotImplementedException();
+            if (entity == null)
+            {
+                return;
+            }
 
-        //    var entity = GetByKey(classType, id);
+            Set<TEntity>().Remove(entity);
+        }
 
-
-        //    var s = Set<DynamicClassBase>().Remove(entity!);
-
-
-        //    //return Query(classType);
-        //}
-
-        //public DynamicClassBase? GetByKey(Type type, long id)
-        //{
-        //    var query = GetType().GetMethod("Set")!.MakeGenericMethod(type).Invoke(this, null);
-        //    return (query as IQueryable<DynamicClassBase>)!.FirstOrDefault(m => m.Id == id);
-        //}
+        public TEntity? GetByKey<TEntity>(long id) where TEntity : DynamicClassBase
+        {
+            return Set<TEntity>().FirstOrDefault(m => m.Id == id);
+        }
 
         public IQueryable<TEntity> Query<TEntity>() where TEntity : DynamicClassBase
         {
