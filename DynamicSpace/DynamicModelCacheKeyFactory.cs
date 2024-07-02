@@ -8,9 +8,18 @@ namespace DynamicSpace
     {
         public object Create(DbContext context, bool designTime)
         {
-            return context is DynamicDesignTimeDbContext dynamicDbContext
-            ? (context.GetType(), dynamicDbContext.Assembly, designTime)
-            : (object)context.GetType();
+            if (context is DynamicDesignTimeDbContext dynamicDesignTimeDbContext)
+            {
+                return (context.GetType(), dynamicDesignTimeDbContext.Assembly, designTime);
+            }
+
+            if (context is DynamicDbContext dynamicDbContext)
+            {
+                return (context.GetType(), dynamicDbContext.Assembly);
+            }
+
+            return (object)context.GetType();
+
         }
     }
 }

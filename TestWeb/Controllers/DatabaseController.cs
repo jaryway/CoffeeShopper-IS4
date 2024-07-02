@@ -40,7 +40,6 @@ namespace TestWeb.Controllers
     {
         private readonly ILogger<DynamicClassController> _logger;
         private readonly ApplicationDbContext _applicationDbContext;
-        //private readonly DynamicDesignTimeDbContext _context;
         private readonly IDynamicDesignTimeService _dynamicDesignTimeService;
 
         public DynamicClassController(ILogger<DynamicClassController> logger, IDynamicDesignTimeService dynamicDesignTimeService, ApplicationDbContext applicationDbContext)

@@ -96,11 +96,13 @@ namespace DynamicSpace
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()!;
 
-
-                context.MigrationEntries.ToList().ForEach(item =>
+                if (DesignTime)
                 {
-                    syntaxTrees.Add(CSharpSyntaxTree.ParseText(item.Code).WithFilePath(item.MigrationId));
-                });
+                    context.MigrationEntries.ToList().ForEach(item =>
+                    {
+                        syntaxTrees.Add(CSharpSyntaxTree.ParseText(item.Code).WithFilePath(item.MigrationId));
+                    });
+                }
 
                 var query = context.DynamicClasses.AsQueryable();
 
