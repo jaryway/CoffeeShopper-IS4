@@ -24,12 +24,8 @@
 
   <ItemGroup>
     <None Remove="Models\" />
-    <None Remove="Attributes\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DynamicSpace\DynamicSpace.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Attributes\" />
   </ItemGroup>
 </Project>
