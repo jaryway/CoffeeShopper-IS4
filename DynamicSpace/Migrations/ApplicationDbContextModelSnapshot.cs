@@ -90,22 +90,7 @@ namespace DynamicSpace.Migrations
                     b.ToTable("MigrationEntries");
                 });
 
-            modelBuilder.Entity("DynamicSpace.Models.Test", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tests");
-                });
 #pragma warning restore 612, 618
         }
     }

@@ -10,12 +10,25 @@ public class ApplicationDbContext : DbContext
     { }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    { }
+    {
+
+        //this.Set(typeof(Models.Test));
+
+        //this.Set(typeof(DynamicClass), "");
+        //DynamicClasses.Remove();
+
+    }
 
     public DbSet<DynamicClass> DynamicClasses { get; set; }
 
     public DbSet<MigrationEntry> MigrationEntries { get; set; }
-    public DbSet<Test> Tests { get; set; }
+
+    public IQueryable<T> Query<T>() where T : class
+    {
+        return Set<T>() as IQueryable<T>;
+    }
+
+    //public DbSet<Test> Tests { get; set; }
 
     //public DbSet<SourceCode> SourceCodes { get; set; }
 

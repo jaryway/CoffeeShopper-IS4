@@ -16,16 +16,26 @@ var connectionString = builder.Configuration.GetConnectionString("MySql");
 
 builder.Services.AddScoped<IDynamicDesignTimeService, DynamicDesignTimeService>();
 
-builder.Services.AddControllers(o => o.Conventions.Add(new GenericControllerRouteConvention()))
+builder.Services.AddControllers(o => o.Conventions.Add(new GenericTypeControllerRouteConvention()))
     .ConfigureApplicationPartManager(app =>
     {
         app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider());
+        app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider(true));
     });
 
 builder.Services.AddSingleton<IActionDescriptorChangeProvider>(DynamicActionDescriptorChangeProvider.Instance);
 
+//builder.Services.AddScoped(typeof(BaseController<>));
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<DynamicDbContext>(options =>
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    //options.ReplaceService<IMigrator, DynamicMySqlMigrator>();
+    //options.ReplaceService<IMigrationsAssembly, DynamicMigrationsAssembly>();
+    //options.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
+});
 builder.Services.AddDbContext<DynamicDesignTimeDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -43,10 +53,10 @@ DynamicAssemblyBuilder.Initialize(builder.Services);
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<DynamicDesignTimeDbContext>();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var context = scope.ServiceProvider.GetRequiredService<DynamicDesignTimeDbContext>();
+//}
 
 
 // Configure the HTTP request pipeline.

@@ -13,13 +13,10 @@ namespace DynamicSpace.Services.Impl
 {
     public class DynamicDesignTimeService : IDynamicDesignTimeService
     {
-        private static readonly string dynamicAssemblyName = "DynamicAssembly";
-        private static readonly string dynamicClassNamespace = $"{dynamicAssemblyName}.Models";
-        private static readonly string dynamicMigrationNamespace = $"{dynamicAssemblyName}.Migrations";
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly DynamicDesignTimeDbContext _dynamicDbContext;
         private readonly DynamicAssemblyBuilder _dynamicAssemblyBuilder; private readonly IServiceProvider _serviceProvider;
-        //private bool hasChanged = false;
+
         public DynamicDesignTimeService(ApplicationDbContext applicationDbContext, DynamicDesignTimeDbContext dynamicDbContext, IServiceProvider serviceProvider)
         {
             _applicationDbContext = applicationDbContext;
@@ -99,7 +96,7 @@ namespace DynamicSpace.Services.Impl
             //using (var scope = this.GetService<IServiceScopeFactory>().CreateScope())
             //{
             var scaffolder = GetMigrationsScaffolder();
-            var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: dynamicAssemblyName);
+            var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: DynamicAssemblyBuilder.AssemblyName);
 
             var migration1 = new MigrationEntry { MigrationId = migration.MigrationId, Code = migration.MigrationCode };
             var migration2 = new MigrationEntry { MigrationId = migration.MigrationId + ".Designer", Code = migration.MetadataCode };

@@ -2,9 +2,9 @@
 namespace DynamicSpace.Controllers;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public class GeneratedControllerAttribute : Attribute
+public class GenericTypeControllerAttribute : Attribute
 {
-    public GeneratedControllerAttribute(string route)
+    public GenericTypeControllerAttribute(string route)
     {
         Route = route;
     }

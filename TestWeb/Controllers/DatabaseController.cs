@@ -39,15 +39,15 @@ namespace TestWeb.Controllers
     public class DynamicClassController : ControllerBase
     {
         private readonly ILogger<DynamicClassController> _logger;
-        //private readonly ApplicationDbContext _applicationDbContext;
+        private readonly ApplicationDbContext _applicationDbContext;
         //private readonly DynamicDesignTimeDbContext _context;
         private readonly IDynamicDesignTimeService _dynamicDesignTimeService;
 
-        public DynamicClassController(ILogger<DynamicClassController> logger, IDynamicDesignTimeService dynamicDesignTimeService)
+        public DynamicClassController(ILogger<DynamicClassController> logger, IDynamicDesignTimeService dynamicDesignTimeService, ApplicationDbContext applicationDbContext)
         {
             _logger = logger;
             //_context = context;
-            //_applicationDbContext = applicationDbContext;
+            _applicationDbContext = applicationDbContext;
             _dynamicDesignTimeService = dynamicDesignTimeService;
         }
 
@@ -153,20 +153,23 @@ namespace TestWeb.Controllers
 
         [HttpGet]
         [Route("add")]
-        public string AddRuntimeController([FromServices] ApplicationPartManager partManager, [FromServices] DynamicActionDescriptorChangeProvider provider)
+        public IEnumerable<DynamicClass> AddRuntimeController()
         {
-            string name = "andrei" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            //var ass = CreateController(name);
-            var ass= DynamicAssemblyBuilder.GetInstance(true).Assembly;
+            //string name = "andrei" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            ////var ass = CreateController(name);
+            //var ass= DynamicAssemblyBuilder.GetInstance(true).Assembly;
 
-            if (ass != null)
-            {
-                partManager.ApplicationParts.Add(new AssemblyPart(ass));
-                // Notify change
-                provider.HasChanged = true;
-                provider.TokenSource.Cancel();
-                return "api/" + name;
-            }
+            //if (ass != null)
+            //{
+            //    partManager.ApplicationParts.Add(new AssemblyPart(ass));
+            //    // Notify change
+            //    provider.HasChanged = true;
+            //    provider.TokenSource.Cancel();
+            //    return "api/" + name;
+            //}
+
+            return _applicationDbContext.Query<DynamicClass>().ToList();
+
             throw new Exception("controller not generated");
         }
 

@@ -1,20 +1,34 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
+using DynamicSpace.Attributes;
+using Microsoft.Extensions.Logging;
+using DynamicSpace.Models;
 
 namespace DynamicSpace.Controllers;
 
-public class BaseController<T> : ControllerBase where T : class
+public class BaseController<T> : ControllerBase where T : DynamicClassBase
 {
-    public BaseController()
+
+    private readonly DynamicDbContext _dynamicDbContext;
+    private readonly ILogger<BaseController<T>> _logger;
+
+    public BaseController(DynamicDbContext dynamicDbContext, ILogger<BaseController<T>> logger)
     {
+        _dynamicDbContext = dynamicDbContext;
+        _logger = logger;
     }
 
     [HttpGet]
     [Route("")]
     public IEnumerable<T> GetList()
     {
-        //return _storage.GetAll();
-        throw new NotImplementedException();
+        var typeInfo = typeof(T)!;
+        var classId = typeInfo.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
+        return _dynamicDbContext.Query<T>().ToList();
+        //throw new NotImplementedException();
 
     }
 

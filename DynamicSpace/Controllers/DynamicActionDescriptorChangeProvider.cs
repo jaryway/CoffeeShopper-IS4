@@ -12,7 +12,7 @@ public class DynamicActionDescriptorChangeProvider : IActionDescriptorChangeProv
 {
     public static DynamicActionDescriptorChangeProvider Instance { get; } = new DynamicActionDescriptorChangeProvider();
 
-    public CancellationTokenSource TokenSource { get; private set; }
+    public CancellationTokenSource? TokenSource { get; private set; }
 
     public bool HasChanged { get; set; }
 

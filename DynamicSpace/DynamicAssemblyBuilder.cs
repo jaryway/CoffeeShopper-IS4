@@ -20,25 +20,17 @@ namespace DynamicSpace
 {
     public class DynamicAssemblyBuilder
     {
-        //private readonly string _assemblyName = "DynamicAssembly";
         private AssemblyLoadContext _assemblyLoadContext;
-        //private bool hasChanged = false;
         private Assembly? assembly;
-        //private readonly Dictionary<string, MigrationEntry> migrationEntries = new();
-        //private readonly Dictionary<long, DynamicClass> dynamicClasses = new();
         private static DynamicAssemblyBuilder? instance;
         private static DynamicAssemblyBuilder? designTimeInstance;
-        //private readonly ApplicationDbContext _applicationDbContext;
         private static IServiceProvider? _serviceProvider;
-        private static IServiceCollection? _services;
         private int currentVersion = 0;
         private int nextVersion = 0;
-        //private int version = 0;
 
         public static void Initialize(IServiceCollection services)
         {
             _serviceProvider = services.BuildServiceProvider();
-            _services = services;
         }
 
         private DynamicAssemblyBuilder(bool disignTime = false)
@@ -57,6 +49,7 @@ namespace DynamicSpace
         }
 
         public bool DesignTime { get; }
+
         public static string AssemblyName => "DynamicAssembly";
 
         public void IncreaseVersion() => nextVersion++;

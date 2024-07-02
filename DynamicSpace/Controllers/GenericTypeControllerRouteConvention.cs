@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace DynamicSpace.Controllers;
 
-public class GenericControllerRouteConvention : IControllerModelConvention
+public class GenericTypeControllerRouteConvention : IControllerModelConvention
 {
-    public GenericControllerRouteConvention()
+    public GenericTypeControllerRouteConvention()
     {
     }
 
@@ -17,7 +17,7 @@ public class GenericControllerRouteConvention : IControllerModelConvention
         if (controller.ControllerType.IsGenericType)
         {
             var genericType = controller.ControllerType.GenericTypeArguments[0];
-            var customNameAttribute = genericType.GetCustomAttribute<GeneratedControllerAttribute>();
+            var customNameAttribute = genericType.GetCustomAttribute<GenericTypeControllerAttribute>();
 
             if (customNameAttribute?.Route != null)
             {
