@@ -13,19 +13,21 @@ namespace DynamicSpace.Services.Impl
 {
     public class DynamicDesignTimeService : IDynamicDesignTimeService
     {
-        private static readonly string dynamicAssemblyName = "DynamicAssembly";
-        private static readonly string dynamicClassNamespace = $"{dynamicAssemblyName}.Models";
-        private static readonly string dynamicMigrationNamespace = $"{dynamicAssemblyName}.Migrations";
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly DynamicDesignTimeDbContext _dynamicDbContext;
-        private readonly DynamicAssemblyBuilder _dynamicAssemblyBuilder; private readonly IServiceProvider _serviceProvider;
-        //private bool hasChanged = false;
-        public DynamicDesignTimeService(ApplicationDbContext applicationDbContext, DynamicDesignTimeDbContext dynamicDbContext, IServiceProvider serviceProvider)
+        private readonly DynamicAssemblyBuilder _designTimeDynamicAssemblyBuilder;
+        private readonly DynamicAssemblyBuilder _dynamicAssemblyBuilder;
+        private readonly IServiceProvider _serviceProvider;
+
+        public DynamicDesignTimeService(ApplicationDbContext applicationDbContext,
+            DynamicDesignTimeDbContext dynamicDbContext,
+            IServiceProvider serviceProvider)
         {
             _applicationDbContext = applicationDbContext;
             _dynamicDbContext = dynamicDbContext;
-            _dynamicAssemblyBuilder = DynamicAssemblyBuilder.GetInstance(true);
             _serviceProvider = serviceProvider;
+            _dynamicAssemblyBuilder = DynamicAssemblyBuilder.GetInstance();
+            _designTimeDynamicAssemblyBuilder = DynamicAssemblyBuilder.GetInstance(true);
         }
 
         public DynamicClass? Get(long id)
@@ -67,11 +69,11 @@ namespace DynamicSpace.Services.Impl
         {
             try
             {
-                _dynamicAssemblyBuilder.IncreaseVersion();
+                _designTimeDynamicAssemblyBuilder.IncreaseVersion();
 
                 if (AddMigration(migrationName))
                 {
-                    _dynamicAssemblyBuilder.IncreaseVersion();
+                    _designTimeDynamicAssemblyBuilder.IncreaseVersion();
                 }
 
                 using var scope = _serviceProvider.CreateScope();
@@ -81,6 +83,7 @@ namespace DynamicSpace.Services.Impl
 
                 var result = migrator.Migrate(migrationName);
                 UpateEntityPublishState(result.MigrationsToApply, result.MigrationsToRevert);
+                _dynamicAssemblyBuilder.IncreaseVersion();
             }
             catch (Exception)
             {
@@ -99,7 +102,7 @@ namespace DynamicSpace.Services.Impl
             //using (var scope = this.GetService<IServiceScopeFactory>().CreateScope())
             //{
             var scaffolder = GetMigrationsScaffolder();
-            var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: dynamicAssemblyName);
+            var migration = scaffolder.ScaffoldMigration(migrationName, rootNamespace: DynamicAssemblyBuilder.AssemblyName);
 
             var migration1 = new MigrationEntry { MigrationId = migration.MigrationId, Code = migration.MigrationCode };
             var migration2 = new MigrationEntry { MigrationId = migration.MigrationId + ".Designer", Code = migration.MetadataCode };

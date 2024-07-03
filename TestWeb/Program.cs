@@ -1,4 +1,5 @@
-﻿using DynamicSpace;
+﻿using System.Text.Json.Serialization;
+using DynamicSpace;
 using DynamicSpace.Controllers;
 using DynamicSpace.Design;
 using DynamicSpace.Services;
@@ -16,16 +17,30 @@ var connectionString = builder.Configuration.GetConnectionString("MySql");
 
 builder.Services.AddScoped<IDynamicDesignTimeService, DynamicDesignTimeService>();
 
-builder.Services.AddControllers(o => o.Conventions.Add(new GenericControllerRouteConvention()))
+builder.Services.AddControllers(o => o.Conventions.Add(new GenericTypeControllerRouteConvention()))
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    })
     .ConfigureApplicationPartManager(app =>
     {
         app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider());
+        //app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider(true));
     });
 
 builder.Services.AddSingleton<IActionDescriptorChangeProvider>(DynamicActionDescriptorChangeProvider.Instance);
 
+//builder.Services.AddScoped(typeof(BaseController<>));
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<DynamicDbContext>(options =>
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    //options.ReplaceService<IMigrator, DynamicMySqlMigrator>();
+    //options.ReplaceService<IMigrationsAssembly, DynamicMigrationsAssembly>();
+    options.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
+});
 builder.Services.AddDbContext<DynamicDesignTimeDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -36,17 +51,15 @@ builder.Services.AddDbContext<DynamicDesignTimeDbContext>(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.OrderActionsBy(m => m.GroupName);
+});
 
 
 DynamicAssemblyBuilder.Initialize(builder.Services);
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<DynamicDesignTimeDbContext>();
-}
 
 
 // Configure the HTTP request pipeline.

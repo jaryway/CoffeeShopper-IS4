@@ -7,7 +7,7 @@ using DynamicSpace.Controllers;
 
 namespace DynamicSpace.Models
 {
-    [GenericController("api/test")]
+    //[GenericTypeController("api/test")]
     public class Test
     {
         public int Id { get; set; }
