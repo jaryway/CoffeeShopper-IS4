@@ -17,7 +17,7 @@ public class GenericControllerRouteConvention : IControllerModelConvention
         if (controller.ControllerType.IsGenericType)
         {
             var genericType = controller.ControllerType.GenericTypeArguments[0];
-            var customNameAttribute = genericType.GetCustomAttribute<GeneratedControllerAttribute>();
+            var customNameAttribute = genericType.GetCustomAttribute<GenericControllerAttribute>();
 
             if (customNameAttribute?.Route != null)
             {

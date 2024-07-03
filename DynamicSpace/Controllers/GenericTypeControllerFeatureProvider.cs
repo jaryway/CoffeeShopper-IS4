@@ -12,7 +12,7 @@ public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<
     {
         var currentAssembly = DynamicAssemblyBuilder.GetInstance(true).Assembly;
 
-        var candidates = currentAssembly.GetExportedTypes().Where(x => x.GetCustomAttributes<GeneratedControllerAttribute>().Any());
+        var candidates = currentAssembly.GetExportedTypes().Where(x => x.GetCustomAttributes<GenericControllerAttribute>().Any());
 
         foreach (var candidate in candidates)
         {

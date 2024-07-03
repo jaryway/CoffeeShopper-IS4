@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using {typeof(DynamicClassBase).Namespace};
 using {typeof(EntityIdAttribute).Namespace};
 using {typeof(TableAttribute).Namespace};
-using {typeof(GeneratedControllerAttribute).Namespace};
+using {typeof(GenericControllerAttribute).Namespace};
 [EntityId({entity.Id})]
 [Table(""Dynamic_{entity.TableName}"")]
 [GeneratedController(""api/{entity.Name}"")]
