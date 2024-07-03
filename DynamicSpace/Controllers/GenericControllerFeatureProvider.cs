@@ -1,14 +1,12 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace DynamicSpace.Controllers;
 
-public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
+public class GenericControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
 {
-    public GenericTypeControllerFeatureProvider()
+    public GenericControllerFeatureProvider()
     {
     }
 
@@ -17,11 +15,11 @@ public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<
         var currentAssembly = DynamicAssemblyBuilder.GetInstance().Assembly;
 
         var candidates = currentAssembly.GetExportedTypes()
-            .Where(x => x.GetCustomAttributes<GenericTypeControllerAttribute>().Any());
+            .Where(x => x.GetCustomAttributes<GenericControllerAttribute>().Any());
 
         foreach (var candidate in candidates)
         {
-            var typeInfo = typeof(BaseController<>).MakeGenericType(candidate).GetTypeInfo();
+            var typeInfo = typeof(GenericController<>).MakeGenericType(candidate).GetTypeInfo();
             feature.Controllers.Add(typeInfo);
         }
     }

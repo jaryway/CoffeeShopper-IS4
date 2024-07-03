@@ -14,19 +14,19 @@ var connectionString = builder.Configuration.GetConnectionString("MySql");
 // Add services to the container.
 builder.Services.AddScoped<IDynamicDesignTimeService, DynamicDesignTimeService>();
 
-builder.Services.AddControllers(o => o.Conventions.Add(new GenericTypeControllerRouteConvention()))
+builder.Services.AddControllers(o => o.Conventions.Add(new GenericControllerModelConvention()))
     .AddJsonOptions(o =>
     {
         o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     })
     .ConfigureApplicationPartManager(app =>
     {
-        app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider());
+        app.FeatureProviders.Add(new GenericControllerFeatureProvider());
         //app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider(true));
     });
 
-builder.Services.AddSingleton<IActionDescriptorChangeProvider>(DynamicActionDescriptorChangeProvider.Instance);
-builder.Services.AddKeyedSingleton<IActionDescriptorChangeProvider>("DesignTime", DynamicActionDescriptorChangeProvider.Instance);
+builder.Services.AddSingleton<IActionDescriptorChangeProvider>(GenericControllerActionDescriptorChangeProvider.Instance);
+builder.Services.AddKeyedSingleton<IActionDescriptorChangeProvider>("DesignTime", GenericControllerActionDescriptorChangeProvider.Instance);
 
 //builder.Services.AddScoped(typeof(BaseController<>));
 
@@ -37,7 +37,7 @@ builder.Services.AddDbContext<DynamicDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
     //options.ReplaceService<IMigrator, DynamicMySqlMigrator>();
     //options.ReplaceService<IMigrationsAssembly, DynamicMigrationsAssembly>();
-    options.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
+    //options.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
 });
 builder.Services.AddDbContext<DynamicDesignTimeDbContext>(options =>
 {
@@ -52,6 +52,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.OrderActionsBy(m => m.GroupName);
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    //
+    options.AddPolicy("AdminOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("Admin");
+    });
 });
 
 
@@ -69,6 +79,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

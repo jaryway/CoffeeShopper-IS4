@@ -1,43 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations.Design;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Sqlite;
-using Microsoft.EntityFrameworkCore.Sqlite.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Sqlite.Design.Internal;
-using Microsoft.EntityFrameworkCore.Design.Internal;
-using Microsoft.EntityFrameworkCore.Scaffolding;
-using Microsoft.EntityFrameworkCore.Sqlite.Scaffolding.Internal;
-//using MySql.EntityFrameworkCore;
-//using MySql.EntityFrameworkCore.Migrations;
-//using MySql.EntityFrameworkCore.Design.Internal;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql;
-using Pomelo.EntityFrameworkCore.MySql.Design.Internal;
-using System.Xml.Linq;
-using Pomelo.EntityFrameworkCore.MySql.Storage.Internal;
+﻿
 using DynamicSpace;
 using DynamicSpace.Models;
-using TestWeb.ViewModels;
 using DynamicSpace.Services;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using DynamicSpace.Controllers;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
-using System.Reflection;
-using System.Text;
-using System.Text.Json.Serialization;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using TestWeb.ViewModels;
 
 namespace TestWeb.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("api/[controller]", Name = "DynamicClass1")]
+    [Route("api/[controller]")]
     public class DynamicClassController : ControllerBase
     {
         private readonly ILogger<DynamicClassController> _logger;
@@ -47,30 +20,21 @@ namespace TestWeb.Controllers
         public DynamicClassController(ILogger<DynamicClassController> logger, IDynamicDesignTimeService dynamicDesignTimeService, ApplicationDbContext applicationDbContext)
         {
             _logger = logger;
-            //_context = context;
             _applicationDbContext = applicationDbContext;
             _dynamicDesignTimeService = dynamicDesignTimeService;
         }
 
         [HttpGet]
         [Route("Query")]
-        public ActionResult<IEnumerable<DynamicClass>> DynamicClassList()
+        public ActionResult<IEnumerable<DynamicClass>> Query()
         {
-
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
-
             var list = _dynamicDesignTimeService.GetList();
-            //_context.AddDynamicClass(entity);
-
             return Ok(list);
         }
 
         [HttpPost]
-        [Route("Addition")]
-        public ActionResult<DynamicClassModel> AddDynamicClass([FromBody] DynamicClassModel model)
+        [Route("Create")]
+        public ActionResult<DynamicClassModel> Create([FromBody] DynamicClassModel model)
         {
 
             if (!ModelState.IsValid)
@@ -83,8 +47,6 @@ namespace TestWeb.Controllers
             entity.TableName = model.TableName;
             entity.EntityProperties_ = model.EntityProperties;
 
-            //var builder = DynamicAssemblyBuilder.GetInstance(true);
-            //builder.AddDynamicClasses(entity);
             _dynamicDesignTimeService.Create(entity);
 
             return Ok(entity);
@@ -92,7 +54,7 @@ namespace TestWeb.Controllers
 
         [HttpPut]
         [Route("Update/{id}")]
-        public ActionResult<DynamicClassModel> UpdateDynamicClass([FromRoute] long id, [FromBody] DynamicClassModel model)
+        public ActionResult<DynamicClassModel> Update([FromRoute] long id, [FromBody] DynamicClassModel model)
         {
             var e = _dynamicDesignTimeService.Get(id);
             if (e == null)
@@ -106,12 +68,7 @@ namespace TestWeb.Controllers
             }
 
             var entity = new DynamicClass();
-            //entity.Name = model.Name;
-            //entity.TableName = model.TableName;
             entity.EntityProperties_ = model.EntityProperties;
-
-            //var builder = DynamicAssemblyBuilder.GetInstance(true);
-            //builder.AddDynamicClasses(entity);
             _dynamicDesignTimeService.Update(entity);
 
             return Ok(entity);
@@ -119,7 +76,7 @@ namespace TestWeb.Controllers
 
         [HttpDelete]
         [Route("Remove")]
-        public ActionResult<DynamicClassModel> RemoveDynamicClass(long id)
+        public ActionResult<DynamicClassModel> Remove(long id)
         {
 
             if (id <= 0)
@@ -132,49 +89,10 @@ namespace TestWeb.Controllers
             {
                 return BadRequest("未找到记录");
             }
-            //_applicationDbContext.DynamicClasses.Remove(e);
-            //_applicationDbContext.SaveChanges();
+
             _dynamicDesignTimeService.Remove(e);
             return Ok();
         }
-
-        //[HttpGet]
-        //[Route("/Migration/List")]
-        //public IEnumerable<string> GetMigrations()
-        //{
-        //    return _context.Database.GetMigrations();
-        //}
-
-        //// GET: DatabaseController
-        //[HttpPost]
-        //[Route("/Migration/Addition")]
-        //public ActionResult AddMigration(string name)
-        //{
-        //    if (string.IsNullOrEmpty(name))
-        //    {
-        //        return BadRequest("参数 name 不能为空");
-        //    }
-
-        //    try
-        //    {
-        //        _context.AddMigration(name);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError("AddMigration 报错：" + ex.Message);
-        //        return BadRequest(ex.Message);
-        //    }
-
-        //    return Ok();
-        //}
-
-        //[HttpPost]
-        //[Route("/Migration/Remove")]
-        //public ActionResult RemoveMigration()
-        //{
-        //    _context.RemoveMigration(false);
-        //    return Ok();
-        //}
 
         [HttpPost]
         [Route("Generate")]

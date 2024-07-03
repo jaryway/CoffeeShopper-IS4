@@ -15,7 +15,7 @@ namespace DynamicSpace
     {
         public static string GenerateCode(this DynamicClass entity, bool designTime = false)
         {
-            var genericTypeControllerType = typeof(GenericTypeControllerAttribute);
+            var genericTypeControllerType = typeof(GenericControllerAttribute);
             var genericTypeController = genericTypeControllerType.Name.Replace("Attribute", "");
             var dynamicClassBaseType = typeof(DynamicClassBase);
 

@@ -56,7 +56,7 @@ namespace DynamicSpace
 
         public void NotifyUpdate()
         {
-            var provider = _serviceProvider?.GetService<IActionDescriptorChangeProvider>() as DynamicActionDescriptorChangeProvider;
+            var provider = _serviceProvider?.GetService<IActionDescriptorChangeProvider>() as GenericControllerActionDescriptorChangeProvider;
             if (provider != null && HasChanged)
             {
                 provider.HasChanged = true;

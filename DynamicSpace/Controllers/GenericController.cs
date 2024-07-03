@@ -1,29 +1,24 @@
-﻿using System;
+﻿using DynamicSpace.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
-using DynamicSpace.Attributes;
 using Microsoft.Extensions.Logging;
-using DynamicSpace.Models;
-using System.Text.Json.Serialization;
 
 namespace DynamicSpace.Controllers;
 
+[Authorize]
 [ApiController]
-//[JsonSourceGenerationOptions(MaxDepth = 1)]
-public class BaseController<T> : ControllerBase where T : DynamicClassBase
+public class GenericController<T> : ControllerBase where T : DynamicClassBase
 {
 
     private readonly DynamicDbContext _dynamicDbContext;
-    private readonly ILogger<BaseController<T>> _logger;
+    private readonly ILogger<GenericController<T>> _logger;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="dynamicDbContext"></param>
     /// <param name="logger"></param>
-    public BaseController(DynamicDbContext dynamicDbContext, ILogger<BaseController<T>> logger)
+    public GenericController(DynamicDbContext dynamicDbContext, ILogger<GenericController<T>> logger)
     {
         _dynamicDbContext = dynamicDbContext;
         _logger = logger;

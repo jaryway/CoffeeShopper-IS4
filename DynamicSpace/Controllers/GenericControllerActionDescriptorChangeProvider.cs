@@ -8,9 +8,9 @@ using Microsoft.Extensions.Primitives;
 
 namespace DynamicSpace.Controllers;
 
-public class DynamicActionDescriptorChangeProvider : IActionDescriptorChangeProvider
+public class GenericControllerActionDescriptorChangeProvider : IActionDescriptorChangeProvider
 {
-    public static DynamicActionDescriptorChangeProvider Instance { get; } = new DynamicActionDescriptorChangeProvider();
+    public static GenericControllerActionDescriptorChangeProvider Instance { get; } = new GenericControllerActionDescriptorChangeProvider();
 
     public CancellationTokenSource? TokenSource { get; private set; }
 

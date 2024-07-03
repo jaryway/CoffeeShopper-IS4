@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 
 namespace DynamicSpace.Controllers;
 
-public class GenericTypeControllerRouteConvention : IControllerModelConvention
+public class GenericControllerModelConvention : IControllerModelConvention
 {
-    public GenericTypeControllerRouteConvention()
+    public GenericControllerModelConvention()
     {
     }
 
@@ -17,8 +18,9 @@ public class GenericTypeControllerRouteConvention : IControllerModelConvention
         if (controller.ControllerType.IsGenericType)
         {
             var genericType = controller.ControllerType.GenericTypeArguments[0];
-            var customNameAttribute = genericType.GetCustomAttribute<GenericTypeControllerAttribute>();
+            var customNameAttribute = genericType.GetCustomAttribute<GenericControllerAttribute>();
             controller.ControllerName = genericType.Name;
+            //controller.Filters.Add(new AuthorizeAttribute());
 
             if (customNameAttribute?.Route != null)
             {
