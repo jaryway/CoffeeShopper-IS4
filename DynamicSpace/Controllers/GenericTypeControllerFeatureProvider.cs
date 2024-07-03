@@ -8,20 +8,16 @@ namespace DynamicSpace.Controllers;
 
 public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
 {
-    private readonly bool _disignTime = false;
-    public GenericTypeControllerFeatureProvider(bool disignTime = false)
+    public GenericTypeControllerFeatureProvider()
     {
-        _disignTime = disignTime;
     }
 
     public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
     {
-        var currentAssembly = DynamicAssemblyBuilder.GetInstance(_disignTime).Assembly;
+        var currentAssembly = DynamicAssemblyBuilder.GetInstance().Assembly;
 
         var candidates = currentAssembly.GetExportedTypes()
             .Where(x => x.GetCustomAttributes<GenericTypeControllerAttribute>().Any());
-            //.OrderBy(x => x.GetCustomAttribute<GenericTypeControllerAttribute>()!.Order)
-            //.ToList();
 
         foreach (var candidate in candidates)
         {

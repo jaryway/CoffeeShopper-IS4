@@ -54,6 +54,16 @@ namespace DynamicSpace
 
         public void IncreaseVersion() => nextVersion++;
 
+        public void NotifyUpdate()
+        {
+            var provider = _serviceProvider?.GetService<IActionDescriptorChangeProvider>() as DynamicActionDescriptorChangeProvider;
+            if (provider != null && HasChanged)
+            {
+                provider.HasChanged = true;
+                provider.TokenSource?.Cancel();
+            }
+        }
+
         private bool HasChanged => currentVersion != nextVersion;
 
         public Assembly Assembly
@@ -144,17 +154,13 @@ namespace DynamicSpace
             }
 
             assembly = _assemblyLoadContext!.LoadFromStream(ms);
-            //var part = new AssemblyPart(assembly);
-            //_services!.AddControllers().AddApplicationPart(assembly);
-            //var partManager = _serviceProvider.GetService<ApplicationPartManager>();
 
-
-            var provider = _serviceProvider?.GetService<IActionDescriptorChangeProvider>() as DynamicActionDescriptorChangeProvider;
-            if (provider != null && currentVersion > 0)
-            {
-                provider.HasChanged = true;
-                provider.TokenSource.Cancel();
-            }
+            //var provider = _serviceProvider?.GetService<IActionDescriptorChangeProvider>() as DynamicActionDescriptorChangeProvider;
+            //if (provider != null && currentVersion > 0)
+            //{
+            //    provider.HasChanged = true;
+            //    provider.TokenSource?.Cancel();
+            //}
 
             currentVersion = nextVersion;
             return assembly;

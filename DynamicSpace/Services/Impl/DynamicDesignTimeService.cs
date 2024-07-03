@@ -84,6 +84,7 @@ namespace DynamicSpace.Services.Impl
                 var result = migrator.Migrate(migrationName);
                 UpateEntityPublishState(result.MigrationsToApply, result.MigrationsToRevert);
                 _dynamicAssemblyBuilder.IncreaseVersion();
+                _dynamicAssemblyBuilder.NotifyUpdate();
             }
             catch (Exception)
             {

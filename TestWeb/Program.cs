@@ -12,9 +12,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MySql");
 // Add services to the container.
-
-//builder.Services.AddSingleton<DynamicAssemblyBuilder>(new DynamicAssemblyBuilder("DynamicAssembly"));
-
 builder.Services.AddScoped<IDynamicDesignTimeService, DynamicDesignTimeService>();
 
 builder.Services.AddControllers(o => o.Conventions.Add(new GenericTypeControllerRouteConvention()))
@@ -29,6 +26,7 @@ builder.Services.AddControllers(o => o.Conventions.Add(new GenericTypeController
     });
 
 builder.Services.AddSingleton<IActionDescriptorChangeProvider>(DynamicActionDescriptorChangeProvider.Instance);
+builder.Services.AddKeyedSingleton<IActionDescriptorChangeProvider>("DesignTime", DynamicActionDescriptorChangeProvider.Instance);
 
 //builder.Services.AddScoped(typeof(BaseController<>));
 
