@@ -22,7 +22,6 @@ builder.Services.AddControllers(o => o.Conventions.Add(new GenericControllerMode
     .ConfigureApplicationPartManager(app =>
     {
         app.FeatureProviders.Add(new GenericControllerFeatureProvider());
-        //app.FeatureProviders.Add(new GenericTypeControllerFeatureProvider(true));
     });
 
 builder.Services.AddSingleton<IActionDescriptorChangeProvider>(GenericControllerActionDescriptorChangeProvider.Instance);

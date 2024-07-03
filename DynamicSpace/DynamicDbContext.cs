@@ -9,35 +9,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DynamicSpace
 {
-    public class DynamicDbContext : DbContext
+    public class DynamicDbContext : DynamicDbContextBase
     {
-        private readonly DynamicAssemblyBuilder dynamicAssemblyBuilder;
-
         public DynamicDbContext(DbContextOptions<DynamicDbContext> options) : base(options)
         {
-            dynamicAssemblyBuilder = DynamicAssemblyBuilder.GetInstance();
+
         }
 
-        public Assembly Assembly => dynamicAssemblyBuilder.Assembly;
+        protected override DynamicAssemblyBuilder InitializeDynamicAssemblyBuilder() => DynamicAssemblyBuilder.GetInstance();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            var entityTypes = Assembly?
-              .GetTypes()
-              .Where(t => typeof(DynamicClassBase).IsAssignableFrom(t) && !t.IsAbstract)
-              .ToList();
+        //public Assembly Assembly => dynamicAssemblyBuilder.Assembly;
 
-            foreach (var entityType in entityTypes!)
-            {
-                var entityId = entityType.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
-                var tableName = entityType.GetCustomAttribute<TableAttribute>()!.Name;
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    var entityTypes = Assembly?
+        //      .GetTypes()
+        //      .Where(t => typeof(DynamicClassBase).IsAssignableFrom(t) && !t.IsAbstract)
+        //      .ToList();
 
-                var builder = modelBuilder.Entity(entityType);
+        //    foreach (var entityType in entityTypes!)
+        //    {
+        //        var entityId = entityType.GetCustomAttribute<EntityIdAttribute>()!.EntityId;
+        //        var tableName = entityType.GetCustomAttribute<TableAttribute>()!.Name;
 
-                builder.ToTable((tableName ?? entityId.ToString()))
-                    .HasAnnotation("EntityId", entityId);
-            }
-        }
+        //        var builder = modelBuilder.Entity(entityType);
+
+        //        builder.ToTable((tableName ?? entityId.ToString()))
+        //            .HasAnnotation("EntityId", entityId);
+        //    }
+        //}
     }
 
 }

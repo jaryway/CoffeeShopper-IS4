@@ -8,7 +8,7 @@ using TestWeb.ViewModels;
 
 namespace TestWeb.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DynamicClassController : ControllerBase

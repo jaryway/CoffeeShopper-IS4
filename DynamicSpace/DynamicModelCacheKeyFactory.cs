@@ -18,8 +18,7 @@ namespace DynamicSpace
                 return (context.GetType(), dynamicDbContext.Assembly);
             }
 
-            return (object)context.GetType();
-
+            return context.GetType();
         }
     }
 }

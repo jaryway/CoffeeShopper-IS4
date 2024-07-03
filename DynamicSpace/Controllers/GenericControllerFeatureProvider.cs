@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Routing.Matching;
 
 namespace DynamicSpace.Controllers;
 
@@ -12,9 +13,12 @@ public class GenericControllerFeatureProvider : IApplicationFeatureProvider<Cont
 
     public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
     {
-        var currentAssembly = DynamicAssemblyBuilder.GetInstance().Assembly;
-
-        var candidates = currentAssembly.GetExportedTypes()
+        AddControllers(DynamicAssemblyBuilder.GetInstance().Assembly, feature);
+        AddControllers(typeof(GenericController<>).Assembly, feature);
+    }
+    private void AddControllers(Assembly assembly, ControllerFeature feature)
+    {
+        var candidates = assembly.GetExportedTypes()
             .Where(x => x.GetCustomAttributes<GenericControllerAttribute>().Any());
 
         foreach (var candidate in candidates)

@@ -7,10 +7,10 @@ using DynamicSpace.Controllers;
 
 namespace DynamicSpace.Models
 {
-    //[GenericTypeController("api/test")]
-    public class Test
+    [GenericController("api/test")]
+    public class Test : DynamicClassBase
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         public string Name { get; set; }
     }

@@ -5,8 +5,10 @@ using Microsoft.Extensions.Logging;
 
 namespace DynamicSpace.Controllers;
 
-[Authorize]
+
 [ApiController]
+[Route("api/[controller]")]
+[Authorize]
 public class GenericController<T> : ControllerBase where T : DynamicClassBase
 {
 
@@ -28,15 +30,15 @@ public class GenericController<T> : ControllerBase where T : DynamicClassBase
     /// 
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
-    [Route("Query")]
+    [HttpGet("Query")]
+    //[Authorize]
     public IEnumerable<T> Query()
     {
         return _dynamicDbContext.Set<T>().ToList();
     }
 
-    [HttpGet]
-    [Route("{id}")]
+    [HttpGet("{id}")]
+    //[Route()]
     public ActionResult<T?> Get(long id)
     {
         try
@@ -51,7 +53,7 @@ public class GenericController<T> : ControllerBase where T : DynamicClassBase
     }
 
     [HttpPost]
-    [Route("")]
+    //[Route("")]
     public ActionResult<T> Post([FromBody] T entity)
     {
 
@@ -66,8 +68,8 @@ public class GenericController<T> : ControllerBase where T : DynamicClassBase
         return entity;
     }
 
-    [HttpPut]
-    [Route("{id}")]
+    [HttpPut("{id}")]
+    //[Route("{id}")]
     public ActionResult<T> Put(long id, [FromBody] T value)
     {
         if (!ModelState.IsValid)
@@ -94,8 +96,8 @@ public class GenericController<T> : ControllerBase where T : DynamicClassBase
         return entity;
     }
 
-    [HttpDelete]
-    [Route("{id}")]
+    [HttpDelete("{id}")]
+    //[Route("{id}")]
     public ActionResult<T> Delete(long id)
     {
         if (!ModelState.IsValid)
@@ -115,8 +117,8 @@ public class GenericController<T> : ControllerBase where T : DynamicClassBase
         return entity;
     }
 
-    [HttpPost]
-    [Route("BatchDelete")]
+    [HttpPost("BatchDelete")]
+    //[Route("BatchDelete")]
     public ActionResult BatchDelete([FromBody] long[] ids)
     {
         if (!ModelState.IsValid)
