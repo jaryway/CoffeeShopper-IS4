@@ -1,5 +1,5 @@
 using System;
-using IdentityServer4.Models;
+using Jaryway.IdentityServer.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityServerHost.Quickstart.UI

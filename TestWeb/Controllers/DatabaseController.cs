@@ -75,7 +75,7 @@ namespace TestWeb.Controllers
         }
 
         [HttpDelete]
-        [Route("Remove")]
+        [Route("Delete/{id}")]
         public ActionResult<DynamicClassModel> Remove(long id)
         {
 

@@ -16,10 +16,10 @@ namespace DataAccess.Data
 
 		public DbSet<CoffeeShop> CoffeeShops { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            EntityTypeGenerator.RegisterEntities(modelBuilder);
-            base.OnModelCreating(modelBuilder);
-        }
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    //EntityTypeGenerator.RegisterEntities(modelBuilder);
+        //    base.OnModelCreating(modelBuilder);
+        //}
     }
 }

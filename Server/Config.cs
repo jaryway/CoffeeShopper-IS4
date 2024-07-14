@@ -1,4 +1,4 @@
-﻿using IdentityServer4.Models;
+﻿using Jaryway.IdentityServer.Models;
 
 namespace Server
 {
