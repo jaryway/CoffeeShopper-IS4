@@ -17,7 +17,11 @@ namespace Server
             };
 
         public static IEnumerable<ApiScope> ApiScopes =>
-            new[] { new ApiScope("CoffeeAPI.read"), new ApiScope("CoffeeAPI.write"), };
+            new[] {
+                new ApiScope("CoffeeAPI.read"),
+                new ApiScope("CoffeeAPI.write"),
+                //new ApiScope("api1", "Full access to API #1")
+            };
         public static IEnumerable<ApiResource> ApiResources =>
             new[]
             {
@@ -26,7 +30,8 @@ namespace Server
                     Scopes = new List<string> { "CoffeeAPI.read", "CoffeeAPI.write" },
                     ApiSecrets = new List<Secret> { new Secret("ScopeSecret".Sha256()) },
                     UserClaims = new List<string> { "role" }
-                }
+                },
+                //new ApiResource("api1", "API #1") { Scopes = { "api1" } }
             };
 
         public static IEnumerable<Client> Clients =>
@@ -59,8 +64,25 @@ namespace Server
                     RequirePkce = true,
                     RequireConsent = true,
                     AllowPlainTextPkce = false,
-                    AccessTokenLifetime = 10
+                    AccessTokenLifetime = 60
                 },
+                new Client
+                {
+                    ClientId = "api_swagger",
+                    ClientName = "Swagger UI for api",
+                    ClientSecrets = { new Secret("secret".Sha256()) }, // change me!
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    RequireClientSecret = false,
+
+                    RedirectUris = {
+                        "https://localhost:5445/swagger/oauth2-redirect.html",
+                        "http://localhost:5445/swagger/oauth2-redirect.html"
+                    },
+                    AllowedCorsOrigins = { "https://localhost:5445", "https://localhost:5445"},
+                    AllowedScopes = { "CoffeeAPI.read", "CoffeeAPI.write" }
+                }
+
             };
     }
 }

@@ -7,7 +7,8 @@ namespace API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	[Authorize]
+	[Authorize()]
+    
 	public class CoffeeShopController : ControllerBase
 	{
         private readonly ICoffeeShopService coffeeShopService;

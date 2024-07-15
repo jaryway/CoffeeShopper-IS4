@@ -9,9 +9,9 @@ using System.Security.Claims;
 
 namespace Server
 {
-	public class SeedData
-	{
-		public static void EnsureSeedData(string connectionString)
+    public class SeedData
+    {
+        public static void EnsureSeedData(string connectionString)
         {
             var services = new ServiceCollection();
             services.AddLogging();
@@ -100,35 +100,33 @@ namespace Server
 
         private static void EnsureSeedData(ConfigurationDbContext context)
         {
-            if (!context.Clients.Any())
+            foreach (var client in Config.Clients.ToList())
             {
-                foreach (var client in Config.Clients.ToList())
+                if (!context.Clients.Any(m => m.ClientId == client.ClientId))
                 {
                     context.Clients.Add(client.ToEntity());
                 }
-
-                context.SaveChanges();
             }
 
-            if (!context.IdentityResources.Any())
+            foreach (var resource in Config.IdentityResources.ToList())
             {
-                foreach (var resource in Config.IdentityResources.ToList())
+                if (!context.IdentityResources.Any(m => m.Name == resource.Name))
                 {
                     context.IdentityResources.Add(resource.ToEntity());
                 }
-
-                context.SaveChanges();
             }
 
-            if (!context.ApiScopes.Any())
+            context.SaveChanges();
+
+            foreach (var apiScope in Config.ApiScopes.ToList())
             {
-                foreach (var resource in Config.ApiScopes.ToList())
+                if (!context.ApiScopes.Any(m => m.Name == apiScope.Name))
                 {
-                    context.ApiScopes.Add(resource.ToEntity());
+                    context.ApiScopes.Add(apiScope.ToEntity());
                 }
-
-                context.SaveChanges();
             }
+
+            context.SaveChanges();
 
             if (!context.ApiResources.Any())
             {
@@ -140,5 +138,5 @@ namespace Server
                 context.SaveChanges();
             }
         }
-	}
+    }
 }
