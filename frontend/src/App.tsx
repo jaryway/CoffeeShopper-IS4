@@ -1,5 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Spin } from "antd";
+import "assets/styles/index.css";
 import routes from "./routes";
 import { PUBLIC_URL } from "./env";
 

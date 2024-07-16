@@ -1,9 +1,0 @@
-{
-  "csharp.debug.enableStepFiltering": false,
-  "csharp.debug.justMyCode": false,
-  "csharp.debug.requireExactSource": false,
-  "csharp.debug.symbolOptions.searchMicrosoftSymbolServer": true,
-  "csharp.debug.symbolOptions.searchNuGetOrgSymbolServer": true,
-  "csharp.debug.symbolOptions.searchPaths": [],
-  "csharp.debug.symbolOptions.moduleFilter.mode": "loadAllButExcluded",
-}

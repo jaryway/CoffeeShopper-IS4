@@ -21,12 +21,18 @@ const lazyComponent = (loader: () => Promise<any>) => {
 
 const routes: RouteObject[] = [
   {
-    path: "/",
+    // path: "/",
     lazy: lazyComponent(() => import("layouts/SecurityLayout")),
     children: [
       {
-        index: true,
-        lazy: lazyComponent(() => import("pages/Home")),
+        // index: true,
+        lazy: lazyComponent(() => import("layouts/BasicLayout")),
+        children: [
+          {
+            index: true,
+            lazy: lazyComponent(() => import("pages/Home")),
+          },
+        ],
       },
     ],
   },
