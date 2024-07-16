@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Spin } from "antd";
+import routes from "./routes";
+import { PUBLIC_URL } from "./env";
+
+// const getLayoutMode = () => {
+//   let pathname = window.location.pathname;
+//   if (PUBLIC_URL) {
+//     pathname = pathname.slice(PUBLIC_URL.length);
+//   }
+
+//   if (pathname.startsWith("/nosider")) {
+//     return "nosider";
+//   } else if (pathname.startsWith("/noheader")) {
+//     return "noheader";
+//   } else if (pathname.startsWith("/onlycontent")) {
+//     return "onlycontent";
+//   }
+// };
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  // const layoutMode = getLayoutMode();
+  const router = createBrowserRouter(routes, { basename: PUBLIC_URL });
+  return <RouterProvider router={router} fallbackElement={<Spin />} />;
 }
 
 export default App;
