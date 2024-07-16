@@ -51,6 +51,7 @@ namespace Server
                 {
                     ClientId = "interactive",
                     ClientSecrets = { new Secret("ClientSecret1".Sha256()) },
+                    RequireClientSecret = false,
                     AllowedGrantTypes = GrantTypes.Code,
                     RedirectUris = {
                         "https://localhost:4100/signin-oidc",
@@ -64,7 +65,7 @@ namespace Server
                     RequirePkce = true,
                     RequireConsent = true,
                     AllowPlainTextPkce = false,
-                    AccessTokenLifetime = 60
+                    //AccessTokenLifetime = 60
                 },
                 new Client
                 {

@@ -26,7 +26,7 @@ builder.Services.AddAuthentication("Bearer")
     {
         options.Authority = "https://localhost:5443";
         options.ApiName = "CoffeeAPI";
-        options.JwtValidationClockSkew = TimeSpan.FromSeconds(60);
+        //options.JwtValidationClockSkew = TimeSpan.FromSeconds(60);
     });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
