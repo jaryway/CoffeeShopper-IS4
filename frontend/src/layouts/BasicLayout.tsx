@@ -9,7 +9,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./BasicLayout.css";
 import UserInfo from "component/user-info";
@@ -18,7 +18,7 @@ const { Header, Footer, Sider } = Layout;
 
 const BasicLayout = () => {
   const items: MenuProps["items"] = [
-    { key: "1", icon: <PieChartOutlined />, label: "Option 1" },
+    { key: "1", icon: <PieChartOutlined />, label: "动态对象管理" },
     { key: "2", icon: <DesktopOutlined />, label: "Option 2" },
     { key: "3", icon: <ContainerOutlined />, label: "Option 3" },
     {
@@ -52,6 +52,7 @@ const BasicLayout = () => {
   ];
 
   const [collapsed, handleSetCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <ConfigProvider
@@ -113,6 +114,9 @@ const BasicLayout = () => {
                       defaultSelectedKeys={["4"]}
                       items={items}
                       style={{ borderRight: 0 }}
+                      onClick={() => {
+                        navigate("/dynamic-object-management");
+                      }}
                     />
                   </div>
                 </div>
