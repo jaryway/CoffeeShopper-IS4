@@ -77,7 +77,7 @@ const OIDCProvider = ({ children }: OIDCProviderProps) => {
   }, []);
 
   if (loading) {
-    return <Indicator />;
+    return <Indicator title="加载中..." />;
   }
 
   return <OIDCContext.Provider value={{}}>{children}</OIDCContext.Provider>;

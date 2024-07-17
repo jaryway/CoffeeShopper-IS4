@@ -7,6 +7,7 @@ import React, { useEffect } from "react";
 // &session_state=RwmsiFFydGldeAXqTyI6HLVhAcT0LMSTf6j4gWir-q0.824C25526220E2E11CB48C0EA47783C0
 import { settings } from "./settings";
 import { useNavigate } from "react-router-dom";
+import Indicator from "component/indicator";
 const mgr = new UserManager({
   ...settings,
   loadUserInfo: true,
@@ -41,7 +42,7 @@ const SignIn = () => {
     signInCallback(() => navigate("/"));
   }, []);
 
-  return <div>SignIn</div>;
+  return <Indicator title="登录中..." />;
 };
 
 export default SignIn;

@@ -4,6 +4,7 @@
   align-items: center;
   display: flex;
   flex: auto;
+  flex-direction: column;
 
   &-inner {
     justify-content: center;

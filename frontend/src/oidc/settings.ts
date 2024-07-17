@@ -9,7 +9,7 @@ export const settings = {
   // client_secret: 'ClientSecret1',
   //client_id: 'interactive.public.short',
   redirect_uri: "http://localhost:4100/signin-oidc",
-  post_logout_redirect_uri: "http://localhost:4100/signout-oidc",
+  post_logout_redirect_uri: "http://localhost:4100/signout-callback-oidc",
   response_type: "code",
   //response_mode: 'fragment',
   scope: "openid profile CoffeeAPI.read offline_access",

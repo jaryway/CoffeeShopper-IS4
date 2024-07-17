@@ -88,10 +88,6 @@ const BasicLayout = () => {
           <div>DynamicSpace</div>
 
           <div>
-            {/* <div className="global-header-action">
-              <Avatar src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" />
-              <span style={{ paddingLeft: 8 }}>小明</span>
-            </div> */}
             <UserInfo className="global-header-action" />
           </div>
         </Header>
