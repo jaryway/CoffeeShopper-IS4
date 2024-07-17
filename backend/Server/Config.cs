@@ -59,7 +59,7 @@ namespace Server
                         "http://localhost:4100/private"
                     },
                     FrontChannelLogoutUri = "http://localhost:4100/signout-oidc",
-                    PostLogoutRedirectUris = { "http://localhost:4100/signout-callback-oidc" },
+                    PostLogoutRedirectUris = { "http://localhost:4100/signout-oidc" },
                     AllowOfflineAccess = true,
                     AllowedScopes = { "openid", "profile", "CoffeeAPI.read" },
                     RequirePkce = true,

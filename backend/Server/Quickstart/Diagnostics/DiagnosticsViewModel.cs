@@ -2,11 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using IdentityModel;
-using Microsoft.AspNetCore.Authentication;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using IdentityModel;
+using Microsoft.AspNetCore.Authentication;
 
 namespace IdentityServerHost.Quickstart.UI
 {

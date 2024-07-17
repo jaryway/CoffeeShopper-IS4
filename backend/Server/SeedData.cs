@@ -1,11 +1,11 @@
-﻿using IdentityModel;
+﻿using System.Security.Claims;
+using IdentityModel;
 using Jaryway.IdentityServer.EntityFramework.DbContexts;
 using Jaryway.IdentityServer.EntityFramework.Mappers;
 using Jaryway.IdentityServer.EntityFramework.Storage;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
-using System.Security.Claims;
 
 namespace Server
 {

@@ -9,15 +9,10 @@ using Jaryway.IdentityServer.Extensions;
 using Jaryway.IdentityServer.Models;
 using Jaryway.IdentityServer.Services;
 using Jaryway.IdentityServer.Stores;
-using Jaryway.IdentityServer.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IdentityServerHost.Quickstart.UI
 {

@@ -2,15 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using Jaryway.IdentityServer.Services;
-using Jaryway.IdentityServer.Stores;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Jaryway.IdentityServer.Events;
 using Jaryway.IdentityServer.Extensions;
+using Jaryway.IdentityServer.Services;
+using Jaryway.IdentityServer.Stores;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -64,7 +61,7 @@ namespace IdentityServerHost.Quickstart.UI
             var grants = await _interaction.GetAllUserGrantsAsync();
 
             var list = new List<GrantViewModel>();
-            foreach(var grant in grants)
+            foreach (var grant in grants)
             {
                 var client = await _clients.FindClientByIdAsync(grant.ClientId);
                 if (client != null)

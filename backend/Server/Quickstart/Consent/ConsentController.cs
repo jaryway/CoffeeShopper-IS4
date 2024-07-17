@@ -3,17 +3,12 @@
 
 
 using Jaryway.IdentityServer.Events;
+using Jaryway.IdentityServer.Extensions;
 using Jaryway.IdentityServer.Models;
 using Jaryway.IdentityServer.Services;
-using Jaryway.IdentityServer.Extensions;
+using Jaryway.IdentityServer.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Threading.Tasks;
-using Jaryway.IdentityServer.Validation;
-using System.Collections.Generic;
-using System;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -197,7 +192,7 @@ namespace IdentityServerHost.Quickstart.UI
             vm.IdentityScopes = request.ValidatedResources.Resources.IdentityResources.Select(x => CreateScopeViewModel(x, vm.ScopesConsented.Contains(x.Name) || model == null)).ToArray();
 
             var apiScopes = new List<ScopeViewModel>();
-            foreach(var parsedScope in request.ValidatedResources.ParsedScopes)
+            foreach (var parsedScope in request.ValidatedResources.ParsedScopes)
             {
                 var apiScope = request.ValidatedResources.Resources.FindApiScope(parsedScope.ParsedName);
                 if (apiScope != null)

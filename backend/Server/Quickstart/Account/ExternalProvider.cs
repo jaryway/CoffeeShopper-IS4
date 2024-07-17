@@ -6,7 +6,13 @@ namespace IdentityServerHost.Quickstart.UI
 {
     public class ExternalProvider
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public string DisplayName { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string AuthenticationScheme { get; set; }
     }
 }
