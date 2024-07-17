@@ -27,7 +27,7 @@ using System.Linq.Dynamic.Core;
 using DynamicBuilder.Data;
 using DynamicBuilder.Attributes;
 
-namespace DynamicSpace;
+namespace Jaryway.DynamicSpace.DynamicWebApi;
 
 public class DynamicDbContextGenerator
 {

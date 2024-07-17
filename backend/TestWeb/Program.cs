@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
-using DynamicSpace;
-using DynamicSpace.Controllers;
-using DynamicSpace.Design;
-using DynamicSpace.Services;
-using DynamicSpace.Services.Impl;
+using Jaryway.DynamicSpace.DynamicWebApi;
+using Jaryway.DynamicSpace.DynamicWebApi.Controllers;
+using Jaryway.DynamicSpace.DynamicWebApi.Design;
+using Jaryway.DynamicSpace.DynamicWebApi.Services;
+using Jaryway.DynamicSpace.DynamicWebApi.Services.Impl;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

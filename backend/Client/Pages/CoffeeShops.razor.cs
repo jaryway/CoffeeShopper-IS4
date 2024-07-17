@@ -1,4 +1,4 @@
-﻿using API.Models;
+﻿using Jaryway.DynamicSpace.WebApi.Models;
 using Client.Services;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Components;

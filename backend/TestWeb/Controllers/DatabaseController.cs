@@ -1,7 +1,7 @@
 ﻿
-using DynamicSpace;
-using DynamicSpace.Models;
-using DynamicSpace.Services;
+using Jaryway.DynamicSpace.DynamicWebApi;
+using Jaryway.DynamicSpace.DynamicWebApi.Models;
+using Jaryway.DynamicSpace.DynamicWebApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TestWeb.ViewModels;

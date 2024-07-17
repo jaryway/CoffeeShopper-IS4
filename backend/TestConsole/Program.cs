@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using DataAccess.Data;
+using Jaryway.DynamicSpace.DataAccess.Data;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis;
@@ -14,7 +14,7 @@ var db = new ApplicationDbContext(builder.Options);
 string className = "A";
 
 string classString = $@"
-public class {className} {{ 
+public class {className} {{
     public int Id {{ get; set; }}
     public stirng Name {{ get; set; }}
 }}
