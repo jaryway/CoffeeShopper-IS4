@@ -13,7 +13,7 @@ const Home = () => {
 
   const columns = [
     {
-      title: "姓名",
+      title: "姓名000",
       dataIndex: "name",
       key: "name",
     },
@@ -96,8 +96,9 @@ const Home = () => {
   ];
 
   return (
-    <div style={{ flex: "auto", overflow: "auto", width: 0 }}>
-      <Table dataSource={dataSource} columns={columns} style={{ width: "3000px" }} />
+    <div className="content" style={{ flex: "auto", padding: "0 16px" }}>
+      <div style={{ padding: "16px 0" }}>人员管理</div>
+      <Table dataSource={dataSource} columns={columns} scroll={{ x: 3000 }} />
     </div>
   );
 };

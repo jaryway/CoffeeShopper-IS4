@@ -1,7 +1,9 @@
 import { UserManager, Log } from "oidc-client-ts";
 import type { PropsWithChildren } from "react";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { settings } from "./settings";
+import { Spin } from "antd";
+import Indicator from "component/indicator";
 
 const OIDCContext = React.createContext({});
 
@@ -35,19 +37,48 @@ const loginIfNotLogedIn = async () => {
   if (flag) return;
 
   flag = true;
-  const user = await mgr.getUser();
+  try {
+    const user = await mgr.getUser();
 
-  if (user) return;
+    if (user) return;
 
-  const result = mgr.signinRedirect();
-  console.log("signinRedirect", result);
+    const result = await mgr.signinRedirect();
+    console.log("signinRedirect", result);
+  } catch (ex) {
+    // return Promise.reject("请求出错");
+    throw ex;
+  }
+
   flag = false;
 };
 
 const OIDCProvider = ({ children }: OIDCProviderProps) => {
+  const flag = useRef(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    loginIfNotLogedIn();
+    if (flag.current == true) return;
+
+    flag.current = true;
+
+    setLoading(true);
+    try {
+      loginIfNotLogedIn() //
+        .then(() => {
+          setLoading(false);
+        })
+        .catch(() => {})
+        .finally(() => {
+          flag.current = false;
+        });
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
+
+  if (loading) {
+    return <Indicator />;
+  }
 
   return <OIDCContext.Provider value={{}}>{children}</OIDCContext.Provider>;
 };
