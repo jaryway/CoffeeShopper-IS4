@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Jaryway.DynamicSpace.DynamicWebApi.Migrations
+namespace Jaryway.DynamicSpace.DynamicWebApi.Migrations.MySql
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20240630154613_Init")]

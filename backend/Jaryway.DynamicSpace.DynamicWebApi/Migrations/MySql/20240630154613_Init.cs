@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Jaryway.DynamicSpace.DynamicWebApi.Migrations
+namespace Jaryway.DynamicSpace.DynamicWebApi.Migrations.MySql
 {
     /// <inheritdoc />
     public partial class Init : Migration
