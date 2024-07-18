@@ -128,15 +128,16 @@ namespace Jaryway.DynamicSpace.IdentityServer
 
             context.SaveChanges();
 
-            if (!context.ApiResources.Any())
+            foreach (var resource in Config.ApiResources.ToList())
             {
-                foreach (var resource in Config.ApiResources.ToList())
+                if (!context.ApiResources.Any(m => m.Name == resource.Name))
                 {
                     context.ApiResources.Add(resource.ToEntity());
                 }
-
-                context.SaveChanges();
             }
+
+            context.SaveChanges();
+
         }
     }
 }

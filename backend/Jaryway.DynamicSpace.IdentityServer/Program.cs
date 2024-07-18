@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AspNetIdentityDbContext>(options =>
     options.UseSqlite(defaultConnString,
         b => b.MigrationsAssembly(assembly)));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(o => { })
     .AddEntityFrameworkStores<AspNetIdentityDbContext>();
 
 builder.Services.AddIdentityServer(options => { })
@@ -44,7 +44,9 @@ builder.Services.AddIdentityServer(options => { })
     .AddOperationalStore(options =>
     {
         options.ConfigureDbContext = b =>
-        b.UseSqlite(defaultConnString, opt => opt.MigrationsAssembly(assembly));
+        {
+            b.UseSqlite(defaultConnString, opt => opt.MigrationsAssembly(assembly));
+        };
     })
     .AddDeveloperSigningCredential();
 

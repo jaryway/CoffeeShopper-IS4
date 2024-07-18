@@ -20,6 +20,7 @@ namespace Jaryway.DynamicSpace.IdentityServer
             new[] {
                 new ApiScope("CoffeeAPI.read"),
                 new ApiScope("CoffeeAPI.write"),
+                new ApiScope("DynamicWebApi.all")
                 //new ApiScope("api1", "Full access to API #1")
             };
         public static IEnumerable<ApiResource> ApiResources =>
@@ -31,7 +32,12 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     ApiSecrets = new List<Secret> { new Secret("ScopeSecret".Sha256()) },
                     UserClaims = new List<string> { "role" }
                 },
-                //new ApiResource("api1", "API #1") { Scopes = { "api1" } }
+                 new ApiResource("DynamicWebApi")
+                {
+                    Scopes = new List<string> { "DynamicWebApi.all" },
+                    ApiSecrets = new List<Secret> { new Secret("ScopeSecret".Sha256()) },
+                    UserClaims = new List<string> { "role" }
+                },
             };
 
         public static IEnumerable<Client> Clients =>
@@ -82,8 +88,23 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     },
                     AllowedCorsOrigins = { "https://localhost:5445", "https://localhost:5445"},
                     AllowedScopes = { "CoffeeAPI.read", "CoffeeAPI.write" }
-                }
+                },
+                new Client
+                {
+                    ClientId = "dynamic_web_api_swagger",
+                    ClientName = "Swagger UI for dynamic web api",
+                    ClientSecrets = { new Secret("secret".Sha256()) }, // change me!
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    RequireClientSecret = false,
 
+                    RedirectUris = {
+                        "https://localhost:5046/swagger/oauth2-redirect.html",
+                        "http://localhost:5047/swagger/oauth2-redirect.html"
+                    },
+                    AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047"},
+                    AllowedScopes = { "DynamicWebApi.all" }
+                }
             };
     }
 }

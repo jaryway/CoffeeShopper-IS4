@@ -6,8 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-var dataAccessAssemby = Assembly.Load("DataAccess");
-var dataAccessAssembyName = dataAccessAssemby.GetName().Name;
+var dataAccessAssembyName = typeof(ApplicationDbContext).Assembly.GetName().Name;
 
 var defaultConnString = builder.Configuration.GetConnectionString("DefaultConnection");
 var folder = Environment.SpecialFolder.LocalApplicationData;
@@ -34,11 +33,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ICoffeeShopService, CoffeeShopService>();
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
-    //options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-    options.AddPolicy(name: MyAllowSpecificOrigins,
+    options.AddPolicy(name: myAllowSpecificOrigins,
         policy =>
         {
             policy.AllowAnyOrigin()
@@ -88,7 +86,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors(myAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 
