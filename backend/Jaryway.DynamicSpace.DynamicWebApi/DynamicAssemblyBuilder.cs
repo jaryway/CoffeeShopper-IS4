@@ -76,7 +76,7 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
 
             var references = new[] {
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(ApplicationDbContext).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(DynamicDbContext).Assembly.Location),
                     MetadataReference.CreateFromFile(Assembly.Load("System").Location),
                     MetadataReference.CreateFromFile(Assembly.Load("System.Reflection").Location),
                     MetadataReference.CreateFromFile(Assembly.Load("System.Collections").Location),

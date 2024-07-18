@@ -189,15 +189,6 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
             serviceCollection.AddEntityFrameworkDesignTimeServices();
             serviceCollection.AddDbContextDesignTimeServices(_dynamicDbContext);
 
-            if ((_dynamicDbContext.Database.ProviderName ?? "").Contains("MySql"))
-            {
-                serviceCollection.AddScoped<IMigrator, DynamicMySqlMigrator>();
-            }
-            else
-            {
-                serviceCollection.AddScoped<IMigrator, DynamicMigrator>();
-            }
-
             serviceCollection.AddScoped<IMigrationsAssembly, DynamicMigrationsAssembly>();
             serviceCollection.AddScoped<IMigrationsModelDiffer, DynamicMigrationsModelDiffer>();
             serviceCollection.AddScoped<IMigrationsScaffolder, DynamicMigrationsScaffolder>();
