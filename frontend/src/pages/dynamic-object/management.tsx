@@ -3,17 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRequest } from "ahooks";
 
 const Management = () => {
-  const flag = useRef(false).current;
+//   const flag = useRef(false).current;
 
-  async function getUserList(keywords = "") {
-    new Promise((resolve) => {
+  async function getDynamicObjects(keywords = "") {
+    return new Promise<any[]>((resolve) => {
       setTimeout(() => {
         resolve([]);
       }, 1000);
     });
   }
 
-  const { data: dataSource, loading } = useRequest(getUserList, {
+  const { data: dataSource, loading } = useRequest(getDynamicObjects, {
     onSuccess: (result, params) => {
       //   setState("");
       message.success(`The username was changed to "${params[0]}"!`);
@@ -110,7 +110,7 @@ const Management = () => {
   return (
     <div className="content" style={{ flex: "auto", padding: "0 16px" }}>
       <div style={{ padding: "16px 0" }}>人员管理</div>
-      <Table dataSource={dataSource} columns={columns} scroll={{ x: 3000 }} />
+      <Table dataSource={dataSource} columns={columns} loading={loading} scroll={{ x: 3000 }} />
     </div>
   );
 };

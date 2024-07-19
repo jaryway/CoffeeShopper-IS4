@@ -64,13 +64,14 @@ namespace Jaryway.DynamicSpace.IdentityServer
                         "http://localhost:4100/signin-oidc",
                         "http://localhost:4100/private"
                     },
-                    FrontChannelLogoutUri = "http://localhost:4100/signout-oidc",
-                    PostLogoutRedirectUris = { "http://localhost:4100/signout-oidc" },
+                    FrontChannelLogoutUri = "http://localhost:4100/signout-callback-oidc",
+                    PostLogoutRedirectUris = { "http://localhost:4100/signout-callback-oidc" },
                     AllowOfflineAccess = true,
                     AllowedScopes = { "openid", "profile", "CoffeeAPI.read" },
                     RequirePkce = true,
                     RequireConsent = true,
                     AllowPlainTextPkce = false,
+                   
                     //AccessTokenLifetime = 60
                 },
                 new Client
