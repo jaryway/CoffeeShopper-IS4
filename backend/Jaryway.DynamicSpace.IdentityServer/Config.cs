@@ -1,14 +1,25 @@
-﻿using Jaryway.IdentityServer.Models;
+﻿using Jaryway.IdentityServer;
+using Jaryway.IdentityServer.Models;
 
 namespace Jaryway.DynamicSpace.IdentityServer
 {
     public class Config
     {
+        static string[] allowedScopes =
+       {
+            IdentityServerConstants.StandardScopes.OpenId,
+            IdentityServerConstants.StandardScopes.Profile,
+            IdentityServerConstants.StandardScopes.Email,
+            "CoffeeAPI.read",
+            "CoffeeAPI.write",
+            "DynamicWebApi.all"
+        };
         public static IEnumerable<IdentityResource> IdentityResources =>
             new[]
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
+                new IdentityResources.Email(),
                 new IdentityResource
                 {
                     Name = "role",
@@ -104,7 +115,29 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     },
                     AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047"},
                     AllowedScopes = { "DynamicWebApi.all" }
-                }
+                },
+                new Client
+                {
+                    ClientId = "js_oidc",
+                    ClientName = "JavaScript OIDC Client",
+                    ClientUri = "http://localhost:4100/wwwroot",
+
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequireClientSecret = false,
+
+                    RedirectUris =
+                    {
+                        "http://localhost:4100/wwwroot/index.html",
+                        "http://localhost:4100/wwwroot/callback.html",
+                        "http://localhost:4100/wwwroot/silent.html",
+                        "http://localhost:4100/wwwroot/popup.html"
+                    },
+
+                    PostLogoutRedirectUris = { "http://localhost:4100/wwwroot/index.html" },
+                    AllowedCorsOrigins = { "http://localhost:4100/wwwroot" },
+
+                    AllowedScopes = allowedScopes
+                },
             };
     }
 }

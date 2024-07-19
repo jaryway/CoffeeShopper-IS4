@@ -110,7 +110,7 @@ const Management = () => {
   return (
     <div className="content" style={{ flex: "auto", padding: "0 16px" }}>
       <div style={{ padding: "16px 0" }}>人员管理</div>
-      <Table dataSource={dataSource} columns={columns} scroll={{ x: 3000 }} />
+      <Table dataSource={dataSource || []} columns={columns} scroll={{ x: 3000 }} />
     </div>
   );
 };
