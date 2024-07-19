@@ -2,19 +2,20 @@
 using Jaryway.DynamicSpace.DynamicWebApi.Services;
 using Jaryway.DynamicSpace.DynamicWebApi.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class DynamicClassController : ControllerBase
+    public class RuntimeController : ControllerBase
     {
-        private readonly ILogger<DynamicClassController> _logger;
+        private readonly ILogger<RuntimeController> _logger;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IDynamicDesignTimeService _dynamicDesignTimeService;
 
-        public DynamicClassController(ILogger<DynamicClassController> logger, IDynamicDesignTimeService dynamicDesignTimeService, ApplicationDbContext applicationDbContext)
+        public RuntimeController(ILogger<RuntimeController> logger, IDynamicDesignTimeService dynamicDesignTimeService, ApplicationDbContext applicationDbContext)
         {
             _logger = logger;
             _applicationDbContext = applicationDbContext;

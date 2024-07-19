@@ -1,9 +1,6 @@
-﻿using System;
-using System.Reflection;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Authorization;
 
 
 namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers;

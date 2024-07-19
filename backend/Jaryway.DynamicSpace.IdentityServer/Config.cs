@@ -41,7 +41,7 @@ namespace Jaryway.DynamicSpace.IdentityServer
                 {
                     Scopes = new List<string> { "CoffeeAPI.read", "CoffeeAPI.write" },
                     ApiSecrets = new List<Secret> { new Secret("ScopeSecret".Sha256()) },
-                    UserClaims = new List<string> { "role" }
+                    UserClaims = new List<string> { "role" },
                 },
                  new ApiResource("DynamicWebApi")
                 {
@@ -82,8 +82,8 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     RequirePkce = true,
                     RequireConsent = true,
                     AllowPlainTextPkce = false,
-                   
-                    //AccessTokenLifetime = 60
+                    // 设置 access_token 的过期时间
+                     //AccessTokenLifetime = 60
                 },
                 new Client
                 {
@@ -124,7 +124,10 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     ClientUri = "http://localhost:4100/wwwroot",
 
                     AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
                     RequireClientSecret = false,
+                    AllowOfflineAccess = true,
+                    //RefreshTokenExpiration = TokenExpiration.Sliding,
 
                     RedirectUris =
                     {
@@ -135,7 +138,8 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     },
 
                     PostLogoutRedirectUris = { "http://localhost:4100/wwwroot/index.html" },
-                    AllowedCorsOrigins = { "http://localhost:4100/wwwroot" },
+                    FrontChannelLogoutUri = "http://localhost:4100/wwwroot/callback.html",
+                    AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047" },
 
                     AllowedScopes = allowedScopes
                 },

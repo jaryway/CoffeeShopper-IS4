@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +36,7 @@ builder.Services.AddAuthentication("Bearer")
         options.Authority = "https://localhost:5443";
         options.ApiName = "DynamicWebApi";
         //options.JwtValidationClockSkew = TimeSpan.FromSeconds(60);
+        //options.JwtValidationClockSkew
     });
 
 builder.Services.AddSingleton<IActionDescriptorChangeProvider>(GenericControllerActionDescriptorChangeProvider.Instance);

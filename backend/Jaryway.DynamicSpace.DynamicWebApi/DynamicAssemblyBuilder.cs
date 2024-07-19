@@ -4,6 +4,7 @@ using Jaryway.DynamicSpace.DynamicWebApi.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi
@@ -95,6 +96,7 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
             using (var scope = _serviceProvider!.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()!;
+                context!.Database.Migrate();
 
                 if (DesignTime)
                 {

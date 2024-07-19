@@ -7,7 +7,7 @@ using Jaryway.DynamicSpace.DynamicWebApi.Controllers;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi.Models
 {
-    [GenericController("api/test")]
+    //[GenericController("api/test")]
     public class Test : DynamicClassBase
     {
         //public int Id { get; set; }

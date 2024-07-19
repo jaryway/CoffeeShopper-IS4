@@ -31,7 +31,12 @@ builder.Services.AddDbContext<AspNetIdentityDbContext>(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(o => { })
     .AddEntityFrameworkStores<AspNetIdentityDbContext>();
 
-builder.Services.AddIdentityServer(options => { })
+builder.Services
+    .AddIdentityServer(options =>
+    {
+        //options.Authentication.CookieLifetime = TimeSpan.FromDays(30);
+        //options.Authentication.CookieSlidingExpiration = true;
+    })
     .AddAspNetIdentity<IdentityUser>()
     .AddConfigurationStore(options =>
     {
