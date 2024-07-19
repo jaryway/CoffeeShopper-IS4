@@ -4,7 +4,7 @@ Log.setLogger(console);
 Log.setLevel(Log.INFO);
 
 export const settings = {
-  authority: "https://localhost:5443",
+  authority: "https://localhost:5443/",
   client_id: "interactive",
   // client_secret: 'ClientSecret1',
   //client_id: 'interactive.public.short',
@@ -13,6 +13,8 @@ export const settings = {
   response_type: "code",
   //response_mode: 'fragment',
   scope: "openid profile CoffeeAPI.read offline_access",
+  monitorSession: true,
+  revokeTokensOnSignout: true,
   //scope: 'openid profile api offline_access',
 
   // popup_redirect_uri: url + "/sample-popup-signin.html",
@@ -20,9 +22,9 @@ export const settings = {
 
   // silent renew will get a new access_token via an iframe
   // just prior to the old access_token expiring (60 seconds prior)
-  silent_redirect_uri: "http://localhost:4100/silent-renew",
-   // no silent renew via "prompt=none" (https://github.com/authts/oidc-client-ts/issues/366)
-  automaticSilentRenew: false,
+  // silent_redirect_uri: "http://localhost:4100/silent-renew",
+  // no silent renew via "prompt=none" (https://github.com/authts/oidc-client-ts/issues/366)
+  // automaticSilentRenew: true,
   // validateSubOnSilentRenew: true,
   //silentRequestTimeout: 10000,
   // accessTokenExpiringNotificationTime: 5,

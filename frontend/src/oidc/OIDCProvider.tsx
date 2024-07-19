@@ -34,22 +34,22 @@ let flag = false;
 const loginIfNotLogedIn = async () => {
   console.log("loginIfNotLogedIn");
 
-  if (flag) return;
+  // if (flag) return;
 
-  flag = true;
+  // flag = true;
   try {
     const user = await mgr.getUser();
 
     if (user) return;
 
     const result = await mgr.signinRedirect();
-    console.log("signinRedirect", result);
+    console.log("OIDCProvider-signinRedirect", result);
   } catch (ex) {
     // return Promise.reject("请求出错");
     throw ex;
   }
 
-  flag = false;
+  // flag = false;
 };
 
 const OIDCProvider = ({ children }: OIDCProviderProps) => {
@@ -65,6 +65,8 @@ const OIDCProvider = ({ children }: OIDCProviderProps) => {
     try {
       loginIfNotLogedIn() //
         .then(() => {
+          console.log("OIDCProvider-signinRedirect-success");
+
           setLoading(false);
         })
         .catch(() => {})
@@ -75,6 +77,8 @@ const OIDCProvider = ({ children }: OIDCProviderProps) => {
       console.log(error);
     }
   }, []);
+
+  console.log("OIDCProvider-loading", loading);
 
   if (loading) {
     return <Indicator title="加载中..." />;
