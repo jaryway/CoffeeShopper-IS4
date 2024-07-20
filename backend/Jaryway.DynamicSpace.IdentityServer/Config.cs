@@ -82,6 +82,7 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     RequirePkce = true,
                     RequireConsent = true,
                     AllowPlainTextPkce = false,
+                    
                     // 设置 access_token 的过期时间
                      //AccessTokenLifetime = 60
                 },

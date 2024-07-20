@@ -523,7 +523,7 @@ var oidc = (() => {
       this.stop();
       this._session_state = session_state;
       const send = () => {
-        console.log('SessionMonitor.start__.send',this._client_id + " " + this._session_state, this._frame_origin);
+        // console.log('SessionMonitor.start__.send',this._client_id + " " + this._session_state, this._frame_origin);
         if (!this._frame.contentWindow || !this._session_state) {
           return;
         }
@@ -538,7 +538,7 @@ var oidc = (() => {
       // },this._intervalInSeconds * 1e3);
 
       this._timer1 = setInterval(()=>{
-        console.log('SessionMonitor.setInterval');
+        console.log('SessionMonitor.send');
         send();
       }, this._intervalInSeconds * 1e3);
     }
