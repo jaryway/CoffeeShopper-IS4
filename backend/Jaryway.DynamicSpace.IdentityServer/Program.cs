@@ -37,7 +37,9 @@ builder.Services
     {
         //options.Authentication.CookieLifetime = TimeSpan.FromDays(30);
         //options.Authentication.CookieSlidingExpiration = true;
+        //options.Validation
     })
+    .AddRedirectUriValidator<PathOnlyRedirectUriValidator>()
     .AddAspNetIdentity<IdentityUser>()
     .AddConfigurationStore(options =>
     {
