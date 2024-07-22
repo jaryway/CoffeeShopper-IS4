@@ -28,10 +28,10 @@ export const PUBLIC_URL = getConfig("PUBLIC_URL");
 //  * 站点静态资源 CDN 配置，默认空字符串
 //  */
 // export const IMAGE_CDN_BASE = getConfig('IMAGE_CDN_BASE');
-// /**
-//  * 接口请求地址配置，默认值 '/base'
-//  */
-// export const API_BASE_URL = getConfig('API_BASE_URL', '/base');
+/**
+ * 接口请求地址配置，默认值 '/base'
+ */
+export const API_BASE_URL = getConfig("API_BASE_URL", "/base");
 // /**
 //  * 部署环境配置，可选值 prod=正式生产环境,test=测试生产环境，此时系统会显示“测试”,默认值 test
 //  */

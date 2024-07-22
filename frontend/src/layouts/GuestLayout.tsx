@@ -1,11 +1,13 @@
 import { Layout, ConfigProvider, theme, Button } from "antd";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import "./GuestLayout.css";
+import { useAuth } from "auth/use-auth";
 
 const { Header, Footer } = Layout;
 
 const GuestLayout = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+  const auth = useAuth();
 
   return (
     <ConfigProvider
@@ -42,7 +44,7 @@ const GuestLayout = () => {
             {/* <UserInfo className="global-header-action" /> */}
 
             <div className="global-header-action">
-              <Button type="primary" onClick={() => navigate("/login")}>
+              <Button type="primary" onClick={() => auth.signinRedirect()}>
                 登录
               </Button>
             </div>

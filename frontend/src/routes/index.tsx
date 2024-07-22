@@ -1,8 +1,9 @@
 // import { lazy } from "react";
 
-import { Outlet, type RouteObject } from "react-router-dom";
+import { Outlet, useNavigate, type RouteObject } from "react-router-dom";
 import { DefaultErrorBoundary } from "../DefaultErrorBoundary";
 import AuthProvider from "../auth/AuthProvider";
+import ApiProvider from "api";
 
 const lazyComponent = (loader: () => Promise<any>) => {
   return async () => {
@@ -21,6 +22,7 @@ const lazyComponent = (loader: () => Promise<any>) => {
 };
 
 const RootComponent = () => {
+  const navigate = useNavigate();
   return (
     <AuthProvider
       {...{
@@ -37,15 +39,17 @@ const RootComponent = () => {
         loadUserInfo: true,
         monitorSession: true,
         onSigninCallback() {
-          // console.log("onSigninCallback");
-          // navigate("/");
+          console.log("onSigninCallback");
+          navigate("/dashboard");
         },
         onSignoutCallback() {
           // console.log("onSignoutCallback");
         },
       }}
     >
-      <Outlet />
+      <ApiProvider>
+        <Outlet />
+      </ApiProvider>
     </AuthProvider>
   );
 };
