@@ -1,7 +1,6 @@
 import { UserManager, User } from "oidc-client-ts";
 import type { ProcessResourceOwnerPasswordCredentialsArgs, UserManagerSettings } from "oidc-client-ts";
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { settings } from "./settings";
 import { AuthContext, AuthContextValue } from "./AuthContext";
 import { initialAuthState } from "./AuthState";
 import { reducer } from "./reducer";
@@ -193,7 +192,6 @@ const AuthProvider = (props: AuthProviderProps) => {
     const autoSignout = async () => {
       try {
         if (matchSignoutCallback && matchSignoutCallback(userManager.settings)) {
-          console.log("signoutCallback")
           await userManager.signoutCallback();
           onSignoutCallback && (await onSignoutCallback());
         }

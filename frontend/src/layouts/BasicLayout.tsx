@@ -1,4 +1,4 @@
-import { Layout, ConfigProvider, Menu, theme, Button, Avatar } from "antd";
+import { Layout, ConfigProvider, Menu, theme, Button } from "antd";
 import type { MenuProps } from "antd";
 import {
   AppstoreOutlined,
@@ -87,7 +87,6 @@ const BasicLayout = () => {
           }}
         >
           <div>DynamicSpace</div>
-
           <div>
             <UserInfo className="global-header-action" />
           </div>

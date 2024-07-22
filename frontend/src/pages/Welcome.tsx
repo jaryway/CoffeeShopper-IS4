@@ -1,8 +1,8 @@
 import { Button, Result, Table } from "antd";
 import React from "react";
 
-const Home = () => {
-  console.log("Home");
+const Welcome = () => {
+  console.log("Welcome");
 
   return (
     <div className="content" style={{ flex: "auto", padding: "0 16px" }}>
@@ -26,4 +26,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Welcome;
