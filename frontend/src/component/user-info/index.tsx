@@ -7,8 +7,9 @@ import { Avatar, Menu, MenuProps, Spin } from "antd";
 
 import HeaderDropdown from "../header-dropdown";
 import { UserManager } from "oidc-client-ts";
-import { settings } from "oidc/settings";
+import { settings } from "auth/settings";
 import { useCurrentUser } from "hooks/use-current-user";
+import { useAuth } from "auth/use-auth";
 // import { useLogout, useCurrentUser, useAPI } from "@fregata/shared";
 // import ChangePassword from "pages/accounts/ChangePassword";
 // import Profile from "pages/accounts/Profile";
@@ -19,14 +20,18 @@ export default function UserInfo({ ...rest }: any) {
   // const userManager = useUserManager();
   //   const { api } = useAPI();
   //   const logoutUser = useLogout();
-  const { currentUser, logout } = useCurrentUser();
+  // const { currentUser, logout } = useCurrentUser();
+  const { isLoading, user, signoutRedirect } = useAuth();
+
+  const currentUser = user?.profile;
+  const headImg = user?.profile.picture;
 
   console.log("loading", currentUser);
 
   //   const currentUser = { userName: "小明", headImg: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" };
-  const { headImg, name } = currentUser || {};
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [profileVisible, setProfileVisible] = useState(false);
+  const { name } = currentUser || {};
+  // const [passwordVisible, setPasswordVisible] = useState(false);
+  // const [profileVisible, setProfileVisible] = useState(false);
   const navigate = useNavigate();
   //   const logout = useCallback(async () => {
   //     // try {
@@ -41,18 +46,18 @@ export default function UserInfo({ ...rest }: any) {
   //   }, []);
 
   const _onPasswordVisibleChange = useCallback(() => {
-    setPasswordVisible((prev) => !prev);
+    // setPasswordVisible((prev) => !prev);
   }, []);
 
   const _onProfileVisibleChange = useCallback(() => {
-    setProfileVisible((prev) => !prev);
+    // setProfileVisible((prev) => !prev);
   }, []);
 
   const _onMenuClick = useCallback(
     ({ key }: any) => {
       switch (key) {
         case "logout":
-          return logout();
+          return signoutRedirect();
         case "changepwd":
           _onPasswordVisibleChange();
           break;
@@ -67,7 +72,7 @@ export default function UserInfo({ ...rest }: any) {
           break;
       }
     },
-    [_onPasswordVisibleChange, _onProfileVisibleChange, logout, navigate]
+    [_onPasswordVisibleChange, _onProfileVisibleChange, navigate, signoutRedirect]
   );
 
   var mgr = new UserManager(settings);

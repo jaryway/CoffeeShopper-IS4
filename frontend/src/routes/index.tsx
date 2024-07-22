@@ -36,18 +36,18 @@ const routes: RouteObject[] = [
       },
     ],
   },
+  // {
+  //   path: "/signin-oidc",
+  //   lazy: lazyComponent(() => import("auth/SignInCallback")),
+  // },
   {
-    path: "/signin-oidc",
-    lazy: lazyComponent(() => import("oidc/SignIn")),
+    path: "/signout-success",
+    lazy: lazyComponent(() => import("auth/SignOutSuccess")),
   },
-  {
-    path: "/signout-callback-oidc",
-    lazy: lazyComponent(() => import("oidc/SignOut")),
-  },
-  {
-    path: "/test",
-    lazy: lazyComponent(() => import("pages/Test")),
-  },
+  // {
+  //   path: "/test",
+  //   lazy: lazyComponent(() => import("pages/Test")),
+  // },
 ];
 
 export default routes;

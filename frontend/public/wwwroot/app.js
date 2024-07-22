@@ -61,14 +61,14 @@ mgr.events.addUserSignedOut(function () {
 mgr.events.addUserSessionChanged((e) => {
   log("User session changed", e);
 });
-mgr.events.addUserSignedOut(() => {
-    mgr.removeUser().then(() => {
-        console.log('User signed out from OP');
-        // window.location.href = '/';
-    }).catch(error => {
-        console.error('Error during user signout', error);
-    });
-});
+// mgr.events.addUserSignedOut(() => {
+//     mgr.removeUser().then(() => {
+//         console.log('User signed out from OP');
+//         // window.location.href = '/';
+//     }).catch(error => {
+//         console.error('Error during user signout', error);
+//     });
+// });
 
 
 function login() {

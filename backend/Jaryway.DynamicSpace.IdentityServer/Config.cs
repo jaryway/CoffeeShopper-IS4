@@ -71,12 +71,16 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     RequireClientSecret = false,
                     AllowedGrantTypes = GrantTypes.Code,
                     RedirectUris = {
-                        "https://localhost:4100/signin-oidc",
-                        "http://localhost:4100/signin-oidc",
-                        "http://localhost:4100/private"
+                        "https://localhost:4100/",
+                        "http://localhost:4100/",
                     },
-                    FrontChannelLogoutUri = "http://localhost:4100/signout-callback-oidc",
-                    PostLogoutRedirectUris = { "http://localhost:4100/signout-callback-oidc" },
+                    // 用于在用户注销时通知后端应用程序(如果应用是一个后端应用程序，则用这个)
+                    //BackChannelLogoutUri = "",
+                    // 用于在用户注销时通知前端应用程序(如果应用是一个前端应用程序，则用这个)
+                    FrontChannelLogoutUri = "http://localhost:4100/",
+                    // 用于指定注销后用户应该被重定向到的位置，指用户主动注销后，希望回跳的地址
+                    PostLogoutRedirectUris = { "http://localhost:4100/signout-success" },
+
                     AllowOfflineAccess = true,
                     AllowedScopes = { "openid", "profile", "CoffeeAPI.read" },
                     RequirePkce = true,
@@ -84,7 +88,7 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     AllowPlainTextPkce = false,
                     
                     // 设置 access_token 的过期时间
-                     //AccessTokenLifetime = 60
+                    // AccessTokenLifetime = 60
                 },
                 new Client
                 {
@@ -118,32 +122,32 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047"},
                     AllowedScopes = { "DynamicWebApi.all" }
                 },
-                new Client
-                {
-                    ClientId = "js_oidc",
-                    ClientName = "JavaScript OIDC Client",
-                    ClientUri = "http://localhost:4100/wwwroot",
+                //new Client
+                //{
+                //    ClientId = "js_oidc",
+                //    ClientName = "JavaScript OIDC Client",
+                //    ClientUri = "http://localhost:4100/wwwroot",
 
-                    AllowedGrantTypes = GrantTypes.Code,
-                    RequirePkce = true,
-                    RequireClientSecret = false,
-                    AllowOfflineAccess = true,
-                    //RefreshTokenExpiration = TokenExpiration.Sliding,
+                //    AllowedGrantTypes = GrantTypes.Code,
+                //    RequirePkce = true,
+                //    RequireClientSecret = false,
+                //    AllowOfflineAccess = true,
+                //    //RefreshTokenExpiration = TokenExpiration.Sliding,
 
-                    RedirectUris =
-                    {
-                        "http://localhost:4100/wwwroot/index.html",
-                        "http://localhost:4100/wwwroot/callback.html",
-                        "http://localhost:4100/wwwroot/silent.html",
-                        "http://localhost:4100/wwwroot/popup.html"
-                    },
+                //    RedirectUris =
+                //    {
+                //        "http://localhost:4100/wwwroot/index.html",
+                //        "http://localhost:4100/wwwroot/callback.html",
+                //        "http://localhost:4100/wwwroot/silent.html",
+                //        "http://localhost:4100/wwwroot/popup.html"
+                //    },
 
-                    PostLogoutRedirectUris = { "http://localhost:4100/wwwroot/index.html" },
-                    FrontChannelLogoutUri = "http://localhost:4100/wwwroot/callback.html",
-                    AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047" },
+                //    PostLogoutRedirectUris = { "http://localhost:4100/wwwroot/index.html" },
+                //    FrontChannelLogoutUri = "http://localhost:4100/wwwroot/callback.html",
+                //    AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047" },
 
-                    AllowedScopes = allowedScopes
-                },
+                //    AllowedScopes = allowedScopes
+                //},
             };
     }
 }

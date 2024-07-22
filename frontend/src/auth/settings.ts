@@ -6,15 +6,14 @@ Log.setLevel(Log.INFO);
 export const settings = {
   authority: "https://localhost:5443/",
   client_id: "interactive",
-  // client_secret: 'ClientSecret1',
-  //client_id: 'interactive.public.short',
-  redirect_uri: "http://localhost:4100/signin-oidc",
+  // 登录后的回跳地址
+  redirect_uri: "http://localhost:4100/index.html",
+  // 注销后的回跳地址
   post_logout_redirect_uri: "http://localhost:4100/signout-callback-oidc",
   response_type: "code",
-  //response_mode: 'fragment',
   scope: "openid profile CoffeeAPI.read offline_access",
-  monitorSession: true,
-  revokeTokensOnSignout: true,
+  // monitorSession: true,
+  // revokeTokensOnSignout: true,
   //scope: 'openid profile api offline_access',
 
   // popup_redirect_uri: url + "/sample-popup-signin.html",
@@ -24,12 +23,13 @@ export const settings = {
   // just prior to the old access_token expiring (60 seconds prior)
   // silent_redirect_uri: "http://localhost:4100/silent-renew",
   // no silent renew via "prompt=none" (https://github.com/authts/oidc-client-ts/issues/366)
-  // automaticSilentRenew: true,
+  // 自动刷新 token
+  automaticSilentRenew: true,
   // validateSubOnSilentRenew: true,
   //silentRequestTimeout: 10000,
   // accessTokenExpiringNotificationTime: 5,
 
-  // loadUserInfo: true,
+  loadUserInfo: true,
 
   // monitorAnonymousSession: true,
 

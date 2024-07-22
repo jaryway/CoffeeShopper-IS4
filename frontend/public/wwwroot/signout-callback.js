@@ -32,10 +32,10 @@
   monitorSession: true,
 };
 
-Oidc.Log.logger = window.console;
-Oidc.Log.level = Oidc.Log.DEBUG;
+oidc.Log.logger = window.console;
+oidc.Log.level = oidc.Log.DEBUG;
 
-var mgr = new Oidc.UserManager(config);
+var mgr = new oidc.UserManager(config);
 
 mgr.signoutRedirectCallback().then(function () {
   console.log("Signout redirect callback complete");
