@@ -1,6 +1,6 @@
 import { UserManager, User } from "oidc-client-ts";
 import type { ProcessResourceOwnerPasswordCredentialsArgs, UserManagerSettings } from "oidc-client-ts";
-import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { AuthContext, AuthContextValue } from "./AuthContext";
 import { initialAuthState } from "./AuthState";
 import { reducer } from "./reducer";
@@ -242,6 +242,12 @@ const AuthProvider = (props: AuthProviderProps) => {
     };
   }, [userManager]);
 
+  const removeUser = useCallback(async () => {
+    if (!userManager) unsupported("removeUser");
+    await userManager.removeUser();
+    onRemoveUser && (await onRemoveUser());
+  }, [userManager, onRemoveUser]);
+
   const authContextValue = useMemo(() => {
     return {
       settings: userManager.settings,
@@ -275,7 +281,7 @@ const AuthProvider = (props: AuthProviderProps) => {
     } as AuthContextValue;
   }, [userManager]);
 
-  return <AuthContext.Provider value={{ ...authContextValue, ...state }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ ...authContextValue, ...state, removeUser }}>{children}</AuthContext.Provider>;
 };
 
 AuthProvider.diplayName = "AuthProvider";

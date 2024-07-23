@@ -7,7 +7,6 @@ import type {
   SigninPopupArgs,
   SigninSilentArgs,
   SigninRedirectArgs,
-
   SignoutRedirectArgs,
   SignoutPopupArgs,
   QuerySessionStatusArgs,
@@ -24,6 +23,7 @@ export interface AuthContextValue extends AuthState {
   readonly settings: UserManagerSettings;
   readonly events: UserManagerEvents;
   clearStaleState(): Promise<void>;
+  getUser(): Promise<User | null>;
   removeUser(): Promise<void>;
   signinPopup(args?: SigninPopupArgs): Promise<User>;
   signinSilent(args?: SigninSilentArgs): Promise<User | null>;
