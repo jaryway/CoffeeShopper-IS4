@@ -178,13 +178,14 @@ const AuthProvider = (props: AuthProviderProps) => {
         if (hasAuthParams() && !skipSigninCallback) {
           console.log("signinCallback-11");
           user = await userManager.signinCallback();
-          console.log("signinCallback-22");
+          console.log("signinCallback-22",user);
 
           onSigninCallback && (await onSigninCallback(user));
         }
         user = !user ? await userManager.getUser() : user;
         dispatch({ type: "INITIALISED", user });
       } catch (error) {
+        console.log('error',error);        
         dispatch({ type: "ERROR", error: signinError(error) });
       }
     };
@@ -192,6 +193,8 @@ const AuthProvider = (props: AuthProviderProps) => {
     const autoSignout = async () => {
       try {
         if (matchSignoutCallback && matchSignoutCallback(userManager.settings)) {
+          console.log("signoutCallback-22");
+
           await userManager.signoutCallback();
           onSignoutCallback && (await onSignoutCallback());
         }
@@ -218,10 +221,10 @@ const AuthProvider = (props: AuthProviderProps) => {
 
     // event UserSignedOut (e.g. user was signed out in background (checkSessionIFrame option))
     const handleUserSignedOut = async () => {
-      // console.log('handleUserSignedOut');
+      console.log('handleUserSignedOut');
 
       dispatch({ type: "USER_SIGNED_OUT" });
-      await userManager.removeUser();
+      // await userManager.removeUser();
     };
 
     // event SilentRenewError (silent renew error)

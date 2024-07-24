@@ -29,7 +29,7 @@ const RootComponent = () => {
         authority: "https://localhost:5443/",
         client_id: "interactive",
         // 登录后的回跳地址
-        redirect_uri: "http://localhost:4100/?redirect=/signin-callback",
+        redirect_uri: "http://localhost:4100/",
         // 注销后的回跳地址
         post_logout_redirect_uri: "http://localhost:4100/signout-success",
         response_type: "code",
@@ -64,7 +64,8 @@ const routes: RouteObject[] = [
           {
             index: true,
             path: "/",
-            lazy: lazyComponent(() => import("pages/Welcome")),
+            // lazy: lazyComponent(() => import("pages/Welcome")),
+            element: <div>Welcome</div>,
           },
         ],
       },
@@ -78,16 +79,17 @@ const routes: RouteObject[] = [
             children: [
               {
                 index: true,
-                lazy: lazyComponent(() => import("pages/Home")),
+                // lazy: lazyComponent(() => import("pages/Home")),
+                element: <div>Home</div>,
               },
             ],
           },
         ],
       },
-      {
-        path: "/signout-success",
-        lazy: lazyComponent(() => import("auth/SignOutSuccess")),
-      },
+      // {
+      //   path: "/signout-success",
+      //   lazy: lazyComponent(() => import("auth/SignOutSuccess")),
+      // },
     ],
   },
 ];

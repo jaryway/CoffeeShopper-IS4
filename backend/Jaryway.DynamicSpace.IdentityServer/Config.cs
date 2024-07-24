@@ -122,32 +122,32 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047"},
                     AllowedScopes = { "DynamicWebApi.all" }
                 },
-                //new Client
-                //{
-                //    ClientId = "js_oidc",
-                //    ClientName = "JavaScript OIDC Client",
-                //    ClientUri = "http://localhost:4100/wwwroot",
+                new Client
+                {
+                    ClientId = "js_oidc",
+                    ClientName = "JavaScript OIDC Client",
+                    ClientUri = "http://localhost:4200",
 
-                //    AllowedGrantTypes = GrantTypes.Code,
-                //    RequirePkce = true,
-                //    RequireClientSecret = false,
-                //    AllowOfflineAccess = true,
-                //    //RefreshTokenExpiration = TokenExpiration.Sliding,
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    RequireClientSecret = false,
+                    AllowOfflineAccess = true,
+                    //RefreshTokenExpiration = TokenExpiration.Sliding,
 
-                //    RedirectUris =
-                //    {
-                //        "http://localhost:4100/wwwroot/index.html",
-                //        "http://localhost:4100/wwwroot/callback.html",
-                //        "http://localhost:4100/wwwroot/silent.html",
-                //        "http://localhost:4100/wwwroot/popup.html"
-                //    },
+                    RedirectUris =
+                    {
+                        "http://localhost:4200/index.html",
+                        "http://localhost:4200/callback.html",
+                        "http://localhost:4200/silent.html",
+                        "http://localhost:4200/popup.html"
+                    },
 
-                //    PostLogoutRedirectUris = { "http://localhost:4100/wwwroot/index.html" },
-                //    FrontChannelLogoutUri = "http://localhost:4100/wwwroot/callback.html",
-                //    AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047" },
+                    PostLogoutRedirectUris = { "http://localhost:4200/index.html" },
+                    FrontChannelLogoutUri = "http://localhost:4200/callback.html",
+                    AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047" },
 
-                //    AllowedScopes = allowedScopes
-                //},
+                    AllowedScopes = allowedScopes
+                },
             };
     }
 }

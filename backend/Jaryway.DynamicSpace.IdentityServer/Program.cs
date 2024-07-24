@@ -36,10 +36,10 @@ builder.Services
     .AddIdentityServer(options =>
     {
         //options.Authentication.CookieLifetime = TimeSpan.FromDays(30);
-        //options.Authentication.CookieSlidingExpiration = true;
+        options.Authentication.CookieSlidingExpiration = true;
         //options.Validation
     })
-    .AddRedirectUriValidator<PathOnlyRedirectUriValidator>()
+    //.AddRedirectUriValidator<PathOnlyRedirectUriValidator>()
     .AddAspNetIdentity<IdentityUser>()
     .AddConfigurationStore(options =>
     {

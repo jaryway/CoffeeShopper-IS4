@@ -1,14 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 // import classNames from "classnames";
 import { KeyOutlined, PoweroffOutlined, InfoCircleOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Menu, MenuProps, Spin } from "antd";
+import { Avatar, MenuProps, Spin } from "antd";
 
 import HeaderDropdown from "../header-dropdown";
-import { UserManager } from "oidc-client-ts";
-import { settings } from "auth/settings";
-import { useCurrentUser } from "hooks/use-current-user";
+
 import { useAuth } from "auth/use-auth";
 // import { useLogout, useCurrentUser, useAPI } from "@fregata/shared";
 // import ChangePassword from "pages/accounts/ChangePassword";
@@ -21,7 +19,7 @@ export default function UserInfo({ ...rest }: any) {
   //   const { api } = useAPI();
   //   const logoutUser = useLogout();
   // const { currentUser, logout } = useCurrentUser();
-  const { isLoading, user, signoutRedirect } = useAuth();
+  const { user, signoutRedirect } = useAuth();
 
   const currentUser = user?.profile;
   const headImg = user?.profile.picture;
@@ -75,8 +73,8 @@ export default function UserInfo({ ...rest }: any) {
     [_onPasswordVisibleChange, _onProfileVisibleChange, navigate, signoutRedirect]
   );
 
-  var mgr = new UserManager(settings);
-  mgr.getUser().then((user) => console.log(user));
+  // var mgr = new UserManager(settings);
+  // mgr.getUser().then((user) => console.log(user));
 
   const items: MenuProps["items"] = [
     {

@@ -8,8 +8,9 @@ const Home = () => {
 
   const api = useApi();
   const getList = async () => {
-    const d = await api.get("/api/Rumtime/Query");
-    return d.data;
+    // const d = await api.get("/api/Rumtime/Query");
+    // return d.data;
+    return [];
   };
 
   const { data, loading } = useRequest<any[], any[]>(getList, {});
