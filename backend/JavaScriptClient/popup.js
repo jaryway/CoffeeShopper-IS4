@@ -1,2 +1,2 @@
-﻿var mgr = new oidc.UserManager();
+﻿var mgr = new oidc.UserManager({});
 mgr.signinPopupCallback();
