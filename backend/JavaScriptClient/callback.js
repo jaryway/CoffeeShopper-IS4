@@ -1,5 +1,5 @@
 ﻿var mgr = new oidc.UserManager({
-  authority: "https://localhost:5443/",
+  authority: "http://localhost:5000/",
   client_id: "js_oidc",
   response_type: "code",
   scope: "openid profile email offline_access CoffeeAPI.read CoffeeAPI.write DynamicWebApi.all",

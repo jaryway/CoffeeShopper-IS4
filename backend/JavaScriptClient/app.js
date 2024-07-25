@@ -1,7 +1,7 @@
 ﻿/// <reference path="libs/oidc-client-ts.js" />
 
 var config = {
-  authority: "https://localhost:5443/",
+  authority: "http://localhost:5000/",
   client_id: "js_oidc",
   redirect_uri: window.location.origin + "/callback.html",
   post_logout_redirect_uri: window.location.origin + "/index.html",
@@ -28,6 +28,8 @@ var config = {
 
   // will revoke (reference) access tokens at logout time
   // revokeAccessTokenOnSignout: true,
+  // 监控 seesion 变化，用于实现单点登出
+  // 注意：由于浏览器安全的限制，客户端和idp需要使用相同的协议，比如：都是https；否则会失败
   monitorSession: true,
 
   // this will allow all the OIDC protocol claims to be visible in the window. normally a client app
@@ -119,7 +121,7 @@ function callApi() {
         display("#ajax-result", xhr.response);
       }
     };
-    xhr.open("GET", "https://localhost:5046/api/Runtime/Query", true);
+    xhr.open("GET", "https://localhost:5446/api/Runtime/Query", true);
     xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
     xhr.send();
   });

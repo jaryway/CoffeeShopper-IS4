@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Sqlite");
@@ -33,8 +34,12 @@ builder.Services.AddControllers(o => o.Conventions.Add(new GenericControllerMode
 builder.Services.AddAuthentication("Bearer")
     .AddIdentityServerAuthentication("Bearer", options =>
     {
-        options.Authority = "https://localhost:5443";
+        options.RequireHttpsMetadata = false;
+        //options.Authority = "https://localhost:5443";
+        options.Authority = "http://localhost:5000";
         options.ApiName = "DynamicWebApi";
+        //options.Audience = "";
+        //options.Audience = "";
         //options.JwtValidationClockSkew = TimeSpan.FromSeconds(60);
         //options.JwtValidationClockSkew
     });
@@ -106,8 +111,8 @@ builder.Services.AddSwaggerGen(c =>
         {
             AuthorizationCode = new OpenApiOAuthFlow
             {
-                AuthorizationUrl = new Uri("https://localhost:5443/connect/authorize"),
-                TokenUrl = new Uri("https://localhost:5443/connect/token"),
+                AuthorizationUrl = new Uri("http://localhost:5000/connect/authorize"),
+                TokenUrl = new Uri("http://localhost:5000/connect/token"),
                 Scopes = new Dictionary<string, string> {
                     { "DynamicWebApi.all", "Access operations" },
                     //{ "DynamicWebApi.write", "Access write operations" },
@@ -129,7 +134,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.OAuthClientId("dynamic_web_api_swagger");
+        options.OAuthClientId("api_swagger");
         options.OAuthClientSecret("secret");
         options.OAuthAppName("DynamicWebApi - Swagger");
         options.OAuthUsePkce();
