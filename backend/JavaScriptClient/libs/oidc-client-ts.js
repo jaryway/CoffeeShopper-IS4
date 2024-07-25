@@ -1,9 +1,21 @@
 "use strict";
 var oidc = (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined")
+      return require.apply(this, arguments);
+    throw new Error('Dynamic require of "' + x + '" is not supported');
+  });
+  var __commonJS = (cb, mod) => function __require2() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  };
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -16,7 +28,875 @@ var oidc = (() => {
     }
     return to;
   };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // (disabled):crypto
+  var require_crypto = __commonJS({
+    "(disabled):crypto"() {
+    }
+  });
+
+  // node_modules/crypto-js/core.js
+  var require_core = __commonJS({
+    "node_modules/crypto-js/core.js"(exports, module) {
+      (function(root, factory) {
+        if (typeof exports === "object") {
+          module.exports = exports = factory();
+        } else if (typeof define === "function" && define.amd) {
+          define([], factory);
+        } else {
+          root.CryptoJS = factory();
+        }
+      })(exports, function() {
+        var CryptoJS2 = CryptoJS2 || function(Math2, undefined2) {
+          var crypto;
+          if (typeof window !== "undefined" && window.crypto) {
+            crypto = window.crypto;
+          }
+          if (typeof self !== "undefined" && self.crypto) {
+            crypto = self.crypto;
+          }
+          if (typeof globalThis !== "undefined" && globalThis.crypto) {
+            crypto = globalThis.crypto;
+          }
+          if (!crypto && typeof window !== "undefined" && window.msCrypto) {
+            crypto = window.msCrypto;
+          }
+          if (!crypto && typeof global !== "undefined" && global.crypto) {
+            crypto = global.crypto;
+          }
+          if (!crypto && typeof __require === "function") {
+            try {
+              crypto = require_crypto();
+            } catch (err) {
+            }
+          }
+          var cryptoSecureRandomInt = function() {
+            if (crypto) {
+              if (typeof crypto.getRandomValues === "function") {
+                try {
+                  return crypto.getRandomValues(new Uint32Array(1))[0];
+                } catch (err) {
+                }
+              }
+              if (typeof crypto.randomBytes === "function") {
+                try {
+                  return crypto.randomBytes(4).readInt32LE();
+                } catch (err) {
+                }
+              }
+            }
+            throw new Error("Native crypto module could not be used to get secure random number.");
+          };
+          var create = Object.create || function() {
+            function F() {
+            }
+            return function(obj) {
+              var subtype;
+              F.prototype = obj;
+              subtype = new F();
+              F.prototype = null;
+              return subtype;
+            };
+          }();
+          var C = {};
+          var C_lib = C.lib = {};
+          var Base = C_lib.Base = function() {
+            return {
+              /**
+               * Creates a new object that inherits from this object.
+               *
+               * @param {Object} overrides Properties to copy into the new object.
+               *
+               * @return {Object} The new object.
+               *
+               * @static
+               *
+               * @example
+               *
+               *     var MyType = CryptoJS.lib.Base.extend({
+               *         field: 'value',
+               *
+               *         method: function () {
+               *         }
+               *     });
+               */
+              extend: function(overrides) {
+                var subtype = create(this);
+                if (overrides) {
+                  subtype.mixIn(overrides);
+                }
+                if (!subtype.hasOwnProperty("init") || this.init === subtype.init) {
+                  subtype.init = function() {
+                    subtype.$super.init.apply(this, arguments);
+                  };
+                }
+                subtype.init.prototype = subtype;
+                subtype.$super = this;
+                return subtype;
+              },
+              /**
+               * Extends this object and runs the init method.
+               * Arguments to create() will be passed to init().
+               *
+               * @return {Object} The new object.
+               *
+               * @static
+               *
+               * @example
+               *
+               *     var instance = MyType.create();
+               */
+              create: function() {
+                var instance = this.extend();
+                instance.init.apply(instance, arguments);
+                return instance;
+              },
+              /**
+               * Initializes a newly created object.
+               * Override this method to add some logic when your objects are created.
+               *
+               * @example
+               *
+               *     var MyType = CryptoJS.lib.Base.extend({
+               *         init: function () {
+               *             // ...
+               *         }
+               *     });
+               */
+              init: function() {
+              },
+              /**
+               * Copies properties into this object.
+               *
+               * @param {Object} properties The properties to mix in.
+               *
+               * @example
+               *
+               *     MyType.mixIn({
+               *         field: 'value'
+               *     });
+               */
+              mixIn: function(properties) {
+                for (var propertyName in properties) {
+                  if (properties.hasOwnProperty(propertyName)) {
+                    this[propertyName] = properties[propertyName];
+                  }
+                }
+                if (properties.hasOwnProperty("toString")) {
+                  this.toString = properties.toString;
+                }
+              },
+              /**
+               * Creates a copy of this object.
+               *
+               * @return {Object} The clone.
+               *
+               * @example
+               *
+               *     var clone = instance.clone();
+               */
+              clone: function() {
+                return this.init.prototype.extend(this);
+              }
+            };
+          }();
+          var WordArray = C_lib.WordArray = Base.extend({
+            /**
+             * Initializes a newly created word array.
+             *
+             * @param {Array} words (Optional) An array of 32-bit words.
+             * @param {number} sigBytes (Optional) The number of significant bytes in the words.
+             *
+             * @example
+             *
+             *     var wordArray = CryptoJS.lib.WordArray.create();
+             *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607]);
+             *     var wordArray = CryptoJS.lib.WordArray.create([0x00010203, 0x04050607], 6);
+             */
+            init: function(words, sigBytes) {
+              words = this.words = words || [];
+              if (sigBytes != undefined2) {
+                this.sigBytes = sigBytes;
+              } else {
+                this.sigBytes = words.length * 4;
+              }
+            },
+            /**
+             * Converts this word array to a string.
+             *
+             * @param {Encoder} encoder (Optional) The encoding strategy to use. Default: CryptoJS.enc.Hex
+             *
+             * @return {string} The stringified word array.
+             *
+             * @example
+             *
+             *     var string = wordArray + '';
+             *     var string = wordArray.toString();
+             *     var string = wordArray.toString(CryptoJS.enc.Utf8);
+             */
+            toString: function(encoder) {
+              return (encoder || Hex).stringify(this);
+            },
+            /**
+             * Concatenates a word array to this word array.
+             *
+             * @param {WordArray} wordArray The word array to append.
+             *
+             * @return {WordArray} This word array.
+             *
+             * @example
+             *
+             *     wordArray1.concat(wordArray2);
+             */
+            concat: function(wordArray) {
+              var thisWords = this.words;
+              var thatWords = wordArray.words;
+              var thisSigBytes = this.sigBytes;
+              var thatSigBytes = wordArray.sigBytes;
+              this.clamp();
+              if (thisSigBytes % 4) {
+                for (var i = 0; i < thatSigBytes; i++) {
+                  var thatByte = thatWords[i >>> 2] >>> 24 - i % 4 * 8 & 255;
+                  thisWords[thisSigBytes + i >>> 2] |= thatByte << 24 - (thisSigBytes + i) % 4 * 8;
+                }
+              } else {
+                for (var j = 0; j < thatSigBytes; j += 4) {
+                  thisWords[thisSigBytes + j >>> 2] = thatWords[j >>> 2];
+                }
+              }
+              this.sigBytes += thatSigBytes;
+              return this;
+            },
+            /**
+             * Removes insignificant bits.
+             *
+             * @example
+             *
+             *     wordArray.clamp();
+             */
+            clamp: function() {
+              var words = this.words;
+              var sigBytes = this.sigBytes;
+              words[sigBytes >>> 2] &= 4294967295 << 32 - sigBytes % 4 * 8;
+              words.length = Math2.ceil(sigBytes / 4);
+            },
+            /**
+             * Creates a copy of this word array.
+             *
+             * @return {WordArray} The clone.
+             *
+             * @example
+             *
+             *     var clone = wordArray.clone();
+             */
+            clone: function() {
+              var clone = Base.clone.call(this);
+              clone.words = this.words.slice(0);
+              return clone;
+            },
+            /**
+             * Creates a word array filled with random bytes.
+             *
+             * @param {number} nBytes The number of random bytes to generate.
+             *
+             * @return {WordArray} The random word array.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var wordArray = CryptoJS.lib.WordArray.random(16);
+             */
+            random: function(nBytes) {
+              var words = [];
+              for (var i = 0; i < nBytes; i += 4) {
+                words.push(cryptoSecureRandomInt());
+              }
+              return new WordArray.init(words, nBytes);
+            }
+          });
+          var C_enc = C.enc = {};
+          var Hex = C_enc.Hex = {
+            /**
+             * Converts a word array to a hex string.
+             *
+             * @param {WordArray} wordArray The word array.
+             *
+             * @return {string} The hex string.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var hexString = CryptoJS.enc.Hex.stringify(wordArray);
+             */
+            stringify: function(wordArray) {
+              var words = wordArray.words;
+              var sigBytes = wordArray.sigBytes;
+              var hexChars = [];
+              for (var i = 0; i < sigBytes; i++) {
+                var bite = words[i >>> 2] >>> 24 - i % 4 * 8 & 255;
+                hexChars.push((bite >>> 4).toString(16));
+                hexChars.push((bite & 15).toString(16));
+              }
+              return hexChars.join("");
+            },
+            /**
+             * Converts a hex string to a word array.
+             *
+             * @param {string} hexStr The hex string.
+             *
+             * @return {WordArray} The word array.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var wordArray = CryptoJS.enc.Hex.parse(hexString);
+             */
+            parse: function(hexStr) {
+              var hexStrLength = hexStr.length;
+              var words = [];
+              for (var i = 0; i < hexStrLength; i += 2) {
+                words[i >>> 3] |= parseInt(hexStr.substr(i, 2), 16) << 24 - i % 8 * 4;
+              }
+              return new WordArray.init(words, hexStrLength / 2);
+            }
+          };
+          var Latin1 = C_enc.Latin1 = {
+            /**
+             * Converts a word array to a Latin1 string.
+             *
+             * @param {WordArray} wordArray The word array.
+             *
+             * @return {string} The Latin1 string.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var latin1String = CryptoJS.enc.Latin1.stringify(wordArray);
+             */
+            stringify: function(wordArray) {
+              var words = wordArray.words;
+              var sigBytes = wordArray.sigBytes;
+              var latin1Chars = [];
+              for (var i = 0; i < sigBytes; i++) {
+                var bite = words[i >>> 2] >>> 24 - i % 4 * 8 & 255;
+                latin1Chars.push(String.fromCharCode(bite));
+              }
+              return latin1Chars.join("");
+            },
+            /**
+             * Converts a Latin1 string to a word array.
+             *
+             * @param {string} latin1Str The Latin1 string.
+             *
+             * @return {WordArray} The word array.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var wordArray = CryptoJS.enc.Latin1.parse(latin1String);
+             */
+            parse: function(latin1Str) {
+              var latin1StrLength = latin1Str.length;
+              var words = [];
+              for (var i = 0; i < latin1StrLength; i++) {
+                words[i >>> 2] |= (latin1Str.charCodeAt(i) & 255) << 24 - i % 4 * 8;
+              }
+              return new WordArray.init(words, latin1StrLength);
+            }
+          };
+          var Utf82 = C_enc.Utf8 = {
+            /**
+             * Converts a word array to a UTF-8 string.
+             *
+             * @param {WordArray} wordArray The word array.
+             *
+             * @return {string} The UTF-8 string.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var utf8String = CryptoJS.enc.Utf8.stringify(wordArray);
+             */
+            stringify: function(wordArray) {
+              try {
+                return decodeURIComponent(escape(Latin1.stringify(wordArray)));
+              } catch (e2) {
+                throw new Error("Malformed UTF-8 data");
+              }
+            },
+            /**
+             * Converts a UTF-8 string to a word array.
+             *
+             * @param {string} utf8Str The UTF-8 string.
+             *
+             * @return {WordArray} The word array.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var wordArray = CryptoJS.enc.Utf8.parse(utf8String);
+             */
+            parse: function(utf8Str) {
+              return Latin1.parse(unescape(encodeURIComponent(utf8Str)));
+            }
+          };
+          var BufferedBlockAlgorithm = C_lib.BufferedBlockAlgorithm = Base.extend({
+            /**
+             * Resets this block algorithm's data buffer to its initial state.
+             *
+             * @example
+             *
+             *     bufferedBlockAlgorithm.reset();
+             */
+            reset: function() {
+              this._data = new WordArray.init();
+              this._nDataBytes = 0;
+            },
+            /**
+             * Adds new data to this block algorithm's buffer.
+             *
+             * @param {WordArray|string} data The data to append. Strings are converted to a WordArray using UTF-8.
+             *
+             * @example
+             *
+             *     bufferedBlockAlgorithm._append('data');
+             *     bufferedBlockAlgorithm._append(wordArray);
+             */
+            _append: function(data) {
+              if (typeof data == "string") {
+                data = Utf82.parse(data);
+              }
+              this._data.concat(data);
+              this._nDataBytes += data.sigBytes;
+            },
+            /**
+             * Processes available data blocks.
+             *
+             * This method invokes _doProcessBlock(offset), which must be implemented by a concrete subtype.
+             *
+             * @param {boolean} doFlush Whether all blocks and partial blocks should be processed.
+             *
+             * @return {WordArray} The processed data.
+             *
+             * @example
+             *
+             *     var processedData = bufferedBlockAlgorithm._process();
+             *     var processedData = bufferedBlockAlgorithm._process(!!'flush');
+             */
+            _process: function(doFlush) {
+              var processedWords;
+              var data = this._data;
+              var dataWords = data.words;
+              var dataSigBytes = data.sigBytes;
+              var blockSize = this.blockSize;
+              var blockSizeBytes = blockSize * 4;
+              var nBlocksReady = dataSigBytes / blockSizeBytes;
+              if (doFlush) {
+                nBlocksReady = Math2.ceil(nBlocksReady);
+              } else {
+                nBlocksReady = Math2.max((nBlocksReady | 0) - this._minBufferSize, 0);
+              }
+              var nWordsReady = nBlocksReady * blockSize;
+              var nBytesReady = Math2.min(nWordsReady * 4, dataSigBytes);
+              if (nWordsReady) {
+                for (var offset = 0; offset < nWordsReady; offset += blockSize) {
+                  this._doProcessBlock(dataWords, offset);
+                }
+                processedWords = dataWords.splice(0, nWordsReady);
+                data.sigBytes -= nBytesReady;
+              }
+              return new WordArray.init(processedWords, nBytesReady);
+            },
+            /**
+             * Creates a copy of this object.
+             *
+             * @return {Object} The clone.
+             *
+             * @example
+             *
+             *     var clone = bufferedBlockAlgorithm.clone();
+             */
+            clone: function() {
+              var clone = Base.clone.call(this);
+              clone._data = this._data.clone();
+              return clone;
+            },
+            _minBufferSize: 0
+          });
+          var Hasher = C_lib.Hasher = BufferedBlockAlgorithm.extend({
+            /**
+             * Configuration options.
+             */
+            cfg: Base.extend(),
+            /**
+             * Initializes a newly created hasher.
+             *
+             * @param {Object} cfg (Optional) The configuration options to use for this hash computation.
+             *
+             * @example
+             *
+             *     var hasher = CryptoJS.algo.SHA256.create();
+             */
+            init: function(cfg) {
+              this.cfg = this.cfg.extend(cfg);
+              this.reset();
+            },
+            /**
+             * Resets this hasher to its initial state.
+             *
+             * @example
+             *
+             *     hasher.reset();
+             */
+            reset: function() {
+              BufferedBlockAlgorithm.reset.call(this);
+              this._doReset();
+            },
+            /**
+             * Updates this hasher with a message.
+             *
+             * @param {WordArray|string} messageUpdate The message to append.
+             *
+             * @return {Hasher} This hasher.
+             *
+             * @example
+             *
+             *     hasher.update('message');
+             *     hasher.update(wordArray);
+             */
+            update: function(messageUpdate) {
+              this._append(messageUpdate);
+              this._process();
+              return this;
+            },
+            /**
+             * Finalizes the hash computation.
+             * Note that the finalize operation is effectively a destructive, read-once operation.
+             *
+             * @param {WordArray|string} messageUpdate (Optional) A final message update.
+             *
+             * @return {WordArray} The hash.
+             *
+             * @example
+             *
+             *     var hash = hasher.finalize();
+             *     var hash = hasher.finalize('message');
+             *     var hash = hasher.finalize(wordArray);
+             */
+            finalize: function(messageUpdate) {
+              if (messageUpdate) {
+                this._append(messageUpdate);
+              }
+              var hash = this._doFinalize();
+              return hash;
+            },
+            blockSize: 512 / 32,
+            /**
+             * Creates a shortcut function to a hasher's object interface.
+             *
+             * @param {Hasher} hasher The hasher to create a helper for.
+             *
+             * @return {Function} The shortcut function.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var SHA256 = CryptoJS.lib.Hasher._createHelper(CryptoJS.algo.SHA256);
+             */
+            _createHelper: function(hasher) {
+              return function(message, cfg) {
+                return new hasher.init(cfg).finalize(message);
+              };
+            },
+            /**
+             * Creates a shortcut function to the HMAC's object interface.
+             *
+             * @param {Hasher} hasher The hasher to use in this HMAC helper.
+             *
+             * @return {Function} The shortcut function.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var HmacSHA256 = CryptoJS.lib.Hasher._createHmacHelper(CryptoJS.algo.SHA256);
+             */
+            _createHmacHelper: function(hasher) {
+              return function(message, key) {
+                return new C_algo.HMAC.init(hasher, key).finalize(message);
+              };
+            }
+          });
+          var C_algo = C.algo = {};
+          return C;
+        }(Math);
+        return CryptoJS2;
+      });
+    }
+  });
+
+  // node_modules/crypto-js/sha256.js
+  var require_sha256 = __commonJS({
+    "node_modules/crypto-js/sha256.js"(exports, module) {
+      (function(root, factory) {
+        if (typeof exports === "object") {
+          module.exports = exports = factory(require_core());
+        } else if (typeof define === "function" && define.amd) {
+          define(["./core"], factory);
+        } else {
+          factory(root.CryptoJS);
+        }
+      })(exports, function(CryptoJS2) {
+        (function(Math2) {
+          var C = CryptoJS2;
+          var C_lib = C.lib;
+          var WordArray = C_lib.WordArray;
+          var Hasher = C_lib.Hasher;
+          var C_algo = C.algo;
+          var H = [];
+          var K = [];
+          (function() {
+            function isPrime(n3) {
+              var sqrtN = Math2.sqrt(n3);
+              for (var factor = 2; factor <= sqrtN; factor++) {
+                if (!(n3 % factor)) {
+                  return false;
+                }
+              }
+              return true;
+            }
+            function getFractionalBits(n3) {
+              return (n3 - (n3 | 0)) * 4294967296 | 0;
+            }
+            var n2 = 2;
+            var nPrime = 0;
+            while (nPrime < 64) {
+              if (isPrime(n2)) {
+                if (nPrime < 8) {
+                  H[nPrime] = getFractionalBits(Math2.pow(n2, 1 / 2));
+                }
+                K[nPrime] = getFractionalBits(Math2.pow(n2, 1 / 3));
+                nPrime++;
+              }
+              n2++;
+            }
+          })();
+          var W = [];
+          var SHA256 = C_algo.SHA256 = Hasher.extend({
+            _doReset: function() {
+              this._hash = new WordArray.init(H.slice(0));
+            },
+            _doProcessBlock: function(M, offset) {
+              var H2 = this._hash.words;
+              var a = H2[0];
+              var b = H2[1];
+              var c = H2[2];
+              var d = H2[3];
+              var e2 = H2[4];
+              var f = H2[5];
+              var g = H2[6];
+              var h = H2[7];
+              for (var i = 0; i < 64; i++) {
+                if (i < 16) {
+                  W[i] = M[offset + i] | 0;
+                } else {
+                  var gamma0x = W[i - 15];
+                  var gamma0 = (gamma0x << 25 | gamma0x >>> 7) ^ (gamma0x << 14 | gamma0x >>> 18) ^ gamma0x >>> 3;
+                  var gamma1x = W[i - 2];
+                  var gamma1 = (gamma1x << 15 | gamma1x >>> 17) ^ (gamma1x << 13 | gamma1x >>> 19) ^ gamma1x >>> 10;
+                  W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
+                }
+                var ch = e2 & f ^ ~e2 & g;
+                var maj = a & b ^ a & c ^ b & c;
+                var sigma0 = (a << 30 | a >>> 2) ^ (a << 19 | a >>> 13) ^ (a << 10 | a >>> 22);
+                var sigma1 = (e2 << 26 | e2 >>> 6) ^ (e2 << 21 | e2 >>> 11) ^ (e2 << 7 | e2 >>> 25);
+                var t1 = h + sigma1 + ch + K[i] + W[i];
+                var t2 = sigma0 + maj;
+                h = g;
+                g = f;
+                f = e2;
+                e2 = d + t1 | 0;
+                d = c;
+                c = b;
+                b = a;
+                a = t1 + t2 | 0;
+              }
+              H2[0] = H2[0] + a | 0;
+              H2[1] = H2[1] + b | 0;
+              H2[2] = H2[2] + c | 0;
+              H2[3] = H2[3] + d | 0;
+              H2[4] = H2[4] + e2 | 0;
+              H2[5] = H2[5] + f | 0;
+              H2[6] = H2[6] + g | 0;
+              H2[7] = H2[7] + h | 0;
+            },
+            _doFinalize: function() {
+              var data = this._data;
+              var dataWords = data.words;
+              var nBitsTotal = this._nDataBytes * 8;
+              var nBitsLeft = data.sigBytes * 8;
+              dataWords[nBitsLeft >>> 5] |= 128 << 24 - nBitsLeft % 32;
+              dataWords[(nBitsLeft + 64 >>> 9 << 4) + 14] = Math2.floor(nBitsTotal / 4294967296);
+              dataWords[(nBitsLeft + 64 >>> 9 << 4) + 15] = nBitsTotal;
+              data.sigBytes = dataWords.length * 4;
+              this._process();
+              return this._hash;
+            },
+            clone: function() {
+              var clone = Hasher.clone.call(this);
+              clone._hash = this._hash.clone();
+              return clone;
+            }
+          });
+          C.SHA256 = Hasher._createHelper(SHA256);
+          C.HmacSHA256 = Hasher._createHmacHelper(SHA256);
+        })(Math);
+        return CryptoJS2.SHA256;
+      });
+    }
+  });
+
+  // node_modules/crypto-js/enc-base64.js
+  var require_enc_base64 = __commonJS({
+    "node_modules/crypto-js/enc-base64.js"(exports, module) {
+      (function(root, factory) {
+        if (typeof exports === "object") {
+          module.exports = exports = factory(require_core());
+        } else if (typeof define === "function" && define.amd) {
+          define(["./core"], factory);
+        } else {
+          factory(root.CryptoJS);
+        }
+      })(exports, function(CryptoJS2) {
+        (function() {
+          var C = CryptoJS2;
+          var C_lib = C.lib;
+          var WordArray = C_lib.WordArray;
+          var C_enc = C.enc;
+          var Base642 = C_enc.Base64 = {
+            /**
+             * Converts a word array to a Base64 string.
+             *
+             * @param {WordArray} wordArray The word array.
+             *
+             * @return {string} The Base64 string.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var base64String = CryptoJS.enc.Base64.stringify(wordArray);
+             */
+            stringify: function(wordArray) {
+              var words = wordArray.words;
+              var sigBytes = wordArray.sigBytes;
+              var map = this._map;
+              wordArray.clamp();
+              var base64Chars = [];
+              for (var i = 0; i < sigBytes; i += 3) {
+                var byte1 = words[i >>> 2] >>> 24 - i % 4 * 8 & 255;
+                var byte2 = words[i + 1 >>> 2] >>> 24 - (i + 1) % 4 * 8 & 255;
+                var byte3 = words[i + 2 >>> 2] >>> 24 - (i + 2) % 4 * 8 & 255;
+                var triplet = byte1 << 16 | byte2 << 8 | byte3;
+                for (var j = 0; j < 4 && i + j * 0.75 < sigBytes; j++) {
+                  base64Chars.push(map.charAt(triplet >>> 6 * (3 - j) & 63));
+                }
+              }
+              var paddingChar = map.charAt(64);
+              if (paddingChar) {
+                while (base64Chars.length % 4) {
+                  base64Chars.push(paddingChar);
+                }
+              }
+              return base64Chars.join("");
+            },
+            /**
+             * Converts a Base64 string to a word array.
+             *
+             * @param {string} base64Str The Base64 string.
+             *
+             * @return {WordArray} The word array.
+             *
+             * @static
+             *
+             * @example
+             *
+             *     var wordArray = CryptoJS.enc.Base64.parse(base64String);
+             */
+            parse: function(base64Str) {
+              var base64StrLength = base64Str.length;
+              var map = this._map;
+              var reverseMap = this._reverseMap;
+              if (!reverseMap) {
+                reverseMap = this._reverseMap = [];
+                for (var j = 0; j < map.length; j++) {
+                  reverseMap[map.charCodeAt(j)] = j;
+                }
+              }
+              var paddingChar = map.charAt(64);
+              if (paddingChar) {
+                var paddingIndex = base64Str.indexOf(paddingChar);
+                if (paddingIndex !== -1) {
+                  base64StrLength = paddingIndex;
+                }
+              }
+              return parseLoop(base64Str, base64StrLength, reverseMap);
+            },
+            _map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+          };
+          function parseLoop(base64Str, base64StrLength, reverseMap) {
+            var words = [];
+            var nBytes = 0;
+            for (var i = 0; i < base64StrLength; i++) {
+              if (i % 4) {
+                var bits1 = reverseMap[base64Str.charCodeAt(i - 1)] << i % 4 * 2;
+                var bits2 = reverseMap[base64Str.charCodeAt(i)] >>> 6 - i % 4 * 2;
+                var bitsCombined = bits1 | bits2;
+                words[nBytes >>> 2] |= bitsCombined << 24 - nBytes % 4 * 8;
+                nBytes++;
+              }
+            }
+            return WordArray.create(words, nBytes);
+          }
+        })();
+        return CryptoJS2.enc.Base64;
+      });
+    }
+  });
+
+  // node_modules/crypto-js/enc-utf8.js
+  var require_enc_utf8 = __commonJS({
+    "node_modules/crypto-js/enc-utf8.js"(exports, module) {
+      (function(root, factory) {
+        if (typeof exports === "object") {
+          module.exports = exports = factory(require_core());
+        } else if (typeof define === "function" && define.amd) {
+          define(["./core"], factory);
+        } else {
+          factory(root.CryptoJS);
+        }
+      })(exports, function(CryptoJS2) {
+        return CryptoJS2.enc.Utf8;
+      });
+    }
+  });
 
   // src/index.ts
   var src_exports = {};
@@ -42,6 +922,12 @@ var oidc = (() => {
     Version: () => Version,
     WebStorageStateStore: () => WebStorageStateStore
   });
+
+  // src/utils/CryptoUtils.ts
+  var import_core = __toESM(require_core());
+  var import_sha256 = __toESM(require_sha256());
+  var import_enc_base64 = __toESM(require_enc_base64());
+  var import_enc_utf8 = __toESM(require_enc_utf8());
 
   // src/utils/Logger.ts
   var nopLogger = {
@@ -78,29 +964,29 @@ var oidc = (() => {
     }
     Log2.setLogger = setLogger;
   })(Log || (Log = {}));
-  var Logger = class _Logger {
+  var Logger = class {
     constructor(_name) {
       this._name = _name;
     }
     /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
     debug(...args) {
       if (level >= 4 /* DEBUG */) {
-        logger.debug(_Logger._format(this._name, this._method), ...args);
+        logger.debug(Logger._format(this._name, this._method), ...args);
       }
     }
     info(...args) {
       if (level >= 3 /* INFO */) {
-        logger.info(_Logger._format(this._name, this._method), ...args);
+        logger.info(Logger._format(this._name, this._method), ...args);
       }
     }
     warn(...args) {
       if (level >= 2 /* WARN */) {
-        logger.warn(_Logger._format(this._name, this._method), ...args);
+        logger.warn(Logger._format(this._name, this._method), ...args);
       }
     }
     error(...args) {
       if (level >= 1 /* ERROR */) {
-        logger.error(_Logger._format(this._name, this._method), ...args);
+        logger.error(Logger._format(this._name, this._method), ...args);
       }
     }
     /* eslint-enable @typescript-eslint/no-unsafe-enum-comparison */
@@ -115,7 +1001,7 @@ var oidc = (() => {
       return methodLogger;
     }
     static createStatic(name, staticMethod) {
-      const staticLogger = new _Logger(`${name}.${staticMethod}`);
+      const staticLogger = new Logger(`${name}.${staticMethod}`);
       staticLogger.debug("begin");
       return staticLogger;
     }
@@ -127,22 +1013,22 @@ var oidc = (() => {
     // helpers for static class methods
     static debug(name, ...args) {
       if (level >= 4 /* DEBUG */) {
-        logger.debug(_Logger._format(name), ...args);
+        logger.debug(Logger._format(name), ...args);
       }
     }
     static info(name, ...args) {
       if (level >= 3 /* INFO */) {
-        logger.info(_Logger._format(name), ...args);
+        logger.info(Logger._format(name), ...args);
       }
     }
     static warn(name, ...args) {
       if (level >= 2 /* WARN */) {
-        logger.warn(_Logger._format(name), ...args);
+        logger.warn(Logger._format(name), ...args);
       }
     }
     static error(name, ...args) {
       if (level >= 1 /* ERROR */) {
-        logger.error(_Logger._format(name), ...args);
+        logger.error(Logger._format(name), ...args);
       }
     }
     /* eslint-enable @typescript-eslint/no-unsafe-enum-comparison */
@@ -151,12 +1037,9 @@ var oidc = (() => {
 
   // src/utils/CryptoUtils.ts
   var UUID_V4_TEMPLATE = "10000000-1000-4000-8000-100000000000";
-  var toBase64 = (val) => btoa([...new Uint8Array(val)].map((chr) => String.fromCharCode(chr)).join(""));
-  var CryptoUtils = class _CryptoUtils {
+  var CryptoUtils = class {
     static _randomWord() {
-      const arr = new Uint32Array(1);
-      crypto.getRandomValues(arr);
-      return arr[0];
+      return import_core.default.lib.WordArray.random(1).words[0];
     }
     /**
      * Generates RFC4122 version 4 guid
@@ -164,7 +1047,7 @@ var oidc = (() => {
     static generateUUIDv4() {
       const uuid = UUID_V4_TEMPLATE.replace(
         /[018]/g,
-        (c) => (+c ^ _CryptoUtils._randomWord() & 15 >> +c / 4).toString(16)
+        (c) => (+c ^ CryptoUtils._randomWord() & 15 >> +c / 4).toString(16)
       );
       return uuid.replace(/-/g, "");
     }
@@ -172,20 +1055,15 @@ var oidc = (() => {
      * PKCE: Generate a code verifier
      */
     static generateCodeVerifier() {
-      return _CryptoUtils.generateUUIDv4() + _CryptoUtils.generateUUIDv4() + _CryptoUtils.generateUUIDv4();
+      return CryptoUtils.generateUUIDv4() + CryptoUtils.generateUUIDv4() + CryptoUtils.generateUUIDv4();
     }
     /**
      * PKCE: Generate a code challenge
      */
-    static async generateCodeChallenge(code_verifier) {
-      if (!crypto.subtle) {
-        throw new Error("Crypto.subtle is available only in secure contexts (HTTPS).");
-      }
+    static generateCodeChallenge(code_verifier) {
       try {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(code_verifier);
-        const hashed = await crypto.subtle.digest("SHA-256", data);
-        return toBase64(hashed).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        const hashed = (0, import_sha256.default)(code_verifier);
+        return import_enc_base64.default.stringify(hashed).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
       } catch (err) {
         Logger.error("CryptoUtils.generateCodeChallenge", err);
         throw err;
@@ -195,9 +1073,8 @@ var oidc = (() => {
      * Generates a base64-encoded string for a basic auth header
      */
     static generateBasicAuth(client_id, client_secret) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode([client_id, client_secret].join(":"));
-      return toBase64(data);
+      const basicAuth = import_enc_utf8.default.parse([client_id, client_secret].join(":"));
+      return import_enc_base64.default.stringify(basicAuth);
     }
   };
 
@@ -218,76 +1095,74 @@ var oidc = (() => {
         this._callbacks.splice(idx, 1);
       }
     }
-    async raise(...ev) {
+    raise(...ev) {
       this._logger.debug("raise:", ...ev);
       for (const cb of this._callbacks) {
-        await cb(...ev);
+        void cb(...ev);
       }
     }
   };
 
-  // node_modules/jwt-decode/build/esm/index.js
-  var InvalidTokenError = class extends Error {
-  };
-  InvalidTokenError.prototype.name = "InvalidTokenError";
-  function b64DecodeUnicode(str) {
-    return decodeURIComponent(atob(str).replace(/(.)/g, (m, p) => {
-      let code = p.charCodeAt(0).toString(16).toUpperCase();
-      if (code.length < 2) {
-        code = "0" + code;
-      }
-      return "%" + code;
-    }));
+  // node_modules/jwt-decode/build/jwt-decode.esm.js
+  function e(e2) {
+    this.message = e2;
   }
-  function base64UrlDecode(str) {
-    let output = str.replace(/-/g, "+").replace(/_/g, "/");
-    switch (output.length % 4) {
+  e.prototype = new Error(), e.prototype.name = "InvalidCharacterError";
+  var r = "undefined" != typeof window && window.atob && window.atob.bind(window) || function(r2) {
+    var t2 = String(r2).replace(/=+$/, "");
+    if (t2.length % 4 == 1)
+      throw new e("'atob' failed: The string to be decoded is not correctly encoded.");
+    for (var n2, o2, a = 0, i = 0, c = ""; o2 = t2.charAt(i++); ~o2 && (n2 = a % 4 ? 64 * n2 + o2 : o2, a++ % 4) ? c += String.fromCharCode(255 & n2 >> (-2 * a & 6)) : 0)
+      o2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".indexOf(o2);
+    return c;
+  };
+  function t(e2) {
+    var t2 = e2.replace(/-/g, "+").replace(/_/g, "/");
+    switch (t2.length % 4) {
       case 0:
         break;
       case 2:
-        output += "==";
+        t2 += "==";
         break;
       case 3:
-        output += "=";
+        t2 += "=";
         break;
       default:
-        throw new Error("base64 string is not of the correct length");
+        throw "Illegal base64url string!";
     }
     try {
-      return b64DecodeUnicode(output);
-    } catch (err) {
-      return atob(output);
+      return function(e3) {
+        return decodeURIComponent(r(e3).replace(/(.)/g, function(e4, r2) {
+          var t3 = r2.charCodeAt(0).toString(16).toUpperCase();
+          return t3.length < 2 && (t3 = "0" + t3), "%" + t3;
+        }));
+      }(t2);
+    } catch (e3) {
+      return r(t2);
     }
   }
-  function jwtDecode(token, options) {
-    if (typeof token !== "string") {
-      throw new InvalidTokenError("Invalid token specified: must be a string");
-    }
-    options || (options = {});
-    const pos = options.header === true ? 0 : 1;
-    const part = token.split(".")[pos];
-    if (typeof part !== "string") {
-      throw new InvalidTokenError(`Invalid token specified: missing part #${pos + 1}`);
-    }
-    let decoded;
+  function n(e2) {
+    this.message = e2;
+  }
+  function o(e2, r2) {
+    if ("string" != typeof e2)
+      throw new n("Invalid token specified");
+    var o2 = true === (r2 = r2 || {}).header ? 0 : 1;
     try {
-      decoded = base64UrlDecode(part);
-    } catch (e) {
-      throw new InvalidTokenError(`Invalid token specified: invalid base64 for part #${pos + 1} (${e.message})`);
-    }
-    try {
-      return JSON.parse(decoded);
-    } catch (e) {
-      throw new InvalidTokenError(`Invalid token specified: invalid json for part #${pos + 1} (${e.message})`);
+      return JSON.parse(t(e2.split(".")[o2]));
+    } catch (e3) {
+      throw new n("Invalid token specified: " + e3.message);
     }
   }
+  n.prototype = new Error(), n.prototype.name = "InvalidTokenError";
+  var jwt_decode_esm_default = o;
 
   // src/utils/JwtUtils.ts
   var JwtUtils = class {
     // IMPORTANT: doesn't validate the token
     static decode(token) {
       try {
-        return jwtDecode(token);
+        return jwt_decode_esm_default(token);
       } catch (err) {
         Logger.error("JwtUtils.decode", err);
         throw err;
@@ -317,18 +1192,18 @@ var oidc = (() => {
   };
 
   // src/utils/Timer.ts
-  var Timer = class _Timer extends Event {
+  var Timer = class extends Event {
     constructor() {
       super(...arguments);
       this._logger = new Logger(`Timer('${this._name}')`);
       this._timerHandle = null;
       this._expiration = 0;
       this._callback = () => {
-        const diff = this._expiration - _Timer.getEpochTime();
+        const diff = this._expiration - Timer.getEpochTime();
         this._logger.debug("timer completes in", diff);
-        if (this._expiration <= _Timer.getEpochTime()) {
+        if (this._expiration <= Timer.getEpochTime()) {
           this.cancel();
-          void super.raise();
+          super.raise();
         }
       };
     }
@@ -339,7 +1214,7 @@ var oidc = (() => {
     init(durationInSeconds) {
       const logger2 = this._logger.create("init");
       durationInSeconds = Math.max(Math.floor(durationInSeconds), 1);
-      const expiration = _Timer.getEpochTime() + durationInSeconds;
+      const expiration = Timer.getEpochTime() + durationInSeconds;
       if (this.expiration === expiration && this._timerHandle) {
         logger2.debug("skipping since already initialized for expiration at", this.expiration);
         return;
@@ -477,19 +1352,21 @@ var oidc = (() => {
       this._logger = new Logger("CheckSessionIFrame");
       this._timer = null;
       this._session_state = null;
-      this._message = (e) => {
-        if (e.origin === this._frame_origin && e.source === this._frame.contentWindow) {
-          if (e.data === "error") {
+      this._message = (e2) => {
+        console.log("_message",e2);
+        if (e2.origin === this._frame_origin && e2.source === this._frame.contentWindow) {
+          if (e2.data === "error") {
             this._logger.error("error message from check session op iframe");
             if (this._stopOnError) {
               this.stop();
             }
-          } else if (e.data === "changed") {
+          } else if (e2.data === "changed") {
+            console.log("_message.changed",this._callback);
             this._logger.debug("changed message from check session op iframe");
             this.stop();
             void this._callback();
           } else {
-            this._logger.debug(e.data + " message from check session op iframe");
+            this._logger.debug(e2.data + " message from check session op iframe");
           }
         }
       };
@@ -514,6 +1391,7 @@ var oidc = (() => {
       });
     }
     start(session_state) {
+      console.log('CheckSessionIFrame.start',session_state);
       if (this._session_state === session_state) {
         return;
       }
@@ -870,7 +1748,9 @@ var oidc = (() => {
   var DefaultResponseType = "code";
   var DefaultScope = "openid";
   var DefaultClientAuthentication = "client_secret_post";
+  var DefaultResponseMode = "query";
   var DefaultStaleStateAgeInSeconds = 60 * 15;
+  var DefaultClockSkewInSeconds = 60 * 5;
   var OidcClientSettingsStore = class {
     constructor({
       // metadata related
@@ -894,15 +1774,18 @@ var oidc = (() => {
       ui_locales,
       acr_values,
       resource,
-      response_mode,
+      response_mode = DefaultResponseMode,
       // behavior flags
       filterProtocolClaims = true,
       loadUserInfo = false,
       staleStateAgeInSeconds = DefaultStaleStateAgeInSeconds,
-      mergeClaimsStrategy = { array: "replace" },
+      clockSkewInSeconds = DefaultClockSkewInSeconds,
+      userInfoJwtIssuer = "OP",
+      mergeClaims = false,
       disablePKCE = false,
       // other behavior
       stateStore,
+      refreshTokenCredentials,
       revokeTokenAdditionalContentTypes,
       fetchRequestCredentials,
       refreshTokenAllowedScope,
@@ -943,10 +1826,15 @@ var oidc = (() => {
       this.filterProtocolClaims = filterProtocolClaims != null ? filterProtocolClaims : true;
       this.loadUserInfo = !!loadUserInfo;
       this.staleStateAgeInSeconds = staleStateAgeInSeconds;
-      this.mergeClaimsStrategy = mergeClaimsStrategy;
+      this.clockSkewInSeconds = clockSkewInSeconds;
+      this.userInfoJwtIssuer = userInfoJwtIssuer;
+      this.mergeClaims = !!mergeClaims;
       this.disablePKCE = !!disablePKCE;
       this.revokeTokenAdditionalContentTypes = revokeTokenAdditionalContentTypes;
-      this.fetchRequestCredentials = fetchRequestCredentials ? fetchRequestCredentials : "same-origin";
+      if (fetchRequestCredentials && refreshTokenCredentials) {
+        console.warn("Both fetchRequestCredentials and refreshTokenCredentials is set. Only fetchRequestCredentials will be used.");
+      }
+      this.fetchRequestCredentials = fetchRequestCredentials ? fetchRequestCredentials : refreshTokenCredentials ? refreshTokenCredentials : "same-origin";
       if (stateStore) {
         this.stateStore = stateStore;
       } else {
@@ -1194,6 +2082,7 @@ var oidc = (() => {
     }
     async validateSigninResponse(response, state) {
       const logger2 = this._logger.create("validateSigninResponse");
+      
       this._processSigninState(response, state);
       logger2.debug("state processed");
       await this._processCode(response, state);
@@ -1335,7 +2224,7 @@ var oidc = (() => {
   };
 
   // src/State.ts
-  var State = class _State {
+  var State = class {
     constructor(args) {
       this.id = args.id || CryptoUtils.generateUUIDv4();
       this.data = args.data;
@@ -1359,7 +2248,7 @@ var oidc = (() => {
     }
     static fromStorageString(storageString) {
       Logger.createStatic("State", "fromStorageString");
-      return Promise.resolve(new _State(JSON.parse(storageString)));
+      return new State(JSON.parse(storageString));
     }
     static async clearStaleState(storage, age) {
       const logger2 = Logger.createStatic("State", "clearStaleState");
@@ -1372,7 +2261,7 @@ var oidc = (() => {
         let remove = false;
         if (item) {
           try {
-            const state = await _State.fromStorageString(item);
+            const state = State.fromStorageString(item);
             logger2.debug("got item from key:", key, state.created);
             if (state.created <= cutoff) {
               remove = true;
@@ -1394,11 +2283,17 @@ var oidc = (() => {
   };
 
   // src/SigninState.ts
-  var SigninState = class _SigninState extends State {
+  var SigninState = class extends State {
     constructor(args) {
       super(args);
-      this.code_verifier = args.code_verifier;
-      this.code_challenge = args.code_challenge;
+      if (args.code_verifier === true) {
+        this.code_verifier = CryptoUtils.generateCodeVerifier();
+      } else if (args.code_verifier) {
+        this.code_verifier = args.code_verifier;
+      }
+      if (this.code_verifier) {
+        this.code_challenge = CryptoUtils.generateCodeChallenge(this.code_verifier);
+      }
       this.authority = args.authority;
       this.client_id = args.client_id;
       this.redirect_uri = args.redirect_uri;
@@ -1407,15 +2302,6 @@ var oidc = (() => {
       this.extraTokenParams = args.extraTokenParams;
       this.response_mode = args.response_mode;
       this.skipUserInfo = args.skipUserInfo;
-    }
-    static async create(args) {
-      const code_verifier = args.code_verifier === true ? CryptoUtils.generateCodeVerifier() : args.code_verifier || void 0;
-      const code_challenge = code_verifier ? await CryptoUtils.generateCodeChallenge(code_verifier) : void 0;
-      return new _SigninState({
-        ...args,
-        code_verifier,
-        code_challenge
-      });
     }
     toStorageString() {
       new Logger("SigninState").create("toStorageString");
@@ -1439,17 +2325,13 @@ var oidc = (() => {
     static fromStorageString(storageString) {
       Logger.createStatic("SigninState", "fromStorageString");
       const data = JSON.parse(storageString);
-      return _SigninState.create(data);
+      return new SigninState(data);
     }
   };
 
   // src/SigninRequest.ts
-  var _SigninRequest = class _SigninRequest {
-    constructor(args) {
-      this.url = args.url;
-      this.state = args.state;
-    }
-    static async create({
+  var SigninRequest = class {
+    constructor({
       // mandatory
       url,
       authority,
@@ -1471,31 +2353,32 @@ var oidc = (() => {
       disablePKCE,
       ...optionalParams
     }) {
+      this._logger = new Logger("SigninRequest");
       if (!url) {
-        this._logger.error("create: No url passed");
+        this._logger.error("ctor: No url passed");
         throw new Error("url");
       }
       if (!client_id) {
-        this._logger.error("create: No client_id passed");
+        this._logger.error("ctor: No client_id passed");
         throw new Error("client_id");
       }
       if (!redirect_uri) {
-        this._logger.error("create: No redirect_uri passed");
+        this._logger.error("ctor: No redirect_uri passed");
         throw new Error("redirect_uri");
       }
       if (!response_type) {
-        this._logger.error("create: No response_type passed");
+        this._logger.error("ctor: No response_type passed");
         throw new Error("response_type");
       }
       if (!scope) {
-        this._logger.error("create: No scope passed");
+        this._logger.error("ctor: No scope passed");
         throw new Error("scope");
       }
       if (!authority) {
-        this._logger.error("create: No authority passed");
+        this._logger.error("ctor: No authority passed");
         throw new Error("authority");
       }
-      const state = await SigninState.create({
+      this.state = new SigninState({
         data: state_data,
         request_type,
         url_state,
@@ -1517,32 +2400,27 @@ var oidc = (() => {
       if (nonce) {
         parsedUrl.searchParams.append("nonce", nonce);
       }
-      let stateParam = state.id;
+      let state = this.state.id;
       if (url_state) {
-        stateParam = `${stateParam}${URL_STATE_DELIMITER}${url_state}`;
+        state = `${state}${URL_STATE_DELIMITER}${url_state}`;
       }
-      parsedUrl.searchParams.append("state", stateParam);
-      if (state.code_challenge) {
-        parsedUrl.searchParams.append("code_challenge", state.code_challenge);
+      parsedUrl.searchParams.append("state", state);
+      if (this.state.code_challenge) {
+        parsedUrl.searchParams.append("code_challenge", this.state.code_challenge);
         parsedUrl.searchParams.append("code_challenge_method", "S256");
       }
       if (resource) {
         const resources = Array.isArray(resource) ? resource : [resource];
-        resources.forEach((r) => parsedUrl.searchParams.append("resource", r));
+        resources.forEach((r2) => parsedUrl.searchParams.append("resource", r2));
       }
       for (const [key, value] of Object.entries({ response_mode, ...optionalParams, ...extraQueryParams })) {
         if (value != null) {
           parsedUrl.searchParams.append(key, value.toString());
         }
       }
-      return new _SigninRequest({
-        url: parsedUrl.href,
-        state
-      });
+      this.url = parsedUrl.href;
     }
   };
-  _SigninRequest._logger = new Logger("SigninRequest");
-  var SigninRequest = _SigninRequest;
 
   // src/SigninResponse.ts
   var OidcScope = "openid";
@@ -1674,23 +2552,20 @@ var oidc = (() => {
     mergeClaims(claims1, claims2) {
       const result = { ...claims1 };
       for (const [claim, values] of Object.entries(claims2)) {
-        if (result[claim] !== values) {
-          if (Array.isArray(result[claim]) || Array.isArray(values)) {
-            if (this._settings.mergeClaimsStrategy.array == "replace") {
-              result[claim] = values;
-            } else {
-              const mergedValues = Array.isArray(result[claim]) ? result[claim] : [result[claim]];
-              for (const value of Array.isArray(values) ? values : [values]) {
-                if (!mergedValues.includes(value)) {
-                  mergedValues.push(value);
-                }
-              }
-              result[claim] = mergedValues;
+        for (const value of Array.isArray(values) ? values : [values]) {
+          const previousValue = result[claim];
+          if (previousValue === void 0) {
+            result[claim] = value;
+          } else if (Array.isArray(previousValue)) {
+            if (!previousValue.includes(value)) {
+              previousValue.push(value);
             }
-          } else if (typeof result[claim] === "object" && typeof values === "object") {
-            result[claim] = this.mergeClaims(result[claim], values);
-          } else {
-            result[claim] = values;
+          } else if (result[claim] !== value) {
+            if (typeof value === "object" && this._settings.mergeClaims) {
+              result[claim] = this.mergeClaims(previousValue, value);
+            } else {
+              result[claim] = [previousValue, value];
+            }
           }
         }
       }
@@ -1737,7 +2612,7 @@ var oidc = (() => {
       }
       const url = await this.metadataService.getAuthorizationEndpoint();
       logger2.debug("Received authorization endpoint", url);
-      const signinRequest = await SigninRequest.create({
+      const signinRequest = new SigninRequest({
         url,
         authority: this.settings.authority,
         client_id: this.settings.client_id,
@@ -1782,13 +2657,14 @@ var oidc = (() => {
         logger2.throw(new Error("No matching state found in storage"));
         throw null;
       }
-      const state = await SigninState.fromStorageString(storedStateString);
+      const state = SigninState.fromStorageString(storedStateString);
       return { state, response };
     }
     async processSigninResponse(url) {
       const logger2 = this._logger.create("processSigninResponse");
       const { state, response } = await this.readSigninResponseState(url, true);
       logger2.debug("received state from storage; validating response");
+      
       await this._validator.validateSigninResponse(response, state);
       return response;
     }
@@ -1806,10 +2682,7 @@ var oidc = (() => {
     }
     async useRefreshToken({
       state,
-      redirect_uri,
-      resource,
-      timeoutInSeconds,
-      extraTokenParams
+      timeoutInSeconds
     }) {
       var _a;
       const logger2 = this._logger.create("useRefreshToken");
@@ -1823,19 +2696,17 @@ var oidc = (() => {
       }
       const result = await this._tokenClient.exchangeRefreshToken({
         refresh_token: state.refresh_token,
+        resource: state.resource,
         // provide the (possible filtered) scope list
         scope,
-        redirect_uri,
-        resource,
-        timeoutInSeconds,
-        ...extraTokenParams
+        timeoutInSeconds
       });
       const response = new SigninResponse(new URLSearchParams());
       Object.assign(response, result);
       logger2.debug("validating response", response);
       await this._validator.validateRefreshResponse(response, {
         ...state,
-        // override the scope in the state handed over to the validator
+        // overide the scope in the state handed over to the validator
         // so it can set the granted scope to the requested scope in case none is included in the response
         scope
       });
@@ -1892,7 +2763,7 @@ var oidc = (() => {
         logger2.throw(new Error("No matching state found in storage"));
         throw null;
       }
-      const state = await State.fromStorageString(storedStateString);
+      const state = State.fromStorageString(storedStateString);
       return { state, response };
     }
     async processSignoutResponse(url) {
@@ -1932,9 +2803,11 @@ var oidc = (() => {
         const logger2 = this._logger.create("_start");
         if (user.profile) {
           this._sub = user.profile.sub;
+          this._sid = user.profile.sid;
           logger2.debug("session_state", session_state, ", sub", this._sub);
         } else {
           this._sub = void 0;
+          this._sid = void 0;
           logger2.debug("session_state", session_state, ", anonymous user");
         }
         if (this._checkSessionIFrame) {
@@ -1962,6 +2835,7 @@ var oidc = (() => {
       this._stop = () => {
         const logger2 = this._logger.create("_stop");
         this._sub = void 0;
+        this._sid = void 0;
         if (this._checkSessionIFrame) {
           this._checkSessionIFrame.stop();
         }
@@ -1973,8 +2847,9 @@ var oidc = (() => {
               if (session) {
                 const tmpUser = {
                   session_state: session.session_state,
-                  profile: session.sub ? {
-                    sub: session.sub
+                  profile: session.sub && session.sid ? {
+                    sub: session.sub,
+                    sid: session.sid
                   } : null
                 };
                 void this._start(tmpUser);
@@ -1988,14 +2863,21 @@ var oidc = (() => {
       this._callback = async () => {
         const logger2 = this._logger.create("_callback");
         try {
+          // console.log('_message.session',session);
+          
           const session = await this._userManager.querySessionStatus();
+     
           let raiseEvent = true;
           if (session && this._checkSessionIFrame) {
             if (session.sub === this._sub) {
               raiseEvent = false;
               this._checkSessionIFrame.start(session.session_state);
-              logger2.debug("same sub still logged in at OP, session state has changed, restarting check session iframe; session_state", session.session_state);
-              await this._userManager.events._raiseUserSessionChanged();
+              if (session.sid === this._sid) {
+                logger2.debug("same sub still logged in at OP, restarting check session iframe; session_state", session.session_state);
+              } else {
+                logger2.debug("same sub still logged in at OP, session state has changed, restarting check session iframe; session_state", session.session_state);
+                this._userManager.events._raiseUserSessionChanged();
+              }
             } else {
               logger2.debug("different subject signed into OP", session.sub);
             }
@@ -2004,9 +2886,9 @@ var oidc = (() => {
           }
           if (raiseEvent) {
             if (this._sub) {
-              await this._userManager.events._raiseUserSignedOut();
+              this._userManager.events._raiseUserSignedOut();
             } else {
-              await this._userManager.events._raiseUserSignedIn();
+              this._userManager.events._raiseUserSignedIn();
             }
           } else {
             logger2.debug("no change in session detected, no event to raise");
@@ -2014,7 +2896,7 @@ var oidc = (() => {
         } catch (err) {
           if (this._sub) {
             logger2.debug("Error calling queryCurrentSigninSession; raising signed out event", err);
-            await this._userManager.events._raiseUserSignedOut();
+            this._userManager.events._raiseUserSignedOut();
           }
         }
       };
@@ -2037,8 +2919,9 @@ var oidc = (() => {
         if (session) {
           const tmpUser = {
             session_state: session.session_state,
-            profile: session.sub ? {
-              sub: session.sub
+            profile: session.sub && session.sid ? {
+              sub: session.sub,
+              sid: session.sid
             } : null
           };
           void this._start(tmpUser);
@@ -2048,7 +2931,7 @@ var oidc = (() => {
   };
 
   // src/User.ts
-  var User = class _User {
+  var User = class {
     constructor(args) {
       var _a;
       this.id_token = args.id_token;
@@ -2102,7 +2985,7 @@ var oidc = (() => {
     }
     static fromStorageString(storageString) {
       Logger.createStatic("User", "fromStorageString");
-      return new _User(JSON.parse(storageString));
+      return new User(JSON.parse(storageString));
     }
   };
 
@@ -2122,11 +3005,11 @@ var oidc = (() => {
       logger2.debug("setting URL in window");
       this._window.location.replace(params.url);
       const { url, keepOpen } = await new Promise((resolve, reject) => {
-        const listener = (e) => {
+        const listener = (e2) => {
           var _a;
-          const data = e.data;
+          const data = e2.data;
           const origin = (_a = params.scriptOrigin) != null ? _a : window.location.origin;
-          if (e.origin !== origin || (data == null ? void 0 : data.source) !== messageSource) {
+          if (e2.origin !== origin || (data == null ? void 0 : data.source) !== messageSource) {
             return;
           }
           try {
@@ -2134,7 +3017,7 @@ var oidc = (() => {
             if (!state) {
               logger2.warn("no state found in response url");
             }
-            if (e.source !== this._window && state !== params.state) {
+            if (e2.source !== this._window && state !== params.state) {
               return;
             }
           } catch (err) {
@@ -2244,14 +3127,14 @@ var oidc = (() => {
   };
 
   // src/navigators/IFrameWindow.ts
-  var IFrameWindow = class _IFrameWindow extends AbstractChildWindow {
+  var IFrameWindow = class extends AbstractChildWindow {
     constructor({
       silentRequestTimeoutInSeconds = DefaultSilentRequestTimeoutInSeconds
     }) {
       super();
       this._logger = new Logger("IFrameWindow");
       this._timeoutInSeconds = silentRequestTimeoutInSeconds;
-      this._frame = _IFrameWindow.createHiddenIframe();
+      this._frame = IFrameWindow.createHiddenIframe();
       this._window = this._frame.contentWindow;
     }
     static createHiddenIframe() {
@@ -2267,7 +3150,7 @@ var oidc = (() => {
     }
     async navigate(params) {
       this._logger.debug("navigate: Using timeout of:", this._timeoutInSeconds);
-      const timer = setTimeout(() => void this._abort.raise(new ErrorTimeout("IFrame timed out without a response")), this._timeoutInSeconds * 1e3);
+      const timer = setTimeout(() => this._abort.raise(new ErrorTimeout("IFrame timed out without a response")), this._timeoutInSeconds * 1e3);
       this._disposeHandlers.add(() => clearTimeout(timer));
       return await super.navigate(params);
     }
@@ -2279,7 +3162,7 @@ var oidc = (() => {
             var _a2;
             const frame = ev.target;
             (_a2 = frame.parentNode) == null ? void 0 : _a2.removeChild(frame);
-            void this._abort.raise(new Error("IFrame removed from DOM"));
+            this._abort.raise(new Error("IFrame removed from DOM"));
           }, true);
           (_a = this._frame.contentWindow) == null ? void 0 : _a.location.replace("about:blank");
         }
@@ -2324,7 +3207,7 @@ var oidc = (() => {
       if (popupWindowFeatures.closePopupWindowAfterInSeconds && popupWindowFeatures.closePopupWindowAfterInSeconds > 0) {
         setTimeout(() => {
           if (!this._window || typeof this._window.closed !== "boolean" || this._window.closed) {
-            void this._abort.raise(new Error("Popup blocked by user"));
+            this._abort.raise(new Error("Popup blocked by user"));
             return;
           }
           this.close();
@@ -2336,7 +3219,7 @@ var oidc = (() => {
       (_a = this._window) == null ? void 0 : _a.focus();
       const popupClosedInterval = setInterval(() => {
         if (!this._window || this._window.closed) {
-          void this._abort.raise(new Error("Popup closed by user"));
+          this._abort.raise(new Error("Popup closed by user"));
         }
       }, checkForPopupClosedInterval);
       this._disposeHandlers.add(() => clearInterval(popupClosedInterval));
@@ -2346,7 +3229,7 @@ var oidc = (() => {
       if (this._window) {
         if (!this._window.closed) {
           this._window.close();
-          void this._abort.raise(new Error("Popup closed"));
+          this._abort.raise(new Error("Popup closed"));
         }
       }
       this._window = null;
@@ -2428,15 +3311,15 @@ var oidc = (() => {
       this._userSignedOut = new Event("User signed out");
       this._userSessionChanged = new Event("User session changed");
     }
-    async load(user, raiseEvent = true) {
+    load(user, raiseEvent = true) {
       super.load(user);
       if (raiseEvent) {
-        await this._userLoaded.raise(user);
+        this._userLoaded.raise(user);
       }
     }
-    async unload() {
+    unload() {
       super.unload();
-      await this._userUnloaded.raise();
+      this._userUnloaded.raise();
     }
     /**
      * Add callback: Raised when a user session has been established (or re-established).
@@ -2477,8 +3360,8 @@ var oidc = (() => {
     /**
      * @internal
      */
-    async _raiseSilentRenewError(e) {
-      await this._silentRenewError.raise(e);
+    _raiseSilentRenewError(e2) {
+      this._silentRenewError.raise(e2);
     }
     /**
      * Add callback: Raised when the user is signed in (when `monitorSession` is set).
@@ -2496,8 +3379,8 @@ var oidc = (() => {
     /**
      * @internal
      */
-    async _raiseUserSignedIn() {
-      await this._userSignedIn.raise();
+    _raiseUserSignedIn() {
+      this._userSignedIn.raise();
     }
     /**
      * Add callback: Raised when the user's sign-in status at the OP has changed (when `monitorSession` is set).
@@ -2515,8 +3398,8 @@ var oidc = (() => {
     /**
      * @internal
      */
-    async _raiseUserSignedOut() {
-      await this._userSignedOut.raise();
+    _raiseUserSignedOut() {
+      this._userSignedOut.raise();
     }
     /**
      * Add callback: Raised when the user session changed (when `monitorSession` is set).
@@ -2534,8 +3417,8 @@ var oidc = (() => {
     /**
      * @internal
      */
-    async _raiseUserSessionChanged() {
-      await this._userSessionChanged.raise();
+    _raiseUserSessionChanged() {
+      this._userSessionChanged.raise();
     }
   };
 
@@ -2558,7 +3441,7 @@ var oidc = (() => {
             return;
           }
           logger2.error("Error from signinSilent:", err);
-          await this._userManager.events._raiseSilentRenewError(err);
+          this._userManager.events._raiseSilentRenewError(err);
         }
       };
     }
@@ -2587,12 +3470,13 @@ var oidc = (() => {
 
   // src/RefreshState.ts
   var RefreshState = class {
-    constructor(args) {
+    constructor(args, resource) {
       this.refresh_token = args.refresh_token;
       this.id_token = args.id_token;
       this.session_state = args.session_state;
       this.scope = args.scope;
       this.profile = args.profile;
+      this.resource = resource;
       this.data = args.state;
     }
   };
@@ -2616,51 +3500,39 @@ var oidc = (() => {
         this._sessionMonitor = new SessionMonitor(this);
       }
     }
-    /**
-     * Get object used to register for events raised by the `UserManager`.
-     */
+    /** Returns an object used to register for events raised by the `UserManager`. */
     get events() {
       return this._events;
     }
-    /**
-     * Get object used to access the metadata configuration of the identity provider.
-     */
+    /** Returns an object used to access the metadata configuration of the OIDC provider. */
     get metadataService() {
       return this._client.metadataService;
     }
     /**
-     * Load the `User` object for the currently authenticated user.
-     *
-     * @returns A promise
+     * Returns promise to load the `User` object for the currently authenticated user.
      */
     async getUser() {
       const logger2 = this._logger.create("getUser");
       const user = await this._loadUser();
       if (user) {
         logger2.info("user loaded");
-        await this._events.load(user, false);
+        this._events.load(user, false);
         return user;
       }
       logger2.info("user not found in storage");
       return null;
     }
     /**
-     * Remove from any storage the currently authenticated user.
-     *
-     * @returns A promise
+     * Returns promise to remove from any storage the currently authenticated user.
      */
     async removeUser() {
       const logger2 = this._logger.create("removeUser");
       await this.storeUser(null);
       logger2.info("user removed from storage");
-      await this._events.unload();
+      this._events.unload();
     }
     /**
-     * Trigger a redirect of the current window to the authorization endpoint.
-     *
-     * @returns A promise
-     *
-     * @throws `Error` In cases of wrong authentication.
+     * Returns promise to trigger a redirect of the current window to the authorization endpoint.
      */
     async signinRedirect(args = {}) {
       this._logger.create("signinRedirect");
@@ -2675,12 +3547,7 @@ var oidc = (() => {
       }, handle);
     }
     /**
-     * Process the response (callback) from the authorization endpoint.
-     * It is recommend to use {@link UserManager.signinCallback} instead.
-     *
-     * @returns A promise containing the authenticated `User`.
-     *
-     * @see {@link UserManager.signinCallback}
+     * Returns promise to process response from the authorization endpoint. The result of the promise is the authenticated `User`.
      */
     async signinRedirectCallback(url = window.location.href) {
       const logger2 = this._logger.create("signinRedirectCallback");
@@ -2693,10 +3560,9 @@ var oidc = (() => {
       return user;
     }
     /**
-     * Trigger the signin with user/password.
+     * Returns promise to process the signin with user/password. The result of the promise is the authenticated `User`.
      *
-     * @returns A promise containing the authenticated `User`.
-     * @throws {@link ErrorResponse} In cases of wrong authentication.
+     * Throws an ErrorResponse in case of wrong authentication.
      */
     async signinResourceOwnerCredentials({
       username,
@@ -2715,10 +3581,7 @@ var oidc = (() => {
       return user;
     }
     /**
-     * Trigger a request (via a popup window) to the authorization endpoint.
-     *
-     * @returns A promise containing the authenticated `User`.
-     * @throws `Error` In cases of wrong authentication.
+     * Returns promise to trigger a request (via a popup window) to the authorization endpoint. The result of the promise is the authenticated `User`.
      */
     async signinPopup(args = {}) {
       const logger2 = this._logger.create("signinPopup");
@@ -2748,12 +3611,7 @@ var oidc = (() => {
       return user;
     }
     /**
-     * Notify the opening window of response (callback) from the authorization endpoint.
-     * It is recommend to use {@link UserManager.signinCallback} instead.
-     *
-     * @returns A promise
-     *
-     * @see {@link UserManager.signinCallback}
+     * Returns promise to notify the opening window of response from the authorization endpoint.
      */
     async signinPopupCallback(url = window.location.href, keepOpen = false) {
       const logger2 = this._logger.create("signinPopupCallback");
@@ -2761,28 +3619,22 @@ var oidc = (() => {
       logger2.info("success");
     }
     /**
-     * Trigger a silent request (via refresh token or an iframe) to the authorization endpoint.
-     *
-     * @returns A promise that contains the authenticated `User`.
+     * Returns promise to trigger a silent request (via an iframe) to the authorization endpoint.
+     * The result of the promise is the authenticated `User`.
      */
     async signinSilent(args = {}) {
       var _a;
       const logger2 = this._logger.create("signinSilent");
       const {
         silentRequestTimeoutInSeconds,
+        resource,
         ...requestArgs
       } = args;
       let user = await this._loadUser();
       if (user == null ? void 0 : user.refresh_token) {
         logger2.debug("using refresh token");
-        const state = new RefreshState(user);
-        return await this._useRefreshToken({
-          state,
-          redirect_uri: requestArgs.redirect_uri,
-          resource: requestArgs.resource,
-          extraTokenParams: requestArgs.extraTokenParams,
-          timeoutInSeconds: silentRequestTimeoutInSeconds
-        });
+        const state = new RefreshState(user, resource);
+        return await this._useRefreshToken(state);
       }
       const url = this.settings.silent_redirect_uri;
       if (!url) {
@@ -2810,39 +3662,24 @@ var oidc = (() => {
       }
       return user;
     }
-    async _useRefreshToken(args) {
+    async _useRefreshToken(state) {
       const response = await this._client.useRefreshToken({
-        ...args,
+        state,
         timeoutInSeconds: this.settings.silentRequestTimeoutInSeconds
       });
-      const user = new User({ ...args.state, ...response });
+      const user = new User({ ...state, ...response });
       await this.storeUser(user);
-      await this._events.load(user);
+      this._events.load(user);
       return user;
     }
     /**
-     *
-     * Notify the parent window of response (callback) from the authorization endpoint.
-     * It is recommend to use {@link UserManager.signinCallback} instead.
-     *
-     * @returns A promise
-     *
-     * @see {@link UserManager.signinCallback}
+     * Returns promise to notify the parent window of response from the authorization endpoint.
      */
     async signinSilentCallback(url = window.location.href) {
       const logger2 = this._logger.create("signinSilentCallback");
       await this._iframeNavigator.callback(url);
       logger2.info("success");
     }
-    /**
-     * Process any response (callback) from the authorization endpoint, by dispatching the request_type
-     * and executing one of the following functions:
-     * - {@link UserManager.signinRedirectCallback}
-     * - {@link UserManager.signinPopupCallback}
-     * - {@link UserManager.signinSilentCallback}
-     *
-     * @throws `Error` If request_type is unknown or signout can not processed.
-     */
     async signinCallback(url = window.location.href) {
       const { state } = await this._client.readSigninResponseState(url);
       switch (state.request_type) {
@@ -2856,15 +3693,6 @@ var oidc = (() => {
           throw new Error("invalid response_type in state");
       }
     }
-    /**
-     * Process any response (callback) from the end session endpoint, by dispatching the request_type
-     * and executing one of the following functions:
-     * - {@link UserManager.signoutRedirectCallback}
-     * - {@link UserManager.signoutPopupCallback}
-     * - {@link UserManager.signoutSilentCallback}
-     *
-     * @throws `Error` If request_type is unknown or signout can not processed.
-     */
     async signoutCallback(url = window.location.href, keepOpen = false) {
       const { state } = await this._client.readSignoutResponseState(url);
       if (!state) {
@@ -2885,9 +3713,7 @@ var oidc = (() => {
       }
     }
     /**
-     * Query OP for user's current signin status.
-     *
-     * @returns A promise object with session_state and subject identifier.
+     * Returns promise to query OP for user's current signin status. Returns object with session_state and subject identifier.
      */
     async querySessionStatus(args = {}) {
       const logger2 = this._logger.create("querySessionStatus");
@@ -2908,7 +3734,7 @@ var oidc = (() => {
         prompt: "none",
         id_token_hint: this.settings.includeIdTokenInSilentRenew ? user == null ? void 0 : user.id_token : void 0,
         response_type: this.settings.query_status_response_type,
-        scope: "openid",
+        scope: "openid offline_access",
         skipUserInfo: true,
         ...requestArgs
       }, handle);
@@ -2919,7 +3745,8 @@ var oidc = (() => {
           logger2.info("success for subject", signinResponse.profile.sub);
           return {
             session_state: signinResponse.session_state,
-            sub: signinResponse.profile.sub
+            sub: signinResponse.profile.sub,
+            sid: signinResponse.profile.sid
           };
         }
         logger2.info("success, user not authenticated");
@@ -2981,13 +3808,11 @@ var oidc = (() => {
       }
       await this.storeUser(user);
       logger2.debug("user stored");
-      await this._events.load(user);
+      this._events.load(user);
       return user;
     }
     /**
-     * Trigger a redirect of the current window to the end session endpoint.
-     *
-     * @returns A promise
+     * Returns promise to trigger a redirect of the current window to the end session endpoint.
      */
     async signoutRedirect(args = {}) {
       const logger2 = this._logger.create("signoutRedirect");
@@ -3004,12 +3829,7 @@ var oidc = (() => {
       logger2.info("success");
     }
     /**
-     * Process response (callback) from the end session endpoint.
-     * It is recommend to use {@link UserManager.signoutCallback} instead.
-     *
-     * @returns A promise containing signout response
-     *
-     * @see {@link UserManager.signoutCallback}
+     * Returns promise to process response from the end session endpoint.
      */
     async signoutRedirectCallback(url = window.location.href) {
       const logger2 = this._logger.create("signoutRedirectCallback");
@@ -3018,9 +3838,7 @@ var oidc = (() => {
       return response;
     }
     /**
-     * Trigger a redirect of a popup window window to the end session endpoint.
-     *
-     * @returns A promise
+     * Returns promise to trigger a redirect of a popup window window to the end session endpoint.
      */
     async signoutPopup(args = {}) {
       const logger2 = this._logger.create("signoutPopup");
@@ -3045,12 +3863,7 @@ var oidc = (() => {
       logger2.info("success");
     }
     /**
-     * Process response (callback) from the end session endpoint from a popup window.
-     * It is recommend to use {@link UserManager.signoutCallback} instead.
-     *
-     * @returns A promise
-     *
-     * @see {@link UserManager.signoutCallback}
+     * Returns promise to process response from the end session endpoint from a popup window.
      */
     async signoutPopupCallback(url = window.location.href, keepOpen = false) {
       const logger2 = this._logger.create("signoutPopupCallback");
@@ -3097,9 +3910,7 @@ var oidc = (() => {
       return signoutResponse;
     }
     /**
-     * Trigger a silent request (via an iframe) to the end session endpoint.
-     *
-     * @returns A promise
+     * Returns promise to trigger a silent request (via an iframe) to the end session endpoint.
      */
     async signoutSilent(args = {}) {
       var _a;
@@ -3120,12 +3931,7 @@ var oidc = (() => {
       logger2.info("success");
     }
     /**
-     * Notify the parent window of response (callback) from the end session endpoint.
-     * It is recommend to use {@link UserManager.signoutCallback} instead.
-     *
-     * @returns A promise
-     *
-     * @see {@link UserManager.signoutCallback}
+     * Returns promise to notify the parent window of response from the end session endpoint.
      */
     async signoutSilentCallback(url = window.location.href) {
       const logger2 = this._logger.create("signoutSilentCallback");
@@ -3158,7 +3964,7 @@ var oidc = (() => {
       }
       await this.storeUser(user);
       logger2.debug("user stored");
-      await this._events.load(user);
+      this._events.load(user);
     }
     /**
      * Enables silent renew for the `UserManager`.
@@ -3206,10 +4012,10 @@ var oidc = (() => {
   };
 
   // package.json
-  var version = "3.0.1";
+  var version = "2.4.0";
 
   // src/Version.ts
   var Version = version;
   return __toCommonJS(src_exports);
 })();
-//# sourceMappingURL=oidc-client-ts.js.map
+//# 1111sourceMappingURL=oidc-client-ts.js.map
