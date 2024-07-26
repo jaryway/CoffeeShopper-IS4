@@ -67,11 +67,11 @@ namespace Jaryway.DynamicSpace.IdentityServer
                 new Client
                 {
                     ClientId = "interactive",
-                    ClientSecrets = { new Secret("ClientSecret1".Sha256()) },
+                    ClientSecrets = { new Secret("Secret".Sha256()) },
                     RequireClientSecret = false,
                     AllowedGrantTypes = GrantTypes.Code,
                     RedirectUris = {
-                        "https://localhost:4100/",
+                        //"https://localhost:4100/",
                         "http://localhost:4100/",
                     },
                     // 用于在用户注销时通知后端应用程序(如果应用是一个后端应用程序，则用这个)
@@ -82,13 +82,13 @@ namespace Jaryway.DynamicSpace.IdentityServer
                     PostLogoutRedirectUris = { "http://localhost:4100/signout-success" },
 
                     AllowOfflineAccess = true,
-                    AllowedScopes = { "openid", "profile", "CoffeeAPI.read" },
+                    AllowedScopes = { "openid", "profile", "CoffeeAPI.read", "CoffeeAPI.write", "DynamicWebApi.all" },
                     RequirePkce = true,
                     RequireConsent = true,
                     AllowPlainTextPkce = false,                   
                     
                     // 设置 access_token 的过期时间
-                    // AccessTokenLifetime = 60
+                     AccessTokenLifetime = 120
                 },
                 new Client
                 {
@@ -101,27 +101,19 @@ namespace Jaryway.DynamicSpace.IdentityServer
 
                     RedirectUris = {
                         "https://localhost:5445/swagger/oauth2-redirect.html",
-                        "http://localhost:5445/swagger/oauth2-redirect.html"
+                        "http://localhost:5002/swagger/oauth2-redirect.html",
+                        "https://localhost:5446/swagger/oauth2-redirect.html",
+                        "http://localhost:5003/swagger/oauth2-redirect.html"
                     },
-                    AllowedCorsOrigins = { "https://localhost:5445", "https://localhost:5445"},
-                    AllowedScopes = { "CoffeeAPI.read", "CoffeeAPI.write" }
+                    AllowedCorsOrigins = {
+                        "https://localhost:5445",
+                        "http://localhost:5002",
+                        "https://localhost:5446",
+                        "http://localhost:5003"
+                    },
+                    AllowedScopes = { "CoffeeAPI.read", "CoffeeAPI.write", "DynamicWebApi.all" }
                 },
-                new Client
-                {
-                    ClientId = "dynamic_web_api_swagger",
-                    ClientName = "Swagger UI for dynamic web api",
-                    ClientSecrets = { new Secret("secret".Sha256()) }, // change me!
-                    AllowedGrantTypes = GrantTypes.Code,
-                    RequirePkce = true,
-                    RequireClientSecret = false,
 
-                    RedirectUris = {
-                        "https://localhost:5046/swagger/oauth2-redirect.html",
-                        "http://localhost:5047/swagger/oauth2-redirect.html"
-                    },
-                    AllowedCorsOrigins = { "https://localhost:5046", "https://localhost:5047"},
-                    AllowedScopes = { "DynamicWebApi.all" }
-                },
                 new Client
                 {
                     ClientId = "js_oidc",

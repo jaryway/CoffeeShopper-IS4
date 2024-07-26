@@ -1,4 +1,10 @@
 {
     "liveServer.settings.host": "localhost",
-    "liveServer.settings.port": 4200
+    "liveServer.settings.port": 4200,
+    // "liveServer.settings.https": {
+    //   "enable": true,
+    //   "cert": "/Users/jaryway/cert.pem",
+    //   "key": "/Users/jaryway/key.pem",
+    //   "passphrase": ""
+    // }
 }
