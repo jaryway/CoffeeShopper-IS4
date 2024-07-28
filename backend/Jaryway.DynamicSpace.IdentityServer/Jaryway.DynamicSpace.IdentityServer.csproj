@@ -35,8 +35,10 @@
   <ItemGroup>
     <None Remove="Migrations\" />
     <None Remove="database.db" />
+    <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 </Project>

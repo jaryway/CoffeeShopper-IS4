@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState, createContext, useContext } from "react";
+import { PropsWithChildren, useState, createContext, useContext, useRef } from "react";
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestHeaders } from "axios";
 // import { message, notification } from "antd";
@@ -10,35 +10,31 @@ type ApiContextValue = AxiosInstance;
 export const ApiContext = createContext<ApiContextValue>({} as any);
 
 const ApiProvider = (props: PropsWithChildren<any>) => {
-  const { user } = useAuth();
-  // const accessTokenGetter = useRef<() => Promise<string>>();
+  const { user, getAccessToken } = useAuth();
+  const accessTokenGetter = useRef<() => Promise<string>>();
 
   const [api] = useState<AxiosInstance>(() => {
     const instance = axios.create({ baseURL: API_BASE_URL });
     instance.interceptors.request.use(
       async (config) => {
-        // if (!accessTokenGetter.current) {
-        //   accessTokenGetter.current = async () => {
-        //     try {
-        //       const user = await getUser();
-        //       return user ? user.access_token || "" : "";
-        //     } catch (error) {
-        //       return "";
-        //     }
-        //   };
-        // }
+        console.log("accessTokenGetter", user, accessTokenGetter.current);
+        if (!accessTokenGetter.current) {
+          accessTokenGetter.current = getAccessToken;
+        }
 
-        // const access_token = await accessTokenGetter.current();
+        const access_token = await accessTokenGetter.current();
+        // debugger;
+        // const access_token = user?.access_token || "";
 
-        const access_token = user?.access_token;
-
-        return {
+        const headers = {
           ...config,
           headers: {
             ...config.headers,
-            Authorization: access_token ? ["Bearer", access_token || ""].join(" ") : undefined,
+            Authorization: access_token ? ["Bearer", access_token].join(" ") : undefined,
           } as AxiosRequestHeaders,
         };
+        console.log("first", { access_token, headers });
+        return headers;
       },
       (error) => Promise.reject(error)
     );

@@ -178,14 +178,14 @@ const AuthProvider = (props: AuthProviderProps) => {
         if (hasAuthParams() && !skipSigninCallback) {
           console.log("signinCallback-11");
           user = await userManager.signinCallback();
-          console.log("signinCallback-22",user);
+          console.log("signinCallback-22", user);
 
           onSigninCallback && (await onSigninCallback(user));
         }
         user = !user ? await userManager.getUser() : user;
         dispatch({ type: "INITIALISED", user });
       } catch (error) {
-        console.log('error',error);        
+        console.log("error", error);
         dispatch({ type: "ERROR", error: signinError(error) });
       }
     };
@@ -221,7 +221,7 @@ const AuthProvider = (props: AuthProviderProps) => {
 
     // event UserSignedOut (e.g. user was signed out in background (checkSessionIFrame option))
     const handleUserSignedOut = async () => {
-      console.log('handleUserSignedOut');
+      console.log("handleUserSignedOut");
 
       dispatch({ type: "USER_SIGNED_OUT" });
       // await userManager.removeUser();
@@ -255,6 +255,14 @@ const AuthProvider = (props: AuthProviderProps) => {
     return {
       settings: userManager.settings,
       events: userManager.events,
+
+      // getUser: async () => {},
+
+      getAccessToken: async () => {
+        const user = await userManager.getUser();
+        return user ? user.access_token || "" : "";
+      },
+
       //
       ...(Object.fromEntries(
         userManagerContextKeys.map((key) => {
@@ -283,6 +291,10 @@ const AuthProvider = (props: AuthProviderProps) => {
       ) as Pick<UserManager, (typeof navigatorKeys)[number]>),
     } as AuthContextValue;
   }, [userManager]);
+
+  console.log("authContextValue", { ...authContextValue, ...state, removeUser });
+
+  // if(loa)
 
   return <AuthContext.Provider value={{ ...authContextValue, ...state, removeUser }}>{children}</AuthContext.Provider>;
 };

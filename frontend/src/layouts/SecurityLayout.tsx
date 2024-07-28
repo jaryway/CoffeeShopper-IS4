@@ -1,9 +1,9 @@
-
 import { useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "auth/use-auth";
 import { hasAuthParams } from "auth/utils";
-import Indicator from "component/indicator";
+import BasicLayout from "./BasicLayout";
+import Indicator from "components/indicator";
 
 const SecurityLayout = () => {
   const { isLoading, isAuthenticated, signinRedirect, activeNavigator } = useAuth();
@@ -34,7 +34,11 @@ const SecurityLayout = () => {
     return <Indicator title="登录出错，请刷新页面重试登录" />;
   }
 
-  return <Outlet />;
+  return (
+    <BasicLayout>
+      <Outlet />
+    </BasicLayout>
+  );
 };
 
 SecurityLayout.displayName = "SecurityLayout";

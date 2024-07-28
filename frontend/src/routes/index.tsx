@@ -26,14 +26,14 @@ const RootComponent = () => {
   return (
     <AuthProvider
       {...{
-        authority: "https://localhost:5443/",
+        authority: "http://localhost:5000/",
         client_id: "interactive",
         // 登录后的回跳地址
         redirect_uri: "http://localhost:4100/",
         // 注销后的回跳地址
         post_logout_redirect_uri: "http://localhost:4100/signout-success",
         response_type: "code",
-        scope: "openid profile CoffeeAPI.read offline_access",
+        scope: "openid profile DynamicWebApi.all CoffeeAPI.read offline_access",
         // 自动刷新 token
         automaticSilentRenew: true,
         loadUserInfo: true,
@@ -64,32 +64,39 @@ const routes: RouteObject[] = [
           {
             index: true,
             path: "/",
-            // lazy: lazyComponent(() => import("pages/Welcome")),
-            element: <div>Welcome</div>,
+            lazy: lazyComponent(() => import("pages/Welcome")),
+            // element: <div>Welcome</div>,
           },
         ],
       },
       {
-        path: "/dashboard",
         lazy: lazyComponent(() => import("layouts/SecurityLayout")),
         children: [
           {
+            path: "/dashboard",
             // index: true,
-            lazy: lazyComponent(() => import("layouts/BasicLayout")),
-            children: [
-              {
-                index: true,
-                // lazy: lazyComponent(() => import("pages/Home")),
-                element: <div>Home</div>,
-              },
-            ],
+            // lazy: lazyComponent(() => import("layouts/BasicLayout")),
+            // children: [
+            //   {
+            // index: true,
+            lazy: lazyComponent(() => import("pages/Home")),
+            // element: <div>Home</div>,
+            // },
+            // ],
+          },
+
+          {
+            path: "/dynamic-object-management",
+            lazy: lazyComponent(() => import("pages/dynamic-object/management")),
+            // element: <div>Home</div>,
           },
         ],
       },
-      // {
-      //   path: "/signout-success",
-      //   lazy: lazyComponent(() => import("auth/SignOutSuccess")),
-      // },
+      {},
+      {
+        path: "/signout-success",
+        lazy: lazyComponent(() => import("auth/SignOutSuccess")),
+      },
     ],
   },
 ];

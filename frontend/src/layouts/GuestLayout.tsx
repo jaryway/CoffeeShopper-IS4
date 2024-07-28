@@ -7,7 +7,7 @@ const { Header, Footer } = Layout;
 
 const GuestLayout = () => {
   // const navigate = useNavigate();
-  // const auth = useAuth();
+  const auth = useAuth();
 
   return (
     <ConfigProvider
@@ -44,9 +44,9 @@ const GuestLayout = () => {
             {/* <UserInfo className="global-header-action" /> */}
 
             <div className="global-header-action">
-              {/* <Button type="primary" onClick={() => auth.signinRedirect()}>
+              <Button type="primary" onClick={() => auth.signinRedirect()}>
                 登录
-              </Button> */}
+              </Button>
             </div>
           </div>
         </Header>

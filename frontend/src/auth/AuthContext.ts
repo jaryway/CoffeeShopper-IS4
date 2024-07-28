@@ -24,6 +24,7 @@ export interface AuthContextValue extends AuthState {
   readonly events: UserManagerEvents;
   clearStaleState(): Promise<void>;
   getUser(): Promise<User | null>;
+  getAccessToken(): Promise<string>;
   removeUser(): Promise<void>;
   signinPopup(args?: SigninPopupArgs): Promise<User>;
   signinSilent(args?: SigninSilentArgs): Promise<User | null>;

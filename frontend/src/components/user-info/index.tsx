@@ -24,7 +24,7 @@ export default function UserInfo({ ...rest }: any) {
   const currentUser = user?.profile;
   const headImg = user?.profile.picture;
 
-  console.log("loading", currentUser);
+  // console.log("loading", currentUser);
 
   //   const currentUser = { userName: "小明", headImg: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" };
   const { name } = currentUser || {};
@@ -98,7 +98,7 @@ export default function UserInfo({ ...rest }: any) {
     },
   ];
 
-  console.log("currentUser", currentUser, name);
+  // console.log("currentUser", currentUser, name);
 
   return (
     <>

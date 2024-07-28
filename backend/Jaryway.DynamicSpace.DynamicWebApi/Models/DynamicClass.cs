@@ -35,16 +35,19 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Models
         /// </summary>
         public string EntityProperties_ { get; set; } = string.Empty;
 
-        public bool EntityPropertiesHasChanged()
+        public bool EntityPropertiesHasChanged
         {
-            var s1 = Regex.Replace(EntityProperties_, @"get;", " get; ");
-            s1 = Regex.Replace(s1, " set; ", " set; ");
-            s1 = Regex.Replace(s1, @"\s+", " ");
-            var s2 = Regex.Replace(EntityProperties_, @"get;", " get; ");
-            s2 = Regex.Replace(s2, " set; ", " set; ");
-            s2 = Regex.Replace(s2, @"\s+", " ");
+            get
+            {
+                var s1 = Regex.Replace(EntityProperties_, @"get;", " get; ");
+                s1 = Regex.Replace(s1, " set; ", " set; ");
+                s1 = Regex.Replace(s1, @"\s+", " ");
+                var s2 = Regex.Replace(EntityProperties_, @"get;", " get; ");
+                s2 = Regex.Replace(s2, " set; ", " set; ");
+                s2 = Regex.Replace(s2, @"\s+", " ");
 
-            return s1 == s2;
+                return s1 == s2;
+            }
         }
 
         public string JSON { get; set; } = string.Empty;

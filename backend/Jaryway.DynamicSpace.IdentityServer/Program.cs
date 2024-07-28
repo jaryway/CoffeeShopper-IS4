@@ -2,9 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Jaryway.DynamicSpace.IdentityServer;
 using Jaryway.DynamicSpace.IdentityServer.Data;
-using Microsoft.AspNetCore.CookiePolicy;
+using Jaryway.IdentityServer.Extensions;
 using Jaryway.IdentityServer;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 var seed = args.Contains("/seed");
 if (seed)
@@ -36,6 +35,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 
 //builder.Services.AddAuthorization(options=>options.AddPolicy());
 
+builder.Services.AddSameSiteCookiePolicy();
+
 builder.Services
     .AddIdentityServer()
     .AddRedirectUriValidator<PathOnlyRedirectUriValidator>()
@@ -57,33 +58,31 @@ builder.Services
     })
     .AddDeveloperSigningCredential();
 
-builder.Services.AddCookiePolicy(options =>
-{
-    options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-    options.Secure = CookieSecurePolicy.SameAsRequest;
-    options.OnAppendCookie = cookieContext =>
-        AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-    options.OnDeleteCookie = cookieContext =>
-        AuthenticationHelpers.CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-});
-
-var authenticationBuilder = builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = "oidc";
-
-        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultForbidScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    })
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-    {
-        options.Cookie.Name = IdentityServerConstants.DefaultCheckSessionCookieName;
-    });
+//builder.Services.AddAuthentication(IdentityServerConstants.DefaultCookieAuthenticationScheme)
+//    .AddCookie(IdentityServerConstants.DefaultCookieAuthenticationScheme, (options) =>
+//    {
+//        options.Cookie.SameSite = SameSiteMode.Lax;
+//        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+//    });
 
 
+//builder.Services
+//    .AddAuthentication(options =>
+//    {
+//        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+//        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//        options.DefaultForbidScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//        options.DefaultSignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    })
+//    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+//    {
+//        options.Cookie.Name = IdentityServerConstants.DefaultCheckSessionCookieName;
+//        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//        options.Cookie.SameSite = SameSiteMode.None;
+//    });
 
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -106,6 +105,7 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(myAllowSpecificOrigins);
+app.UseCookiePolicy();
 app.UseIdentityServer();
 
 app.UseAuthorization();

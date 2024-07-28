@@ -12,11 +12,11 @@ import {
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./BasicLayout.css";
-import UserInfo from "component/user-info";
+import UserInfo from "components/user-info";
 
 const { Header, Footer, Sider } = Layout;
 
-const BasicLayout = () => {
+const BasicLayout = (pros: { children?: JSX.Element }) => {
   const items: MenuProps["items"] = [
     { key: "1", icon: <PieChartOutlined />, label: "动态对象管理" },
     { key: "2", icon: <DesktopOutlined />, label: "Option 2" },
@@ -124,7 +124,8 @@ const BasicLayout = () => {
             </div>
           </Sider>
           <Layout style={{ overflow: "auto" }}>
-            <Outlet />
+            {/* <Outlet /> */}
+            {pros.children}
             <Footer className="footer" style={{ textAlign: "center" }}>
               版权所有 © 2023
             </Footer>
