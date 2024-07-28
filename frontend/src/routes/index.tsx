@@ -39,7 +39,7 @@ const RootComponent = () => {
         loadUserInfo: true,
         monitorSession: true,
         onSigninCallback() {
-          console.log("onSigninCallback");
+          // console.log("onSigninCallback");
           navigate("/dashboard");
         },
         onSignoutCallback() {
@@ -74,20 +74,23 @@ const routes: RouteObject[] = [
         children: [
           {
             path: "/dashboard",
-            // index: true,
-            // lazy: lazyComponent(() => import("layouts/BasicLayout")),
-            // children: [
-            //   {
-            // index: true,
             lazy: lazyComponent(() => import("pages/Home")),
-            // element: <div>Home</div>,
-            // },
-            // ],
           },
 
           {
-            path: "/dynamic-object-management",
-            lazy: lazyComponent(() => import("pages/dynamic-object/management")),
+            path: "/dynamic-object",
+            children: [
+              {
+                index: true,
+                path: "management",
+                lazy: lazyComponent(() => import("pages/dynamic-object/Management")),
+              },
+              {
+                path: "edit",
+                lazy: lazyComponent(() => import("pages/dynamic-object/Edit")),
+              },
+            ],
+
             // element: <div>Home</div>,
           },
         ],

@@ -114,7 +114,7 @@ const BasicLayout = (pros: { children?: JSX.Element }) => {
                       items={items}
                       style={{ borderRight: 0 }}
                       onClick={() => {
-                        navigate("/dynamic-object-management");
+                        navigate("/dynamic-object/management");
                       }}
                     />
                   </div>

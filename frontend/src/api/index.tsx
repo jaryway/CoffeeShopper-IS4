@@ -33,7 +33,7 @@ const ApiProvider = (props: PropsWithChildren<any>) => {
             Authorization: access_token ? ["Bearer", access_token].join(" ") : undefined,
           } as AxiosRequestHeaders,
         };
-        console.log("first", { access_token, headers });
+        // console.log("first", { access_token, headers });
         return headers;
       },
       (error) => Promise.reject(error)
