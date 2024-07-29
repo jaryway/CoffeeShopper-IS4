@@ -1,7 +1,5 @@
 import { Button, Result } from "antd";
-import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./use-auth";
 // import { settings } from "oidc/settings";
 // import { UserManager } from "oidc-client-ts";
 

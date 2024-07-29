@@ -1,18 +1,19 @@
-import { Button, FormInstance, Modal, Popconfirm, message } from "antd";
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import { Alert, Button, Popconfirm, message } from "antd";
 import { useRef, useState } from "react";
 import { useApi } from "api";
 import { type ActionType, ProColumns, ProTable, type ProTableProps } from "@ant-design/pro-table";
 import { CheckCircleOutlined, PlusOutlined, CheckCircleTwoTone } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import { useRequest } from "ahooks";
+import { ActionLink } from "components/action";
+import Edit from "./Edit";
 
 const Management = () => {
   //   const flag = useRef(false).current;
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const api = useApi();
   const actionRef = useRef<ActionType>();
-  const formRef = useRef<FormInstance>();
   const [open, setOpen] = useState(false);
   const [record, setRecord] = useState<any>();
 
@@ -36,67 +37,51 @@ const Management = () => {
     });
   };
 
-  const { loading, runAsync: publish } = useRequest(publishRequest, { manual: true });
-
-  const submit = async (data: any) => {
-    return api(`http://localhost:5003/api/Runtime/${data.id ? "Update/" + data.id : "Create"}`, {
-      method: data.id ? "PUT" : "POST",
-      data,
-    })
-      .then((resp) => {
-        if (resp.data) {
-          actionRef.current?.reload();
-          setOpen(false);
-          setRecord({});
-        }
-      })
-      .catch(() => {
-        message.error("操作成功");
-      });
-
-    // return resp;
-
-    // return api.get<any[]>("http://localhost:5003/api/Runtime/Query").then((resp) => resp.data);
-  };
-
-  // const { data: dataSource, loading } = useRequest(getDynamicObjects, {
-  //   onSuccess: (result, params) => {
-  //     //   setState("");
-  //     // message.success(`The username was changed to "${params[0]}"!`);
-  //   },
-  //   onError: (error) => {
-  //     message.error(error.message);
-  //   },
-  // });
+  const { loading, runAsync: publish } = useRequest(publishRequest, {
+    manual: true, //
+    onSuccess: () => {
+      actionRef.current?.reload();
+    },
+    onError() {
+      message.error("生成失败");
+    },
+  });
 
   const columns: ProColumns<any>[] = [
     {
       title: "名称",
       dataIndex: "name",
       key: "name",
+      formItemProps: {
+        required: true,
+      },
     },
     {
       title: "表名",
       dataIndex: "tableName",
       key: "tableName",
+      formItemProps: {
+        required: true,
+      },
       search: false,
     },
 
     {
-      title: "是否发布",
+      title: "是否生成",
       dataIndex: "published",
       key: "published",
       hideInForm: true,
-      render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CheckCircleOutlined color="error" />),
+      search: false,
+      render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CheckCircleOutlined />),
     },
     {
-      title: "属性发生变化",
+      title: "属性有更新",
       dataIndex: "entityPropertiesHasChanged",
       key: "entityPropertiesHasChanged",
       hideInForm: true,
       search: false,
       valueType: "text",
-      render: (text) => (text ? "是" : "否"),
+      render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CheckCircleOutlined />),
     },
     {
       title: "属性",
@@ -105,48 +90,47 @@ const Management = () => {
       key: "entityProperties",
       search: false,
       hideInTable: true,
+      formItemProps: {
+        required: true,
+      },
     },
     {
-      title: "描述",
-      dataIndex: "description",
-      key: "description",
+      title: "属性1",
+      dataIndex: "json",
+      valueType: "formList",
+      key: "json",
       search: false,
+      hideInTable: true,
+      formItemProps: {
+        required: true,
+      },
+      renderFormItem: () => {
+        return <div>sdf</div>;
+      },
     },
+    { title: "描述", dataIndex: "description", key: "description", search: false },
     {
       title: "操作",
       valueType: "option",
       key: "option",
       render: (text, record, _, action) => [
-        // eslint-disable-next-line jsx-a11y/anchor-is-valid
         <a
           key="editable"
           onClick={() => {
-            // action?.startEditable?.(record.id);
-            // navigate("/dynamic-object/edit/0");
             const { entityProperties_, ...rest } = record;
-
             setRecord({ ...rest, entityProperties: entityProperties_ });
             setOpen(true);
-            // setTimeout(() => {
-            //   console.log("rest", formRef.current);
-            //   // formRef.current?.resetFields({ ...rest, entityProperties: entityProperties_ });
-            //   // formRef.current?.setFieldsValue({ ...rest, entityProperties: entityProperties_ });
-            // }, 100);
           }}
         >
           编辑
         </a>,
-        <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-          查看
-        </a>,
-        // <TableDropdown
-        //   key="actionGroup"
-        //   onSelect={() => action?.reload()}
-        //   menus={[
-        //     { key: 'copy', name: '复制' },
-        //     { key: 'delete', name: '删除' },
-        //   ]}
-        // />,
+
+        <ActionLink
+          key="remove"
+          url={`http://localhost:5003/api/Runtime/Delete/${record.id}`}
+          onSuccess={() => actionRef.current?.reload()}
+          text="删除"
+        />,
       ],
     },
   ];
@@ -180,9 +164,14 @@ const Management = () => {
           >
             新建
           </Button>,
-          <Popconfirm title="您确定要发布吗" onConfirm={() => publish()}>
+          <Popconfirm
+            title="您确定要生成吗"
+            onConfirm={() => {
+              publish();
+            }}
+          >
             <Button key="generate" loading={loading}>
-              发布
+              生成
             </Button>
           </Popconfirm>,
         ]}
@@ -191,9 +180,10 @@ const Management = () => {
         columns={columns}
         // scroll={{ x: 3000 }}
       />
-      <Modal
+      <Alert style={{ marginTop: 16 }} message={<p>新建对象或更改属性后需要重新生成，才会生效。</p>} type="info" />
+      {/* <Modal
         open={open}
-        title="新建动态对象"
+        title={`新建动态对象`}
         footer={null}
         onClose={() => {
           console.log("onClose");
@@ -203,18 +193,22 @@ const Management = () => {
           console.log("onCancel");
           setOpen(false);
         }}
+        width={720}
       >
-        <ProTable
-          key={record?.id ? "edit" + record.id : "create"}
-          type="form"
-          columns={columns}
-          formRef={formRef}
-          form={{ initialValues: record }}
-          onSubmit={(values) => {
-            submit({ ...record, ...values });
-          }}
-        />
-      </Modal>
+        
+
+      </Modal> */}
+
+      <Edit
+        open={open}
+        record={record}
+        onCancel={() => {
+          setOpen(false);
+        }}
+        onOk={() => {
+          setOpen(false);
+        }}
+      />
     </div>
   );
 };

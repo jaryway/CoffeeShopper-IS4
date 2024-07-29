@@ -5,6 +5,7 @@ import { AuthContext, AuthContextValue } from "./AuthContext";
 import { initialAuthState } from "./AuthState";
 import { reducer } from "./reducer";
 import { hasAuthParams, signinError, signoutError } from "./utils";
+import { useNavigate } from "react-router-dom";
 
 const userManagerContextKeys = [
   "clearStaleState",
@@ -158,6 +159,7 @@ const AuthProvider = (props: AuthProviderProps) => {
     ...userManagerSettings
   } = props;
 
+  const navigate = useNavigate();
   const [userManager] = useState<UserManager>(() => {
     return userManagerProp || new UserManager(userManagerSettings as UserManagerSettings);
   });
@@ -225,6 +227,7 @@ const AuthProvider = (props: AuthProviderProps) => {
 
       dispatch({ type: "USER_SIGNED_OUT" });
       await userManager.removeUser();
+      navigate("/");
     };
 
     // event SilentRenewError (silent renew error)
@@ -243,7 +246,7 @@ const AuthProvider = (props: AuthProviderProps) => {
       userManager.events.removeUserSignedOut(handleUserSignedOut);
       userManager.events.removeSilentRenewError(handleSilentRenewError);
     };
-  }, [userManager]);
+  }, [userManager, navigate]);
 
   const removeUser = useCallback(async () => {
     if (!userManager) unsupported("removeUser");
@@ -255,8 +258,6 @@ const AuthProvider = (props: AuthProviderProps) => {
     return {
       settings: userManager.settings,
       events: userManager.events,
-
-      // getUser: async () => {},
 
       getAccessToken: async () => {
         const user = await userManager.getUser();

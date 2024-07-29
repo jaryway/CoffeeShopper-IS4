@@ -1,12 +1,11 @@
 import { useRequest } from "ahooks";
 import { Table } from "antd";
-import { useApi } from "api";
-import React from "react";
+
 
 const Home = () => {
   console.log("Home");
 
-  const api = useApi();
+
   const getList = async () => {
     // const d = await api.get("/api/Rumtime/Query");
     // return d.data;
