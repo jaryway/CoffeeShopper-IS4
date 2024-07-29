@@ -42,11 +42,11 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Models
                 var s1 = Regex.Replace(EntityProperties_, @"get;", " get; ");
                 s1 = Regex.Replace(s1, " set; ", " set; ");
                 s1 = Regex.Replace(s1, @"\s+", " ");
-                var s2 = Regex.Replace(EntityProperties_, @"get;", " get; ");
+                var s2 = Regex.Replace(EntityProperties, @"get;", " get; ");
                 s2 = Regex.Replace(s2, " set; ", " set; ");
                 s2 = Regex.Replace(s2, @"\s+", " ");
 
-                return s1 == s2;
+                return s1 != s2;
             }
         }
 

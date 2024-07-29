@@ -8,11 +8,46 @@ using Jaryway.DynamicSpace.DynamicWebApi.Models;
 using Jaryway.DynamicSpace.DynamicWebApi.Attributes;
 using System.ComponentModel.DataAnnotations.Schema;
 using Jaryway.DynamicSpace.DynamicWebApi.Controllers;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using Microsoft.OpenApi.Extensions;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi
 {
     public static class DynamicEntityExtensions
     {
+        private static string GetProperties(DynamicClass entity)
+        {
+            if (string.IsNullOrEmpty(entity.JSON))
+            {
+                return entity.EntityProperties;
+            }
+
+            var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(entity.JSON);
+
+            if (fields == null)
+            {
+                return "";
+            }
+
+            var fields_ = fields.Select(field =>
+            {
+                var dataType = field.DataType.GetDisplayName();
+                var defaultValue = field.DefaultValue;
+                var arr = new string[] { "public", dataType, field.Name, "{ get; set; }" }.ToList();
+
+                if (!string.IsNullOrEmpty(defaultValue))
+                {
+                    arr.Add("=");
+                    arr.Add(field.DataType == DynamicClassFieldDataType.TEXT ? $"\"{defaultValue}\"" : defaultValue);
+                }
+
+                return string.Join(" ", arr);
+            });
+
+            return string.Join("\r\n", fields_);
+
+        }
         public static string GenerateCode(this DynamicClass entity, bool designTime = false)
         {
             var genericTypeControllerType = typeof(GenericControllerAttribute);
@@ -30,7 +65,7 @@ using {genericTypeControllerType.Namespace};
 [Table(""Dynamic_{entity.TableName}"")]
 [{genericTypeController}(""api/{entity.Name}"")]
 public class {entity.Name} : {dynamicClassBaseType.Name}{{
-    {(designTime ? entity.EntityProperties_ : entity.EntityProperties)}
+    {(designTime ? entity.EntityProperties_ : GetProperties(entity))}
 }}";
             return code;
         }
