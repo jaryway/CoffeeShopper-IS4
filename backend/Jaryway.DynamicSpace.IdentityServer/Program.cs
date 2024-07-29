@@ -109,9 +109,13 @@ app.UseCookiePolicy();
 app.UseIdentityServer();
 
 app.UseAuthorization();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapDefaultControllerRoute();
-});
+
+
+app.MapControllerRoute
+(
+    name: "home",
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
+
 
 app.Run();
