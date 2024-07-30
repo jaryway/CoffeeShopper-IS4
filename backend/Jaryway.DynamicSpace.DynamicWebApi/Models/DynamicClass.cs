@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -35,6 +36,9 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Models
         /// </summary>
         public string EntityProperties_ { get; set; } = string.Empty;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool EntityPropertiesHasChanged
         {
             get
@@ -49,13 +53,23 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Models
                 return s1 != s2;
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        [DefaultValue("[{name:\"Name\",\"dataType\":0}]")]
         public string JSON { get; set; } = string.Empty;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Published { get; set; } = false;
-
+        /// <summary>
+        /// 
+        /// </summary>
         public int? ProjectId { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         [MaxLength(64)]
         public string? TenantId { get; set; }
 

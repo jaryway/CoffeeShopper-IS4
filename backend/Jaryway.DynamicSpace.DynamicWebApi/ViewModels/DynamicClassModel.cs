@@ -19,9 +19,13 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.ViewModels
         /// </summary>
         public string? Description { get; set; } = string.Empty;
         /// <summary>
-        /// 属性字段
+        /// 属性字段 EntityProperties 和 JSON 必填一个
         /// </summary>
-        [Required]
+        // [Required]
         public string EntityProperties { get; set; } = string.Empty;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string JSON { get; set; } = string.Empty;
     }
 }

@@ -1,5 +1,8 @@
 ﻿namespace Jaryway.DynamicSpace.DynamicWebApi.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class DynamicClassFieldDefinition
     {
         /// <summary>

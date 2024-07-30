@@ -14,13 +14,16 @@ using Microsoft.OpenApi.Extensions;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class DynamicEntityExtensions
     {
         private static string GetProperties(DynamicClass entity)
         {
             if (string.IsNullOrEmpty(entity.JSON))
             {
-                return entity.EntityProperties;
+                return entity.EntityProperties_;
             }
 
             var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(entity.JSON);
@@ -48,6 +51,12 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
             return string.Join("\r\n", fields_);
 
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="designTime"></param>
+        /// <returns></returns>
         public static string GenerateCode(this DynamicClass entity, bool designTime = false)
         {
             var genericTypeControllerType = typeof(GenericControllerAttribute);
@@ -65,7 +74,7 @@ using {genericTypeControllerType.Namespace};
 [Table(""Dynamic_{entity.TableName}"")]
 [{genericTypeController}(""api/{entity.Name}"")]
 public class {entity.Name} : {dynamicClassBaseType.Name}{{
-    {(designTime ? entity.EntityProperties_ : GetProperties(entity))}
+    {(designTime ? GetProperties(entity) : entity.EntityProperties)}
 }}";
             return code;
         }

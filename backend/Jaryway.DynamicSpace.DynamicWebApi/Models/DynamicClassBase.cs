@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class DynamicClassBase
     {
+        /// <summary>
+        /// 
+        /// </summary>
         [Key]
         public long Id { get; set; }
     }
