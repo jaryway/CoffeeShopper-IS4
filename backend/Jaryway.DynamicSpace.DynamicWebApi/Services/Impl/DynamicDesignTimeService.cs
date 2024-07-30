@@ -29,16 +29,30 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
             _dynamicAssemblyBuilder = DynamicAssemblyBuilder.GetInstance();
             _designTimeDynamicAssemblyBuilder = DynamicAssemblyBuilder.GetInstance(true);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
 
         public DynamicClass? Get(long id)
         {
             return _applicationDbContext.DynamicClasses.FirstOrDefault(m => m.Id == id);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<DynamicClass> GetList()
         {
             return _applicationDbContext.DynamicClasses.ToList();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dynamicClass"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public DynamicClass Create(DynamicClass dynamicClass)
         {
             if (_applicationDbContext.DynamicClasses.Any(m => m.Name == dynamicClass.Name))
@@ -65,6 +79,10 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
             return e;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="migrationName"></param>
         public void Generate(string? migrationName = null)
         {
             try

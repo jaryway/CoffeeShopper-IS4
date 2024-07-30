@@ -9,6 +9,9 @@ using System.Xml.Linq;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
@@ -17,7 +20,12 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
         private readonly ILogger<RuntimeController> _logger;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IDynamicDesignTimeService _dynamicDesignTimeService;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="dynamicDesignTimeService"></param>
+        /// <param name="applicationDbContext"></param>
         public RuntimeController(ILogger<RuntimeController> logger, IDynamicDesignTimeService dynamicDesignTimeService, ApplicationDbContext applicationDbContext)
         {
             _logger = logger;
@@ -45,7 +53,6 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
         [Route("Create")]
         public ActionResult<DynamicClassModel> Create([FromBody] DynamicClassModel model)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -55,6 +62,7 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
             entity.Name = model.Name;
             entity.TableName = model.TableName;
             entity.EntityProperties_ = model.EntityProperties;
+            entity.JSON = model.JSON;
 
             _dynamicDesignTimeService.Create(entity);
 
@@ -69,10 +77,6 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update/{id}")]
-        //[SwaggerResponse(HttpStatusCode.NotFound, Type = typeof(NotFoundResult))]
-        //[Swashbuckle.AspNetCore.Annotations.SwaggerIgnore]
-        //[SwaggerOperation(Summary = "", Description = "", OperationId = "", Tags = new[] { "" })]
-
         public ActionResult<DynamicClassModel> Update([FromRoute] long id, [FromBody] DynamicClassModel model)
         {
             var entity = _dynamicDesignTimeService.Get(id);

@@ -28,9 +28,9 @@ const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?:
     }
   };
 
-  const onFinish = (values: any) => {
+  const onFinish = ({ json, ...values }: any) => {
     console.log("values", values);
-    submit({ ...record, ...values });
+    submit({ ...record, ...values, json: JSON.stringify(json) });
   };
 
   return (
@@ -128,9 +128,9 @@ const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?:
                                   noStyle
                                 >
                                   <Select placeholder="请输入" style={{ width: "100%" }}>
-                                    <Option value={1}>TEXT</Option>
-                                    <Option value={2}>INTEGER</Option>
-                                    <Option value={3}>NUMERIC</Option>
+                                    <Option value={0}>TEXT</Option>
+                                    <Option value={1}>INTEGER</Option>
+                                    <Option value={2}>NUMERIC</Option>
                                   </Select>
                                 </Form.Item>
                               </td>

@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Jaryway.DynamicSpace.DynamicWebApi.Models;
-using Jaryway.DynamicSpace.DynamicWebApi.Attributes;
-using System.ComponentModel.DataAnnotations.Schema;
-using Jaryway.DynamicSpace.DynamicWebApi.Controllers;
-using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
+using Jaryway.DynamicSpace.DynamicWebApi.Attributes;
+using Jaryway.DynamicSpace.DynamicWebApi.Controllers;
+using Jaryway.DynamicSpace.DynamicWebApi.Models;
 using Microsoft.OpenApi.Extensions;
+using System.ComponentModel.DataAnnotations;
+using System;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi
 {
+
+
     /// <summary>
     /// 
     /// </summary>
     public static class DynamicEntityExtensions
     {
+
+
         private static string GetProperties(DynamicClass entity)
         {
             if (string.IsNullOrEmpty(entity.JSON))
@@ -26,7 +26,13 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
                 return entity.EntityProperties_;
             }
 
-            var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(entity.JSON);
+            var str = $"[{{\"name\":\"Name\",\"dataType\":1}}]";
+
+            var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(str, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = true
+            });
 
             if (fields == null)
             {
@@ -35,7 +41,10 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
 
             var fields_ = fields.Select(field =>
             {
-                var dataType = field.DataType.GetDisplayName();
+                //var dataType1 = field.DataType.GetDisplayName();
+                var attributeOfType = field.DataType.GetAttributeOfType<DisplayAttribute>();
+                var dataType = attributeOfType.Name ?? field.DataType.ToString();
+
                 var defaultValue = field.DefaultValue;
                 var arr = new string[] { "public", dataType, field.Name, "{ get; set; }" }.ToList();
 

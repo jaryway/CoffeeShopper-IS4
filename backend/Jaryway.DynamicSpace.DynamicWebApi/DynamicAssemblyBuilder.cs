@@ -108,7 +108,7 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
 
                 var query = context.DynamicClasses.AsQueryable();
 
-                query = DesignTime ? query.Where(p => p.EntityProperties_ != "") : query.Where(p => p.EntityProperties != "");
+                query = DesignTime ? query.Where(p => p.EntityProperties_ != "" || !string.IsNullOrEmpty(p.JSON)) : query.Where(p => p.EntityProperties != "");
 
                 query.ToList().ForEach(item =>
                 {
