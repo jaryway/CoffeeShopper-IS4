@@ -31,11 +31,12 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
 
             //var str = $"[{{\"name\":\"Name\",\"dataType\":1}}]";
 
-            var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(entity.JSON, new JsonSerializerOptions
+            var options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true
-            });
+            };
+            var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(entity.JSON, options);
 
             if (fields == null)
             {
