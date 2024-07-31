@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Jaryway.DynamicSpace.DynamicWebApi.Attributes;
 using Jaryway.DynamicSpace.DynamicWebApi.Controllers;
-using Jaryway.DynamicSpace.DynamicWebApi.Models;
+using Jaryway.DynamicSpace.DynamicWebApi.Entities;
 using Microsoft.OpenApi.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System;
@@ -17,18 +17,21 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
     /// </summary>
     public static class DynamicEntityExtensions
     {
-
-
-        private static string GetProperties(DynamicClass entity)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static string GetDesignTimeProperties(this DynamicClass entity)
         {
             if (string.IsNullOrEmpty(entity.JSON))
             {
                 return entity.EntityProperties_;
             }
 
-            var str = $"[{{\"name\":\"Name\",\"dataType\":1}}]";
+            //var str = $"[{{\"name\":\"Name\",\"dataType\":1}}]";
 
-            var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(str, new JsonSerializerOptions
+            var fields = JsonSerializer.Deserialize<IList<DynamicClassFieldDefinition>>(entity.JSON, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true
@@ -45,21 +48,27 @@ namespace Jaryway.DynamicSpace.DynamicWebApi
                 var attributeOfType = field.DataType.GetAttributeOfType<DisplayAttribute>();
                 var dataType = attributeOfType.Name ?? field.DataType.ToString();
 
+                // 对象引用
+                if (field.DataType == DynamicClassFieldDataType.REFERENCE)
+                {
+                    dataType = field.Reference;
+                }
+
                 var defaultValue = field.DefaultValue;
                 var arr = new string[] { "public", dataType, field.Name, "{ get; set; }" }.ToList();
 
                 if (!string.IsNullOrEmpty(defaultValue))
                 {
                     arr.Add("=");
-                    arr.Add(field.DataType == DynamicClassFieldDataType.TEXT ? $"\"{defaultValue}\"" : defaultValue);
+                    arr.Add(field.DataType == DynamicClassFieldDataType.TEXT ? $"\"{defaultValue}\";" : $"{defaultValue};");
                 }
 
                 return string.Join(" ", arr);
             });
 
             return string.Join("\r\n", fields_);
-
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -83,7 +92,7 @@ using {genericTypeControllerType.Namespace};
 [Table(""Dynamic_{entity.TableName}"")]
 [{genericTypeController}(""api/{entity.Name}"")]
 public class {entity.Name} : {dynamicClassBaseType.Name}{{
-    {(designTime ? GetProperties(entity) : entity.EntityProperties)}
+    {(designTime ? GetDesignTimeProperties(entity) : entity.EntityProperties)}
 }}";
             return code;
         }

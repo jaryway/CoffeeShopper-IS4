@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Jaryway.DynamicSpace.DynamicWebApi.Models
+namespace Jaryway.DynamicSpace.DynamicWebApi.Entities
 {
     /// <summary>
     /// 
@@ -22,5 +22,10 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Models
         /// </summary>
         [Display(Name = "decimel")]
         NUMERIC = 2,
+        /// <summary>
+        /// 
+        /// </summary>
+        [Display(Name = "REFERENCE")]
+        REFERENCE = 3
     }
 }

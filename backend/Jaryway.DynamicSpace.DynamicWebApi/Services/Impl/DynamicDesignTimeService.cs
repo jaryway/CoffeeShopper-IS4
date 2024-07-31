@@ -1,5 +1,5 @@
 ﻿using Jaryway.DynamicSpace.DynamicWebApi.Design;
-using Jaryway.DynamicSpace.DynamicWebApi.Models;
+using Jaryway.DynamicSpace.DynamicWebApi.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -11,6 +11,9 @@ using Pomelo.EntityFrameworkCore.MySql.Design.Internal;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class DynamicDesignTimeService : IDynamicDesignTimeService
     {
         private readonly ApplicationDbContext _applicationDbContext;
@@ -19,6 +22,12 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
         private readonly DynamicAssemblyBuilder _dynamicAssemblyBuilder;
         private readonly IServiceProvider _serviceProvider;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="applicationDbContext"></param>
+        /// <param name="dynamicDbContext"></param>
+        /// <param name="serviceProvider"></param>
         public DynamicDesignTimeService(ApplicationDbContext applicationDbContext,
             DynamicDesignTimeDbContext dynamicDbContext,
             IServiceProvider serviceProvider)
@@ -65,6 +74,11 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
 
             return dynamicClass;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dynamicClass"></param>
+        /// <returns></returns>
         public DynamicClass Update(DynamicClass dynamicClass)
         {
             _applicationDbContext.DynamicClasses.Update(dynamicClass);
@@ -72,6 +86,12 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
 
             return dynamicClass;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dynamicClass"></param>
+        /// <returns></returns>
         public int Remove(DynamicClass dynamicClass)
         {
             _applicationDbContext.DynamicClasses.Remove(dynamicClass);
@@ -193,7 +213,7 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Services.Impl
                 }
 
                 entity.Published = m.Kind == "create";
-                entity.EntityProperties = entity.EntityProperties_;
+                entity.EntityProperties = entity.GetDesignTimeProperties();
                 _applicationDbContext.DynamicClasses.Update(entity);
             });
 

@@ -8,8 +8,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Jaryway.DynamicSpace.DynamicWebApi.Models
+namespace Jaryway.DynamicSpace.DynamicWebApi.Entities
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Table("DynamicClasses")]
     public partial class DynamicClass
     {
@@ -43,7 +46,8 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Models
         {
             get
             {
-                var s1 = Regex.Replace(EntityProperties_, @"get;", " get; ");
+                var designTimeProperties = this.GetDesignTimeProperties();
+                var s1 = Regex.Replace(designTimeProperties, @"get;", " get; ");
                 s1 = Regex.Replace(s1, " set; ", " set; ");
                 s1 = Regex.Replace(s1, @"\s+", " ");
                 var s2 = Regex.Replace(EntityProperties, @"get;", " get; ");

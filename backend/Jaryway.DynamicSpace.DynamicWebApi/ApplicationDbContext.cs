@@ -1,4 +1,4 @@
-﻿using Jaryway.DynamicSpace.DynamicWebApi.Models;
+﻿using Jaryway.DynamicSpace.DynamicWebApi.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi;

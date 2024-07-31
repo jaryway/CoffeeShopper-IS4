@@ -1,4 +1,4 @@
-﻿namespace Jaryway.DynamicSpace.DynamicWebApi.Models
+﻿namespace Jaryway.DynamicSpace.DynamicWebApi.Entities
 {
     /// <summary>
     /// 
@@ -13,6 +13,10 @@
         /// 
         /// </summary>
         public DynamicClassFieldDataType DataType { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Reference { get; set; } = string.Empty;
         /// <summary>
         /// 默认值
         /// </summary>

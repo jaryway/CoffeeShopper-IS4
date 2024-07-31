@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jaryway.DynamicSpace.DynamicWebApi.Models
+namespace Jaryway.DynamicSpace.DynamicWebApi.Entities
 {
     /// <summary>
     /// 

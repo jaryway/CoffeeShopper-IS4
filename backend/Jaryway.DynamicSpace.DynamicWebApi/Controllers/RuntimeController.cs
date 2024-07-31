@@ -1,11 +1,9 @@
-﻿using Jaryway.DynamicSpace.DynamicWebApi.Models;
+﻿using Jaryway.DynamicSpace.DynamicWebApi.Entities;
 using Jaryway.DynamicSpace.DynamicWebApi.Services;
-using Jaryway.DynamicSpace.DynamicWebApi.ViewModels;
+using Jaryway.DynamicSpace.DynamicWebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Net;
-using Swashbuckle.AspNetCore.Annotations;
-using System.Xml.Linq;
+using Jaryway.DynamicSpace.DynamicWebApi.Mappers;
 
 namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
 {
@@ -39,9 +37,10 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("Query")]
-        public ActionResult<IEnumerable<DynamicClass>> Query()
+        public ActionResult<IEnumerable<DynamicClassModel>> Query()
         {
-            var list = _dynamicDesignTimeService.GetList();
+            var list = _dynamicDesignTimeService.GetList()
+                .Select(m => m.ToModel());
             return Ok(list);
         }
         /// <summary>
@@ -58,11 +57,13 @@ namespace Jaryway.DynamicSpace.DynamicWebApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var entity = new DynamicClass();
-            entity.Name = model.Name;
-            entity.TableName = model.TableName;
-            entity.EntityProperties_ = model.EntityProperties;
-            entity.JSON = model.JSON;
+            var entity = model.ToEntity()!;
+
+            //var entity = new DynamicClass();
+            //entity.Name = model.Name;
+            //entity.TableName = model.TableName;
+            //entity.EntityProperties_ = model.EntityProperties;
+            //entity.JSON = model.JSON;
 
             _dynamicDesignTimeService.Create(entity);
 

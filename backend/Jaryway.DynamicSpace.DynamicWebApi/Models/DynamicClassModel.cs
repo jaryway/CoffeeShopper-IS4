@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Jaryway.DynamicSpace.DynamicWebApi.ViewModels;
+namespace Jaryway.DynamicSpace.DynamicWebApi.Models;
 
 /// <summary>
 /// 
@@ -35,5 +35,9 @@ public class DynamicClassModel
     /// 
     /// </summary>
     public string JSON { get; set; } = string.Empty;
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool EntityPropertiesHasChanged { get; set; }
 }
 

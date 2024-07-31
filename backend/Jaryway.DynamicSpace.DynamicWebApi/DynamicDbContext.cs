@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Jaryway.DynamicSpace.DynamicWebApi.Attributes;
-using Jaryway.DynamicSpace.DynamicWebApi.Models;
+using Jaryway.DynamicSpace.DynamicWebApi.Entities;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 //using Microsoft.EntityFrameworkCore.Metadata.Builders;

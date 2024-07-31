@@ -1,4 +1,4 @@
-﻿using Jaryway.DynamicSpace.DynamicWebApi.Models;
+﻿using Jaryway.DynamicSpace.DynamicWebApi.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
