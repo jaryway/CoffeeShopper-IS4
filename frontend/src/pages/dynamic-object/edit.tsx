@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Checkbox, Form, Input, Select, Modal, InputNumber, message } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useApi } from "api";
 const { Option } = Select;
 
-const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?: () => void }) => {
-  const { record, open, onCancel, onOk } = props;
+const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?: () => void; references: string[] }) => {
+  const { record, references, open, onCancel, onOk } = props;
   const [form] = Form.useForm();
+  const jsonWatch = Form.useWatch("json", form) || [];
   const api = useApi();
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +34,12 @@ const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?:
     submit({ ...record, ...values, json: JSON.stringify(json) });
   };
 
+  useEffect(() => {
+    form.setFieldsValue(record || {});
+  }, [form, record]);
+
+  console.log("record", record, references);
+
   return (
     <Modal
       open={open}
@@ -53,7 +60,7 @@ const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?:
       confirmLoading={loading}
     >
       {open && (
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Form form={form} layout="vertical" onFinish={onFinish} initialValues={record}>
           <Form.Item name={"name"} label="名称" required>
             <Input />
           </Form.Item>
@@ -63,6 +70,7 @@ const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?:
           <Form.Item label="字段" required>
             <Form.List
               name="json"
+              // initialValue={record?.json}
               rules={[
                 {
                   validator: async (_, fields) => {
@@ -92,7 +100,9 @@ const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?:
                       </thead>
                       <tbody>
                         {fields.map(({ key, name, ...rest }, index) => {
-                          console.log("field", rest, key, name, index);
+                          console.log("field", jsonWatch[name]?.dataType, rest, key, name, index);
+                          const dataType = jsonWatch[name]?.dataType;
+                          const reference = jsonWatch[name]?.reference;
 
                           return (
                             <tr key={key}>
@@ -114,25 +124,39 @@ const Edit = (props: { record: any; open: boolean; onCancel?: () => void; onOk?:
                                 </Form.Item>
                               </td>
                               <td style={{ border: "solid 1px #ccc", padding: 4 }}>
-                                <Form.Item
-                                  {...rest}
-                                  name={[name, "dataType"]}
-                                  validateTrigger={["onChange", "onBlur"]}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      // whitespace: true,
-                                      message: "请选择数据类型",
-                                    },
-                                  ]}
-                                  noStyle
-                                >
-                                  <Select placeholder="请输入" style={{ width: "100%" }}>
-                                    <Option value={0}>TEXT</Option>
-                                    <Option value={1}>INTEGER</Option>
-                                    <Option value={2}>NUMERIC</Option>
-                                  </Select>
-                                </Form.Item>
+                                <div style={{ display: "flex", gap: 4 }}>
+                                  <Form.Item
+                                    {...rest}
+                                    name={[name, "dataType"]}
+                                    validateTrigger={["onChange", "onBlur"]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        // whitespace: true,
+                                        message: "请选择数据类型",
+                                      },
+                                    ]}
+                                    noStyle
+                                  >
+                                    <Select placeholder="请输入" style={{ flex: "auto" }}>
+                                      <Option value={0}>TEXT</Option>
+                                      <Option value={1}>INTEGER</Option>
+                                      <Option value={2}>NUMERIC</Option>
+                                      <Option value={3}>REFERENCE</Option>
+                                    </Select>
+                                  </Form.Item>
+                                  {dataType === 3 && (
+                                    <Form.Item name={[name, "reference"]} noStyle>
+                                      <Select style={{ minWidth: 100 }}>
+                                        {references.map((m) => (
+                                          <Option key={m} value={m}>
+                                            {m}
+                                          </Option>
+                                        ))}
+                                      </Select>
+                                    </Form.Item>
+                                  )}
+                                </div>
                               </td>
                               <td style={{ border: "solid 1px #ccc", padding: 4 }}>
                                 <Form.Item

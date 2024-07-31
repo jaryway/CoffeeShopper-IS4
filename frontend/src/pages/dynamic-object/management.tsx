@@ -16,10 +16,13 @@ const Management = () => {
   const actionRef = useRef<ActionType>();
   const [open, setOpen] = useState(false);
   const [record, setRecord] = useState<any>();
+  const references = useRef<string[]>([]);
 
   const request: ProTableProps<any, any>["request"] = () => {
     return api.get<any[]>("http://localhost:5003/api/Runtime/Query").then((resp) => {
       console.log("resp", resp.data);
+
+      references.current = resp.data.map((m) => m.name);
 
       return {
         data: resp.data,
@@ -117,8 +120,8 @@ const Management = () => {
         <a
           key="editable"
           onClick={() => {
-            const { entityProperties_, ...rest } = record;
-            setRecord({ ...rest, entityProperties: entityProperties_ });
+            const { entityProperties_, json, ...rest } = record;
+            setRecord({ ...rest, entityProperties: entityProperties_, json: JSON.parse(json || "[]") });
             setOpen(true);
           }}
         >
@@ -202,6 +205,7 @@ const Management = () => {
       <Edit
         open={open}
         record={record}
+        references={(references.current || []).filter((m) => m !== record?.name)}
         onCancel={() => {
           setOpen(false);
         }}
