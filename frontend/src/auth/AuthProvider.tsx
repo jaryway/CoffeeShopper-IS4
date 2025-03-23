@@ -178,7 +178,7 @@ const AuthProvider = (props: AuthProviderProps) => {
       try {
         // check if returning back from authority server
         if (hasAuthParams() && !skipSigninCallback) {
-          // console.log("signinCallback-11");
+          console.log("signinCallback-11");
           user = await userManager.signinCallback();
           // console.log("signinCallback-22", user);
 

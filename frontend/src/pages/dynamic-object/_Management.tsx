@@ -6,7 +6,7 @@ import { type ActionType, ProColumns, ProTable, type ProTableProps } from "@ant-
 import { CheckCircleOutlined, PlusOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { useRequest } from "ahooks";
 import { ActionLink } from "components/action";
-import Edit from "./Edit";
+import Edit from "./_Eedit";
 
 const Management = () => {
   //   const flag = useRef(false).current;

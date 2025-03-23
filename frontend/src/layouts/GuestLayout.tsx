@@ -39,14 +39,20 @@ const GuestLayout = () => {
             display: "flex",
           }}
         >
-          <div>DynamicSpace</div>
-          <div>
+          <div className="global-header-left">DynamicSpace</div>
+          <div className="global-header-right" style={{ display: "flex", alignItems: "center", lineHeight: 1 }}>
             {/* <UserInfo className="global-header-action" /> */}
 
             <div className="global-header-action">
-              <Button type="primary" onClick={() => auth.signinRedirect()}>
-                登录
-              </Button>
+              <a
+                href="/login"
+                onClick={(e) => {
+                  e.preventDefault();
+                  auth.signinRedirect();
+                }}
+              >
+                <span>登录</span>
+              </a>
             </div>
           </div>
         </Header>

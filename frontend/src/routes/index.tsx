@@ -26,14 +26,15 @@ const RootComponent = () => {
   return (
     <AuthProvider
       {...{
-        authority: "http://localhost:5000/",
+        authority: "https://localhost:5000/",
         client_id: "interactive",
+        client_secret: "49C1A7E1-0C79-4A89-A3D6-A37998FB86B0",
         // 登录后的回跳地址
         redirect_uri: "http://localhost:4100/",
         // 注销后的回跳地址
-        post_logout_redirect_uri: "http://localhost:4100/signout-success",
+        post_logout_redirect_uri: "http://localhost:4100",
         response_type: "code",
-        scope: "openid profile DynamicWebApi.all CoffeeAPI.read offline_access",
+        scope: "openid profile scope2 offline_access",
         // 自动刷新 token
         automaticSilentRenew: true,
         loadUserInfo: true,
@@ -83,11 +84,11 @@ const routes: RouteObject[] = [
               {
                 index: true,
                 path: "management",
-                lazy: lazyComponent(() => import("pages/dynamic-object/Management")),
+                lazy: lazyComponent(() => import("pages/dynamic-object/_Management")),
               },
               {
                 path: "edit",
-                lazy: lazyComponent(() => import("pages/dynamic-object/Edit")),
+                lazy: lazyComponent(() => import("pages/dynamic-object/_Eedit")),
               },
             ],
 

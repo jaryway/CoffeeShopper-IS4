@@ -48,11 +48,14 @@
   color: #fff;
   cursor: pointer;
   display: flex;
-  height: 48px;
-  line-height: 0;
-  padding: 0 8px;
+  height: 32px;
+  padding: 0 12px;
   transition: all .3s;
-
+  border-radius: 4px;
+  user-select: none;
+  a {
+    color: #fff;
+  }
 }
 
 .global-header-action .name {
@@ -60,5 +63,5 @@
 }
 
 .global-header-action:hover {
-  background: #69b1ff;
+  background: rgba(255,255,255,0.1);
 }
