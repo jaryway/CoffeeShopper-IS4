@@ -198,7 +198,7 @@ const Management = () => {
         }}
         width={720}
       >
-        
+
 
       </Modal> */}
 

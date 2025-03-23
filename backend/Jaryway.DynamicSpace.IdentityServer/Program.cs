@@ -46,7 +46,9 @@ builder.Services
         options.ConfigureDbContext = b =>
         {
             b.UseSqlite(defaultConnectionString, opt => opt.MigrationsAssembly(assembly));
+
         };
+        options.ApiResource.Name = "ids4_ApiResource";
 
     })
     .AddOperationalStore(options =>
@@ -55,6 +57,10 @@ builder.Services
         {
             b.UseSqlite(defaultConnectionString, opt => opt.MigrationsAssembly(assembly));
         };
+        options.DefaultSchema = "IdentityServer";
+        options.PersistedGrants.Name = "ids4_PersistedGrants";
+        options.DeviceFlowCodes.Name = "ids4_DeviceFlowCodes";
+
     })
     .AddDeveloperSigningCredential();
 
